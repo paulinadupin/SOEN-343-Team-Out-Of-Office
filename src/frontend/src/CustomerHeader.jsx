@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 
 
 
-function Header() {
+function CustomerHeader() {
     const cartItems = useState(0);
 
     return (
@@ -19,4 +19,4 @@ function Header() {
     )
 }
 
-export default Header
+export default CustomerHeader

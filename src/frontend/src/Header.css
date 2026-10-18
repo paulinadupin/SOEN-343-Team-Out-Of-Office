@@ -1,22 +1,36 @@
 header {
     display: flex;
-    vertical-align: center;
     align-items: center;
     background-color: var(--primary-color);
     gap: 30px;
     height: 100px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 24px;
 
-    .logo{
+    /* the operator/courier headers: &. means "this header, with this class" */
+    &.operator-header,
+    &.courier-header {
+        justify-content: space-between;
+    }
+
+    /* push the user icon to the far right and let nav fill the middle */
+    nav {
+        flex: 1;
+    }
+
+    .logo {
         width: 90px;
-        height:90px;
+        height: 90px;
     }
 
     .search-bar {
+        flex: 1;               /* fills the leftover space */
+        max-width: 700px;      /* optional: stops it getting absurdly wide */
         border: none;
         border-radius: 100px;
         padding: 0 16px;
         height: 46px;
-        width: 500px;
     }
 
     .cart-button {
@@ -27,14 +41,14 @@ header {
         line-height: 20px;
         display: flex;
         align-items: center;
-        /* gap: 8px; */
         max-width: 115px;
         font-size: 14px;
-        height:44px;
+        height: 44px;
     }
 
     .user-icon {
         width: 49px;
         height: 49px;
+        margin-left: auto;     /* keeps it on the right edge */
     }
 }
