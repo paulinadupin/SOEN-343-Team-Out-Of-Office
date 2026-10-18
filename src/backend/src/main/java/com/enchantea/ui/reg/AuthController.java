@@ -11,7 +11,8 @@ import com.enchantea.application.reg.AccountResponse;
 import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.application.reg.LoginRequest;
 import com.enchantea.application.reg.RegisterRequest;
-import com.enchantea.domain.user.User;
+import com.enchantea.domain.reg.User;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;

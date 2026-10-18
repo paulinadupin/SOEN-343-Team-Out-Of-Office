@@ -1,7 +1,7 @@
 package com.enchantea.application.reg;
 
-import com.enchantea.domain.user.AccountType;
-import com.enchantea.domain.user.User;
+import com.enchantea.domain.reg.AccountType;
+import com.enchantea.domain.reg.User;
 
 public class AccountResponse {
     private Long userId;

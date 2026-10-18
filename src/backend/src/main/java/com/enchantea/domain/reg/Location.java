@@ -1,4 +1,4 @@
-package com.enchantea.domain.user;
+package com.enchantea.domain.reg;
 
 import jakarta.persistence.Embeddable;
 

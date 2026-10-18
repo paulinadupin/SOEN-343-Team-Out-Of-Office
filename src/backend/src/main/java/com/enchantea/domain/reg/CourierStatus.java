@@ -1,4 +1,4 @@
-package com.enchantea.domain.user;
+package com.enchantea.domain.reg;
 
 public enum CourierStatus {
     OFFLINE,
