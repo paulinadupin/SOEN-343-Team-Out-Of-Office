@@ -1,7 +1,8 @@
 package com.enchantea.application.reg;
 
-import com.enchantea.domain.user.AccountType;
-import com.enchantea.domain.user.Location;
+import com.enchantea.domain.reg.AccountType;
+import com.enchantea.domain.reg.Location;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

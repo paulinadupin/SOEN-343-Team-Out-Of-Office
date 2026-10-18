@@ -13,13 +13,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.enchantea.domain.user.AccountType;
-import com.enchantea.domain.user.Courier;
-import com.enchantea.domain.user.Customer;
-import com.enchantea.domain.user.Location;
-import com.enchantea.domain.user.Operator;
-import com.enchantea.domain.user.Restaurant;
-import com.enchantea.domain.user.User;
+import com.enchantea.domain.reg.AccountType;
+import com.enchantea.domain.reg.Courier;
+import com.enchantea.domain.reg.Customer;
+import com.enchantea.domain.reg.Location;
+import com.enchantea.domain.reg.Operator;
+import com.enchantea.domain.reg.Restaurant;
+import com.enchantea.domain.reg.User;
 import com.enchantea.infrastructure.persistence.user.UserRepository;
 
 @SpringBootTest

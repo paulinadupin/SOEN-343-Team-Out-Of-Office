@@ -7,8 +7,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-import com.enchantea.domain.user.AccountType;
-import com.enchantea.domain.user.Location;
+import com.enchantea.domain.reg.AccountType;
+import com.enchantea.domain.reg.Location;
 import com.enchantea.infrastructure.persistence.user.UserRepository;
 
 @Component
