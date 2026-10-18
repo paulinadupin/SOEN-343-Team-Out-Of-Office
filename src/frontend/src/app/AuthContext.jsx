@@ -15,8 +15,8 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  async function login(email, password) {
-    const loggedInUser = await authApi.login(email, password);
+  async function login(username, password) {
+    const loggedInUser = await authApi.login(username, password);
     setUser(loggedInUser);
     return loggedInUser; // so the caller can redirect by role
   }

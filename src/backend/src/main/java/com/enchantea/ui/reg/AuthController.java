@@ -1,11 +1,13 @@
 package com.enchantea.ui.reg;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.enchantea.application.reg.AccountResponse;
 import com.enchantea.application.reg.AccountFacade;
@@ -42,6 +44,21 @@ public class AuthController {
         session.setAttribute("userId", user.getUserId());
         session.setAttribute("accountType", user.getAccountType().name());
         return AccountResponse.from(user);
+    }
+
+    @GetMapping("/me")
+    public AccountResponse currentUser(HttpServletRequest servletRequest) {
+        HttpSession session = servletRequest.getSession(false);
+        if (session == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
+        }
+
+        Object userId = session.getAttribute("userId");
+        if (!(userId instanceof Long)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
+        }
+
+        return AccountResponse.from(accountFacade.findById((Long) userId));
     }
 
     @PostMapping("/logout")

@@ -61,6 +61,12 @@ public class AccountFacade {
         return user;
     }
 
+    @Transactional(readOnly = true)
+    public User findById(Long userId) {
+        return users.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in"));
+    }
+
     private User createUser(RegisterRequest request, String passwordHash) {
         String username = request.getUsername();
         AccountType accountType = request.getAccountType();
