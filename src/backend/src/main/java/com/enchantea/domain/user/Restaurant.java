@@ -14,6 +14,7 @@ public class Restaurant extends User {
     private String name;
 
     @Enumerated(EnumType.STRING)
+    @Column(name="restaurant_status")
     private RestaurantStatus status;
 
     @Embedded

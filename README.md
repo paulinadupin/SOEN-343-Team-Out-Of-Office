@@ -14,21 +14,11 @@ cd src/backend
 
 The server runs on http://localhost:8080
 
-### Seed demo accounts
+### Seeded Accounts
 
-Start the backend with the `demo` profile to create one account per role:
-
-```powershell
-.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=demo
-```
-
-The usernames and shared demo password are configured in
-`src/backend/src/main/resources/application-demo.properties`. Existing accounts
-with these usernames are left unchanged. Demo accounts are only created with
-the `demo` profile; do not use these credentials for a public deployment.
+One account per role is seeded automatically every time the backend starts (see table below). The usernames and shared demo password are configured in application.properties. Existing accounts with these usernames are left unchanged, so restarting never creates duplicates. Do not use these credentials for a public deployment.
 
 | Role | Username | Password |
-|---|---|---|
 | Customer | `customer` | `pass1234` |
 | Restaurant | `restaurant` | `pass1234` |
 | Courier | `courier` | `pass1234` |
@@ -72,8 +62,8 @@ should use `credentials: "include"` so the session cookie is sent; the backend
 allows the Vite origin `http://localhost:5173` by default. Set
 `APP_CORS_ALLOWED_ORIGIN` to change it.
 
-Operator self-registration is enabled to support the requested account types;
-restrict it to an administrator or invitation flow before exposing registration
+For now, operator self-registration is enabled to support the requested account types;
+should be restricted later to an administrator or invitation flow before exposing registration
 to the public.
 
 ## Run the frontend

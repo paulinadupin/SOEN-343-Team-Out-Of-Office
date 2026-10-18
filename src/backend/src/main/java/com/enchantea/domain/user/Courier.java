@@ -12,6 +12,7 @@ import jakarta.persistence.Enumerated;
 @DiscriminatorValue("COURIER")
 public class Courier extends User{
     @Enumerated(EnumType.STRING)
+    @Column(name="courier_status")
     private CourierStatus status;
 
     @Embedded

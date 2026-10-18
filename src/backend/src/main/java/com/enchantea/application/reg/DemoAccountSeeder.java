@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import com.enchantea.domain.user.AccountType;
@@ -13,7 +12,6 @@ import com.enchantea.domain.user.Location;
 import com.enchantea.infrastructure.persistence.user.UserRepository;
 
 @Component
-@Profile("demo")
 public class DemoAccountSeeder implements ApplicationRunner {
     private static final Logger logger = LoggerFactory.getLogger(DemoAccountSeeder.class);
 
