@@ -19,6 +19,7 @@ The server runs on http://localhost:8080
 One account per role is seeded automatically every time the backend starts (see table below). The usernames and shared demo password are configured in application.properties. Existing accounts with these usernames are left unchanged, so restarting never creates duplicates. Do not use these credentials for a public deployment.
 
 | Role | Username | Password |
+|---|---|---|
 | Customer | `customer` | `pass1234` |
 | Restaurant | `restaurant` | `pass1234` |
 | Courier | `courier` | `pass1234` |
