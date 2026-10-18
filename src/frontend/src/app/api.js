@@ -1,9 +1,8 @@
 //Test for now
-// features/auth/api.js
 const USERS_KEY = "mock_users";
 const SESSION_KEY = "mock_session";
 
-// Fake "database": a few seed users, saved to localStorage so signups persist
+// Fake "database" to test for now
 function loadUsers() {
   const stored = localStorage.getItem(USERS_KEY);
   if (stored) return JSON.parse(stored);
