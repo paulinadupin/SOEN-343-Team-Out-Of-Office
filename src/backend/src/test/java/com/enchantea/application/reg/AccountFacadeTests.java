@@ -20,7 +20,7 @@ import com.enchantea.domain.reg.Location;
 import com.enchantea.domain.reg.Operator;
 import com.enchantea.domain.reg.Restaurant;
 import com.enchantea.domain.reg.User;
-import com.enchantea.infrastructure.persistence.user.UserRepository;
+import com.enchantea.foundation.reg.UserRepository;
 
 @SpringBootTest
 @TestPropertySource(properties = {

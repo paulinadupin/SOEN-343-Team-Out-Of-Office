@@ -1,4 +1,4 @@
-package com.enchantea.infrastructure.persistence.user;
+package com.enchantea.foundation.reg;
 
 import java.util.Optional;
 

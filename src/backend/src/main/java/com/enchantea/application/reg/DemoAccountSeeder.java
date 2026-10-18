@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Location;
-import com.enchantea.infrastructure.persistence.user.UserRepository;
+import com.enchantea.foundation.reg.UserRepository;
 
 @Component
 public class DemoAccountSeeder implements ApplicationRunner {
