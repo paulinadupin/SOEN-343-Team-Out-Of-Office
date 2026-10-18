@@ -1,0 +1,45 @@
+.restaurant-header {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+ 
+    .title {
+        font-size: var(--title);
+    }
+
+    .address {
+        font-size: var(--header4);
+    }
+
+    .status {
+        max-width:150px;
+        max-height:40px;
+        border: 2px solid;
+        border-radius: var(--default-radius);
+        font-size: var(--header4);
+
+        &.open {
+            border-color: var(--primary-color);
+            
+            svg circle {
+                fill: var(--primary-color);
+            }
+        }
+
+        &.paused {
+            border-color: var(--secondary-color);
+
+            svg circle {
+                fill: var(--secondary-color);
+            }
+        }
+
+        &.closed {
+            border-color: var(--tertiary-color);
+
+            svg circle {
+                fill: var(tertiary-color);
+            }
+        }
+    }
+}
