@@ -43,5 +43,11 @@
         width: 62px;
         height: 62px;
         text-align: center;
+        scale: 1;
+
+        &:hover {
+            scale: 1.1;
+            transition: scale 0.2s ease-in-out;
+        }
     }
 }
