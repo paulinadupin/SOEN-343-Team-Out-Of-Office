@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.DefaultApplicationArguments;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
@@ -35,7 +36,7 @@ class DemoAccountSeederTests {
 
     @Test
     void seedsExactlyOneAccountPerRole() {
-        seeder.run(null);
+        seeder.run(new DefaultApplicationArguments());
 
         List<User> seeded = users.findAll();
         Set<AccountType> roles = seeded.stream().map(User::getAccountType).collect(Collectors.toSet());
@@ -48,8 +49,8 @@ class DemoAccountSeederTests {
 
     @Test
     void runningTwiceDoesNotCreateDuplicates() {
-        seeder.run(null);
-        seeder.run(null);
+        seeder.run(new DefaultApplicationArguments());
+        seeder.run(new DefaultApplicationArguments());
 
         assertEquals(4, users.findAll().size());
     }
