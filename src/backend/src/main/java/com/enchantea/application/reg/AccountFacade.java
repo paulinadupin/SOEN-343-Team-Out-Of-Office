@@ -67,6 +67,15 @@ public class AccountFacade {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in"));
     }
 
+    @Transactional(readOnly = true)
+    public RestaurantResponse findRestaurantById(Long userId) {
+        User user = findById(userId);
+        if (!(user instanceof Restaurant restaurant)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Restaurant account required");
+        }
+        return RestaurantResponse.from(restaurant);
+    }
+
     private User createUser(RegisterRequest request, String passwordHash) {
         String username = request.getUsername();
         AccountType accountType = request.getAccountType();

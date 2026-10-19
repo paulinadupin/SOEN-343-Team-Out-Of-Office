@@ -13,6 +13,7 @@ import com.enchantea.application.reg.AccountResponse;
 import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.application.reg.LoginRequest;
 import com.enchantea.application.reg.RegisterRequest;
+import com.enchantea.application.reg.RestaurantResponse;
 import com.enchantea.domain.reg.User;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,6 +60,21 @@ public class AuthController {
         }
 
         return AccountResponse.from(accountFacade.findById((Long) userId));
+    }
+
+    @GetMapping("/restaurant/me")
+    public RestaurantResponse currentRestaurant(HttpServletRequest servletRequest) {
+        HttpSession session = servletRequest.getSession(false);
+        if (session == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
+        }
+
+        Object userId = session.getAttribute("userId");
+        if (!(userId instanceof Long)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
+        }
+
+        return accountFacade.findRestaurantById((Long) userId);
     }
 
     @PostMapping("/logout")
