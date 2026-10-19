@@ -1,0 +1,52 @@
+.user-menu {
+    position: relative;      /* anchors the dropdown to the icon */
+    margin-left: auto;       /* keeps it on the far right of the header */
+}
+
+.user-menu-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+}
+
+.user-menu-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;                /* aligns with the icon's right edge */
+    min-width: 180px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;            /* sits above the sidebar and page content */
+}
+
+.user-menu-dropdown a,
+.user-menu-dropdown button {
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    text-align: left;
+    font-size: 14px;
+    color: inherit;
+    text-decoration: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.user-menu-dropdown a:hover,
+.user-menu-dropdown button:hover {
+    background: #f0f0f0;
+}
+
+.user-menu-dropdown hr {
+    width: 100%;
+    border: none;
+    border-top: 1px solid #eee;
+    margin: 4px 0;
+}
