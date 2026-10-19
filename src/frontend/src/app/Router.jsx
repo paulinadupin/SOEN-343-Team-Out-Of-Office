@@ -8,6 +8,7 @@ import CustomerDashboard from "../customer/dashboard/CustomerDashboard";
 import Cart from "../customer/cart/Cart";
 import OrdersPage from "../restaurant/orders/OrdersPage";
 import Browse from "../customer/browse/Browse";
+import Register from "../components/Register";
 
 
 function RoleHome({ accountType }) {
@@ -18,6 +19,7 @@ export function AppRouter() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>

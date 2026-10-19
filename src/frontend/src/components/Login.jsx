@@ -48,6 +48,7 @@ export function Login() {
       {error && <p>{error}</p>}
       <button className="login button" type="submit">Log in</button>
     </form>
+    <a href="/register">Don't have an account? Register</a>
     </div>
   );
 }

@@ -25,4 +25,10 @@
         height:44px;
     }
     
+    a {
+        color: var(--accent-color);
+        text-decoration: none;
+        font-size: 14px;
+        margin-top: 10px;
+    }
 }
