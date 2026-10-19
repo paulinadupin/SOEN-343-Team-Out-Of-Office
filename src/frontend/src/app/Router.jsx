@@ -43,6 +43,21 @@ export function AppRouter() {
             <Route path="/operator" element={<RoleHome accountType={ROLES.OPERATOR} />} />
           </Route>
 
+          {/* 
+            <Routes>
+        <Route path="/op-dash" element={<OperatorLayout />}>
+          <Route index element={<OperatorDashboard />} />
+  <Route path="orders" element={<OperatorOrders />} />
+        </Route>
+        <Route path="/courier" element={<CourierLayout />}>
+  <Route index element={<CourierDashboard />} />
+  <Route path="deliveries" element={<CourierDeliveries />} />
+  <Route path="history" element={<CourierHistory />} />
+  <Route path="earnings" element={<CourierEarnings />} />
+</Route>
+        </Routes>
+          */}
+
         </Route>
       </Route>
 

@@ -1,0 +1,14 @@
+
+.sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  padding: 1rem;
+  background: #f4f4f4;
+  border-right: 1px solid #ddd;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
