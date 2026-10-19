@@ -21,7 +21,7 @@ function mapAccount(account) {
   return {
     id: account.userId,
     username: account.username,
-    role: account.accountType.toLowerCase(),
+    accountType: account.accountType,
   };
 }
 
@@ -36,6 +36,10 @@ export async function login(username, password) {
 export async function getCurrentUser() {
   const account = await request("/api/auth/me");
   return mapAccount(account);
+}
+
+export async function getCurrentRestaurant() {
+  return request("/api/auth/restaurant/me");
 }
 
 export async function logout() {
