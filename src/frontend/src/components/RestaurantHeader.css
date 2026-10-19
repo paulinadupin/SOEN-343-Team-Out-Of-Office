@@ -19,7 +19,7 @@
         border-radius: var(--default-radius);
         font-size: var(--header4);
 
-        &.open {
+        &.OPEN {
             border-color: var(--primary-color);
             
             svg circle {
@@ -27,7 +27,7 @@
             }
         }
 
-        &.paused {
+        &.PAUSED {
             border-color: var(--secondary-color);
 
             svg circle {
@@ -35,11 +35,11 @@
             }
         }
 
-        &.closed {
+        &.CLOSED {
             border-color: var(--tertiary-color);
 
             svg circle {
-                fill: var(tertiary-color);
+                fill: var(--tertiary-color);
             }
         }
     }

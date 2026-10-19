@@ -50,4 +50,9 @@
             transition: scale 0.2s ease-in-out;
         }
     }
+
+    .edit-icon {
+        width: 30px;
+        height: 30px;
+    }
 }

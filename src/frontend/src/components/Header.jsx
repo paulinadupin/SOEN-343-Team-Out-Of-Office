@@ -2,10 +2,11 @@ import './Header.css'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
+import { useCart } from '../app/useCart'
 
 function Header() {
-    const [cartItems] = useState(0);
     const { user, logout } = useAuth();
+    const { itemCount } = useCart();
     const navigate = useNavigate();
     const [menuOpen, setMenuOpen] = useState(false)
 
@@ -17,10 +18,20 @@ function Header() {
 
     return (
         <header>
-            <img className="logo" src="./logo.png" alt="Logo"></img>
+            <img className="logo" src="./logo.png" alt="Logo" onClick={() => navigate('/')}></img>
             <h1>Enchantea</h1>
-            <input className="search-bar" type="text" placeholder="Search shops"></input>
-            <button className="cart-button">Cart {cartItems}</button>
+            {user && user.accountType === 'CUSTOMER' && (
+                <div className="customer-header">
+                    <p>Deliver to {user.address}</p>
+                    <input className="search-bar" type="text" placeholder="Search shops"></input>
+                    <button className="cart-button" onClick={()=> navigate('/cart')}>Cart · {itemCount}</button>
+                </div>
+            )}
+
+            {user && user.accountType === 'RESTAURANT' && (
+                <button onClick={() => navigate('/orders')}>View Orders</button>
+            )}
+
             {user ? (
                 <div className="user-menu">
                     <img
@@ -31,7 +42,7 @@ function Header() {
                     />
                     {menuOpen && (
                         <div className="user-dropdown">
-                            <p>{user.name}</p>
+                            <p>{user.username}</p>
                             <button onClick={handleLogout}>Log out</button>
                         </div>
                     )}

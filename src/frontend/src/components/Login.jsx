@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../app/AuthContext";
-import { HOME_BY_ROLE } from "../app/roles";
+import { HOME_BY_ACCOUNT_TYPE } from "../app/roles";
+import "./Login.css";
 
 export function Login() {
   const { login } = useAuth();
@@ -18,14 +19,17 @@ export function Login() {
       const user = await login(username, password);
       // Send them back to the page they tried to visit, else their role's home
       const from = location.state?.from?.pathname;
-      navigate(from || HOME_BY_ROLE[user.role], { replace: true });
+      navigate(from || HOME_BY_ACCOUNT_TYPE[user.accountType], { replace: true });
     } catch {
       setError("Invalid username or password");
     }
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <div className="login">
+      <h1>Login</h1>
+      <form onSubmit={handleSubmit}>
+        <label>Username</label>
       <input
         type="text"
         value={username}
@@ -33,6 +37,7 @@ export function Login() {
         placeholder="Username"
         required
       />
+      <label>Password</label>
       <input
         type="password"
         value={password}
@@ -41,7 +46,8 @@ export function Login() {
         required
       />
       {error && <p>{error}</p>}
-      <button type="submit">Log in</button>
+      <button className="login button" type="submit">Log in</button>
     </form>
+    </div>
   );
 }

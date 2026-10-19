@@ -11,12 +11,20 @@ header {
         height:90px;
     }
 
+    .customer-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+    }
+
     .search-bar {
         border: none;
         border-radius: 100px;
         padding: 0 16px;
         height: 46px;
         width: 500px;
+        visibility: hidden;  /* Hide the search bar for now */
     }
 
     .cart-button {
