@@ -1,0 +1,11 @@
+.browse {
+    display :flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .menu-items {
+        display :flex;
+        flex-direction: row;
+        gap: 20px;
+    }
+}

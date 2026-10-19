@@ -1,0 +1,10 @@
+.cart-item {
+    display:flex;
+    flex-direction: row;
+    gap: 20px;
+    border: 1px solid var(--accent-color);
+
+    .price {
+        color: var(--accent-color);
+    }
+}
