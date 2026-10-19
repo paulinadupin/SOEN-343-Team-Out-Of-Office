@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "./AuthContext";
-import { HOME_BY_ROLE } from "./roles";
+import { HOME_BY_ACCOUNT_TYPE } from "./roles";
 
 export function ProtectedRoute({ role }) {
   const { user, loading } = useAuth();
@@ -12,8 +12,8 @@ export function ProtectedRoute({ role }) {
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />;
 
   // Logged in but wrong role -> bounce to their own home
-  if (role && user.role !== role) {
-    return <Navigate to={HOME_BY_ROLE[user.role]} replace />;
+  if (role && user.accountType !== role) {
+    return <Navigate to={HOME_BY_ACCOUNT_TYPE[user.accountType]} replace />;
   }
 
   return <Outlet />;

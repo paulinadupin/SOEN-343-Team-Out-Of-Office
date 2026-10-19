@@ -3,6 +3,16 @@ import AppLayout  from "../components/AppLayout";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { Login } from "../components/Login";
 import { ROLES } from "./roles";
+import RestaurantDashboard from "../restaurant/dashboard/RestaurantDashboard";
+import CustomerDashboard from "../customer/dashboard/CustomerDashboard";
+import Cart from "../customer/cart/Cart";
+import OrdersPage from "../restaurant/orders/OrdersPage";
+import Browse from "../customer/browse/Browse";
+
+
+function RoleHome({ accountType }) {
+  return <h1>{accountType} home</h1>;
+}
 
 export function AppRouter() {
   return (
@@ -13,16 +23,23 @@ export function AppRouter() {
         <Route element={<AppLayout />}>
 
           <Route element={<ProtectedRoute role={ROLES.CUSTOMER} />}>
-            <Route path="/" element={< AppLayout />} />
-            <Route path="/browse" element={< AppLayout/>} />
-            <Route path="/checkout" element={< AppLayout/>} />
+            <Route path="/" element={<CustomerDashboard />} />
+            <Route path="/browse" element={<Browse />} />
+            <Route path="/cart" element={<Cart />} />
           </Route>
 
-          {/* <Route element={<ProtectedRoute role={ROLES.RESTAURANT} />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/menu" element={<MenuManagement />} />
-            <Route path="/incoming-orders" element={<IncomingOrders />} />
-          </Route> */}
+          <Route element={<ProtectedRoute role={ROLES.RESTAURANT} />}>
+            <Route path="/dashboard" element={<RestaurantDashboard />} />
+            <Route path="/orders" element={<OrdersPage />} /> 
+          </Route>
+
+          <Route element={<ProtectedRoute role={ROLES.COURIER} />}>
+            <Route path="/courier" element={<RoleHome accountType={ROLES.COURIER} />} />
+          </Route>
+
+          <Route element={<ProtectedRoute role={ROLES.OPERATOR} />}>
+            <Route path="/operator" element={<RoleHome accountType={ROLES.OPERATOR} />} />
+          </Route>
 
         </Route>
       </Route>

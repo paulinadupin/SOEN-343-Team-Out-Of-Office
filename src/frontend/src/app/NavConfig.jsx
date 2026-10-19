@@ -1,4 +1,4 @@
-
+import { ROLES } from "./roles";
 
 export const navConfig = {
     [ROLES.CUSTOMER]: {
