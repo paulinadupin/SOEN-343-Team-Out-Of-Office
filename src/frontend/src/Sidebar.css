@@ -12,3 +12,24 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.sidebar a {
+  color: inherit;
+  padding: 0.5rem;
+  text-decoration: none;
+}
+
+.sidebar a.active {
+  background: #ddd;
+  font-weight: 600;
+}
+
+.page-layout {
+  display: flex;
+  min-height: calc(100vh - 80px);
+}
+
+.page-content {
+  flex: 1;
+  padding: 1.5rem;
+}

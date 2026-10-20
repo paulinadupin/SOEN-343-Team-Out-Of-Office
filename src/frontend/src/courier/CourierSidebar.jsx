@@ -1,4 +1,4 @@
-import './Sidebar.css'
+import '../Sidebar.css'
 import { NavLink } from 'react-router-dom'
 
 function CourierSidebar() {
@@ -7,9 +7,9 @@ function CourierSidebar() {
             <h2>Courier</h2>
             <nav>
                 <NavLink to="/courier" end>Overview</NavLink>
-                <NavLink to="/courier/deliveries">Deliveries</NavLink>
-                <NavLink to="/courier/history">History</NavLink>
-                <NavLink to="/courier/earnings">Earnings</NavLink>
+                <NavLink to="/deliveries">Deliveries</NavLink>
+                <NavLink to="/history">History</NavLink>
+                <NavLink to="/earnings">Earnings</NavLink>
             </nav>
         </aside>
     )

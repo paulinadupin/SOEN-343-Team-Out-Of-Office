@@ -9,17 +9,20 @@ import Cart from "../customer/cart/Cart";
 import OrdersPage from "../restaurant/orders/OrdersPage";
 import Browse from "../customer/browse/Browse";
 import Register from "../components/Register";
-
-
-function RoleHome({ accountType }) {
-  return <h1>{accountType} home</h1>;
-}
+import OperatorDashboard from "../operator/dashboard/OperatorDashboard";
+import OperatorOrders from "../operator/dashboard/OperatorOrders";
+import CourierDashboard from "../courier/CourierDashboard";
+import CourierDeliveries from "../courier/CourierDeliveries";
+import CourierHistory from "../courier/CourierHistory";
+import CourierEarnings from "../courier/CourierEarnings";
 
 export function AppRouter() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
+      <Route element={<AppLayout />}>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
 
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
@@ -36,28 +39,16 @@ export function AppRouter() {
           </Route>
 
           <Route element={<ProtectedRoute role={ROLES.COURIER} />}>
-            <Route path="/courier" element={<RoleHome accountType={ROLES.COURIER} />} />
+            <Route path="/courier" element={<CourierDashboard/>} />
+            <Route path="/deliveries" element={<CourierDeliveries />} />
+            <Route path="/history" element={<CourierHistory />} />
+            <Route path="/earnings" element={<CourierEarnings />} />
           </Route>
 
           <Route element={<ProtectedRoute role={ROLES.OPERATOR} />}>
-            <Route path="/operator" element={<RoleHome accountType={ROLES.OPERATOR} />} />
+            <Route path="/operator" element={ <OperatorDashboard/>} />
+            <Route path="/operator/orders" element={<OperatorOrders />} />
           </Route>
-
-          {/* 
-            <Routes>
-        <Route path="/op-dash" element={<OperatorLayout />}>
-          <Route index element={<OperatorDashboard />} />
-  <Route path="orders" element={<OperatorOrders />} />
-        </Route>
-        <Route path="/courier" element={<CourierLayout />}>
-  <Route index element={<CourierDashboard />} />
-  <Route path="deliveries" element={<CourierDeliveries />} />
-  <Route path="history" element={<CourierHistory />} />
-  <Route path="earnings" element={<CourierEarnings />} />
-</Route>
-        </Routes>
-          */}
-
         </Route>
       </Route>
 

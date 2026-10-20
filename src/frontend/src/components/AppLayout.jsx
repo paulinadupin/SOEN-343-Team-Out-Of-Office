@@ -1,15 +1,19 @@
 import Header from "./Header";
-import RestaurantHeader from "./RestaurantHeader";
-import MenuItem from "./MenuItem";
 import { Outlet } from "react-router-dom";
+import Sidebar from "./Sidebar";
 
-function AppLayout(){
-    return(
-        <div>
+function AppLayout() {
+    return (
+        <div className="app">
             <Header />
-            <Outlet />
+            <div className="page-layout">
+                <Sidebar />
+                <main className="page-content">
+                    <Outlet />
+                </main>
+            </div>
         </div>
-    )
+    );
 }
 
 export default AppLayout;
