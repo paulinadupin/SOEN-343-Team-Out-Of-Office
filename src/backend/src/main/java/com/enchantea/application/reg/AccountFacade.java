@@ -92,10 +92,16 @@ public class AccountFacade {
                         username,
                         passwordHash,
                         requireName(request.getName()),
-                        RestaurantStatus.CLOSED,
+                        request.getRestaurantStatus() == null
+                                ? RestaurantStatus.CLOSED
+                                : request.getRestaurantStatus(),
                         requireLocation(request.getPosition(), "position"));
             case COURIER:
-                return new Courier(username, passwordHash, CourierStatus.OFFLINE, request.getPosition());
+                return new Courier(
+                        username,
+                        passwordHash,
+                        request.getCourierStatus() == null ? CourierStatus.OFFLINE : request.getCourierStatus(),
+                        requireLocation(request.getPosition(), "position"));
             case OPERATOR:
                 return new Operator(username, passwordHash);
             default:

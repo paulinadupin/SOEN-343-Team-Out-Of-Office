@@ -11,7 +11,9 @@ async function request(path, options = {}) {
   });
 
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
+    const body = await response.json().catch(() => null);
+    const message = body?.detail || body?.message || body?.error;
+    throw new Error(message || `Request failed with status ${response.status}`);
   }
 
   return response.status === 204 ? null : response.json();
@@ -31,6 +33,14 @@ export async function login(username, password) {
     body: JSON.stringify({ username, password }),
   });
   return mapAccount(account);
+}
+
+export async function register(account) {
+  const response = await request("/api/auth/register", {
+    method: "POST",
+    body: JSON.stringify(account),
+  });
+  return mapAccount(response);
 }
 
 export async function getCurrentUser() {
