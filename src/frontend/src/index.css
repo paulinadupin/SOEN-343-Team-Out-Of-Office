@@ -16,6 +16,10 @@
   --header4: 24px;
 
   --default-radius: 15px;
+
+  --input-height: 30px;
+  --input-width: 200px;
+  --input-padding: 0 16px;
 }
 
 body{
@@ -28,4 +32,12 @@ body{
   color: var(--text-color);
   font-family: "Inder", sans-serif;
   font-weight: 400;
+}
+
+input[type="text"], input[type="password"] {
+  border: 2px solid var(--accent-color);
+  border-radius: var(--default-radius);
+  padding: var(--input-padding);
+  height: var(--input-height);
+  width: var(--input-width);
 }

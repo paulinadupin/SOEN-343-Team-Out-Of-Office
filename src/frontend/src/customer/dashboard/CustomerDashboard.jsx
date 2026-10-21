@@ -12,7 +12,6 @@ function CustomerDashboard() {
             <div className="restaurant-list">
                 {/* TODO: Get the list of restaurants from the backend */}
                 <RestaurantProfile name="Bubble Tea House" address="123 Main St, City, Country" status="Open" />
-                <button onClick={() => navigate('/browse')}>Browse Menu</button>
             </div>
         </div>
     )

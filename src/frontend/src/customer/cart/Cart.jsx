@@ -17,7 +17,12 @@ function Cart() {
             {items.length === 0 ? (
                 <p>Your cart is empty.</p>
             ) : (
-                <>
+                <div className="cart items">
+                    <div className="cart header">
+                        <p>Item</p>
+                        <p>Quantity</p>
+                        <p>Price</p>
+                    </div>
                     {items.map((item) => (
                         <CartItem key={item.name} item={item} />
                     ))}
@@ -28,7 +33,7 @@ function Cart() {
                         alert("Order placed!");
                         navigate("/");
                     }}>Place Order</button>
-                </>
+                </div>
             )}
         </div>
     )
