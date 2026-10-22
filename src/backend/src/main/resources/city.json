@@ -1,0 +1,13 @@
+{
+  "restaurants": [
+    {
+      "username": "restaurant",
+      "status": "OPEN",
+      "menu": [
+        { "id": "classic-milk-tea", "name": "Classic Milk Tea", "price": 4.99, "status": "AVAILABLE" },
+        { "id": "taro-milk-tea", "name": "Taro Milk Tea", "price": 5.99, "status": "AVAILABLE" },
+        { "id": "matcha-latte", "name": "Matcha Latte", "price": 5.49, "status": "SOLD_OUT" }
+      ]
+    }
+  ]
+}
