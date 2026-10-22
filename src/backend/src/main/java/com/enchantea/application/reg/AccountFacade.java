@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import jakarta.servlet.http.HttpSession;
+
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.CourierStatus;
@@ -59,6 +61,22 @@ public class AccountFacade {
         }
 
         return user;
+    }
+
+    @Transactional(readOnly = true)
+    public User requireLoggedIn(HttpSession session) {
+        if (session == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        Object userId = session.getAttribute("userId");
+        if (!(userId instanceof Long)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        return users.findById((Long) userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Authentication required"));
     }
 
     private User createUser(RegisterRequest request, String passwordHash) {
