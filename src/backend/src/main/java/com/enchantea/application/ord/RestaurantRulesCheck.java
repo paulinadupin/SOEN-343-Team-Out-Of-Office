@@ -1,33 +1,35 @@
-package com.enchantea.application.ord.temp;
+package com.enchantea.application.ord;
 
-import com.enchantea.application.ord.OrderCommands;
 import com.enchantea.application.ord.contracts.CommandRejectedException;
 import com.enchantea.application.ord.contracts.CommandType;
-import com.enchantea.application.ord.contracts.CommandValidator;
 import com.enchantea.application.ord.contracts.CurrentUser;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
-import org.springframework.stereotype.Component;
 
-/** TEMP validator. Replace this with Person B's real validation chain. */
-@Component
-public class TempCommandValidator implements CommandValidator {
+public class RestaurantRulesCheck extends CommandCheck {
+    private final OrderRepository orders;
     private final RestaurantQuery restaurantQuery;
 
-    public TempCommandValidator(RestaurantQuery restaurantQuery) {
+    public RestaurantRulesCheck(OrderRepository orders, RestaurantQuery restaurantQuery) {
+        this.orders = orders;
         this.restaurantQuery = restaurantQuery;
     }
 
     @Override
-    public void validate(CommandType type, CurrentUser user, Object command) {
-        if (user == null || user.id() == null || user.id().isBlank() || user.role() == null) {
-            throw new CommandRejectedException("A current user is required");
+    protected void verify(CommandType type, CurrentUser user, Object command) {
+        if (type == CommandType.PLACE_ORDER) {
+            verifyPlaceOrder((OrderCommands.PlaceOrder) command);
+        } else if (type == CommandType.ACCEPT_ORDER) {
+            String orderId = ((OrderCommands.OrderAction) command).orderId();
+            String restaurantId = orders.findById(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException(orderId))
+                    .restaurantId();
+            if (!restaurantQuery.isOpen(restaurantId)) {
+                throw new CommandRejectedException("The restaurant is closed");
+            }
         }
+    }
 
-        if (type != CommandType.PLACE_ORDER) {
-            return;
-        }
-
-        OrderCommands.PlaceOrder place = (OrderCommands.PlaceOrder) command;
+    private void verifyPlaceOrder(OrderCommands.PlaceOrder place) {
         if (place.restaurantId() == null || place.restaurantId().isBlank()) {
             throw new CommandRejectedException("A restaurant is required");
         }
