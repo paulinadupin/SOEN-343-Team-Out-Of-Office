@@ -1,6 +1,7 @@
 package com.enchantea.application.ord;
 
 import com.enchantea.domain.ord.MenuItem;
+import com.enchantea.domain.reg.Location;
 import com.enchantea.domain.reg.Restaurant;
 import com.enchantea.foundation.reg.UserRepository;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class CityConfigLoader {
             }
 
             restaurant.setStatus(config.status());
+            restaurant.setPosition(new Location(config.position().lat(), config.position().lng()));
             users.save(restaurant);
 
             List<MenuItem> items = config.menu().stream()
