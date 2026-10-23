@@ -6,3 +6,5 @@ For REG requirements, GenAI was used to help us out in the placement of certain 
 For ORD requirements, GenAI was used to help implement the order lifecycle using the State pattern, and to record and publish order events using the Observer pattern. It also helped create the ORD application service, REST controller, in-memory order repository and temporary adapters for interfaces.
 
 GenAI was also used to connect the REG implementation to the ORD implementation in various controllers such as AuthController and OrderController.
+
+For the Frontend of the project GenAI was used to create the user type specific page elements for the developed web page pattern. GenAi was also used to proofread, debug code and connect the different FrontEnd elements to their Backend implementation.
