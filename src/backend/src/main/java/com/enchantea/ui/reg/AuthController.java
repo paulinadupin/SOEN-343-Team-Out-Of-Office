@@ -79,7 +79,9 @@ public class AuthController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void logout(HttpSession session) {
+    public void logout(HttpServletRequest servletRequest) {
+        HttpSession session = servletRequest.getSession(false);
+        accountFacade.requireLoggedIn(session);
         session.invalidate();
     }
 }
