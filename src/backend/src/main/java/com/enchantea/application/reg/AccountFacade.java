@@ -18,6 +18,8 @@ import com.enchantea.domain.reg.RestaurantStatus;
 import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 
+import jakarta.servlet.http.HttpSession;
+
 /**
  * Facade for account registration and login.
  * The controller uses this class instead of coordinating account creation,
@@ -59,6 +61,22 @@ public class AccountFacade {
         }
 
         return user;
+    }
+
+    @Transactional(readOnly = true)
+    public User requireLoggedIn(HttpSession session) {
+        if (session == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        Object userId = session.getAttribute("userId");
+        if (!(userId instanceof Long)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        return users.findById((Long) userId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.UNAUTHORIZED, "Authentication required"));
     }
 
     private User createUser(RegisterRequest request, String passwordHash) {
