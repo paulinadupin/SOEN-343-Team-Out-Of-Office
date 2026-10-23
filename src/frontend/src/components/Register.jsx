@@ -147,9 +147,9 @@ function Register() {
                     <button type="submit" disabled={isSubmitting}>
                         {isSubmitting ? 'Registering...' : 'Register'}
                     </button>
-                    <a href="/login">Already have an account? Login</a>
                 </form>
             )}
+            <a href="/login">Already have an account? Login</a>
         </div>
     )
 }

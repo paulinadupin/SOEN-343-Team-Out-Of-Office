@@ -8,26 +8,26 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
-//stores orders in memory while the app is running.
+//stores ORDERS in memory while the app is running.
 public class InMemoryOrderRepository implements OrderRepository {
-    private final Map<String, Order> orders = new HashMap<>();
+    private final Map<String, Order> ORDERS = new HashMap<>();
 
     @Override
     //save a new order or update an existing one
     public Order save(Order order) {
-        orders.put(order.id(), order);
+        ORDERS.put(order.id(), order);
         return order;
     }
 
     @Override
-    //find one order by its ID
+    //find one order by its id
     public Optional<Order> findById(String id) {
-        return Optional.ofNullable(orders.get(id));
+        return Optional.ofNullable(ORDERS.get(id));
     }
 
     @Override
     //return every order currently stored
     public List<Order> findAll() {
-        return new ArrayList<>(orders.values());
+        return new ArrayList<>(ORDERS.values());
     }
 }

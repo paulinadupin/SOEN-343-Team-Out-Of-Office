@@ -19,64 +19,64 @@ import org.springframework.stereotype.Service;
 @Service
 //runs the order use cases and connects the domain to validation, queues, storage, and events.
 public class OrderApplicationService {
-    private final OrderRepository orders;
-    private final CommandValidator validator;
-    private final PreparationQueue preparationQueue;
-    private final DispatchQueue dispatchQueue;
-    private final CourierAssignment courierAssignment;
-    private final RestaurantQuery restaurantQuery;
-    private final OrderEventSubject eventSubject;
+    private final OrderRepository ORDERS;
+    private final CommandValidator VALIDATOR;
+    private final PreparationQueue PREPARATION_QUEUE;
+    private final DispatchQueue DISPATCH_QUEUE;
+    private final CourierAssignment COURIER_ASSIGNMENT;
+    private final RestaurantQuery RESTAURANT_QUERY;
+    private final OrderEventSubject EVENT_SUBJECT;
 
     public OrderApplicationService(
-            OrderRepository orders,
-            CommandValidator validator,
-            PreparationQueue preparationQueue,
-            DispatchQueue dispatchQueue,
-            CourierAssignment courierAssignment,
-            RestaurantQuery restaurantQuery,
-            OrderEventSubject eventSubject) {
-        this.orders = orders;
-        this.validator = validator;
-        this.preparationQueue = preparationQueue;
-        this.dispatchQueue = dispatchQueue;
-        this.courierAssignment = courierAssignment;
-        this.restaurantQuery = restaurantQuery;
-        this.eventSubject = eventSubject;
+            OrderRepository ORDERS,
+            CommandValidator VALIDATOR,
+            PreparationQueue PREPARATION_QUEUE,
+            DispatchQueue DISPATCH_QUEUE,
+            CourierAssignment COURIER_ASSIGNMENT,
+            RestaurantQuery RESTAURANT_QUERY,
+            OrderEventSubject EVENT_SUBJECT) {
+        this.ORDERS = ORDERS;
+        this.VALIDATOR = VALIDATOR;
+        this.PREPARATION_QUEUE = PREPARATION_QUEUE;
+        this.DISPATCH_QUEUE = DISPATCH_QUEUE;
+        this.COURIER_ASSIGNMENT = COURIER_ASSIGNMENT;
+        this.RESTAURANT_QUERY = RESTAURANT_QUERY;
+        this.EVENT_SUBJECT = EVENT_SUBJECT;
     }
 
     public Order place(CurrentUser user, OrderCommands.PlaceOrder command) {
         //check the request before creating the order
-        validator.validate(CommandType.PLACE_ORDER, user, command);
+        VALIDATOR.validate(CommandType.PLACE_ORDER, user, command);
 
         List<OrderLine> lines = command.lines().stream()
                 .map(line -> new OrderLine(
                         line.itemId(),
                         line.quantity(),
-                        restaurantQuery.itemPrice(command.restaurantId(), line.itemId())))
+                        RESTAURANT_QUERY.itemPrice(command.restaurantId(), line.itemId())))
                 .toList();
 
         Order order = Order.create(user.id(), command.restaurantId(), lines);
         //record the placed state and let observers know the order was created
         OrderEvent event = createEvent(order, null, null);
-        orders.save(order);
-        eventSubject.publish(event);
+        ORDERS.save(order);
+        EVENT_SUBJECT.publish(event);
         return order;
     }
 
     public Order accept(CurrentUser user, OrderCommands.OrderAction command) {
-        //accepted orders go to the end of the preparation queue
-        validator.validate(CommandType.ACCEPT_ORDER, user, command);
+        //accepted ORDERS go to the end of the preparation queue
+        VALIDATOR.validate(CommandType.ACCEPT_ORDER, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
         order.accept();
-        preparationQueue.enqueue(order.restaurantId(), order);
+        PREPARATION_QUEUE.enqueue(order.restaurantId(), order);
         return saveAndPublish(order, oldStatus, null);
     }
 
     public Order reject(CurrentUser user, OrderCommands.OrderAction command) {
         //the restaurant gives a reason when it rejects an order
-        validator.validate(CommandType.REJECT_ORDER, user, command);
+        VALIDATOR.validate(CommandType.REJECT_ORDER, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
@@ -85,7 +85,7 @@ public class OrderApplicationService {
     }
 
     public Order cancelByCustomer(CurrentUser user, OrderCommands.OrderAction command) {
-        validator.validate(CommandType.CANCEL_ORDER_CUSTOMER, user, command);
+        VALIDATOR.validate(CommandType.CANCEL_ORDER_CUSTOMER, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
@@ -95,24 +95,24 @@ public class OrderApplicationService {
 
     public Order cancelByOperator(CurrentUser user, OrderCommands.OrderAction command) {
         //remove a cancelled order from queues and its courier assignment
-        validator.validate(CommandType.CANCEL_ORDER_OPERATOR, user, command);
+        VALIDATOR.validate(CommandType.CANCEL_ORDER_OPERATOR, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
         order.cancelByOperator();
-        preparationQueue.remove(order.restaurantId(), order.id());
-        dispatchQueue.removeFromDispatch(order.restaurantId(), order.id());
-        courierAssignment.removeOrderAssignment(order.id());
+        PREPARATION_QUEUE.remove(order.restaurantId(), order.id());
+        DISPATCH_QUEUE.removeFromDispatch(order.restaurantId(), order.id());
+        COURIER_ASSIGNMENT.removeOrderAssignment(order.id());
         return saveAndPublish(order, oldStatus, null);
     }
 
     public Order prepare(CurrentUser user, OrderCommands.OrderAction command) {
         //only the first order in the preparation queue can be prepared
-        validator.validate(CommandType.PREPARE_ORDER, user, command);
+        VALIDATOR.validate(CommandType.PREPARE_ORDER, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
-        Order firstOrder = preparationQueue.peek(order.restaurantId())
+        Order firstOrder = PREPARATION_QUEUE.peek(order.restaurantId())
                 .orElseThrow(() -> new IllegalStateException("Preparation queue is empty"));
         if (!firstOrder.id().equals(order.id())) {
             throw new IllegalStateException("Order is not first in the preparation queue");
@@ -124,34 +124,34 @@ public class OrderApplicationService {
 
     public Order markReady(CurrentUser user, OrderCommands.OrderAction command) {
         //move the first preparing order from preparation to dispatch
-        validator.validate(CommandType.MARK_ORDER_READY, user, command);
+        VALIDATOR.validate(CommandType.MARK_ORDER_READY, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
-        Order firstOrder = preparationQueue.peek(order.restaurantId())
+        Order firstOrder = PREPARATION_QUEUE.peek(order.restaurantId())
                 .orElseThrow(() -> new IllegalStateException("Preparation queue is empty"));
         if (!firstOrder.id().equals(order.id())) {
             throw new IllegalStateException("Order is not first in the preparation queue");
         }
 
         order.markReady();
-        preparationQueue.remove(order.restaurantId(), order.id());
-        dispatchQueue.add(order.restaurantId(), order);
+        PREPARATION_QUEUE.remove(order.restaurantId(), order.id());
+        DISPATCH_QUEUE.add(order.restaurantId(), order);
         return saveAndPublish(order, oldStatus, null);
     }
 
     public Order pickUp(CurrentUser user, OrderCommands.OrderAction command) {
-        validator.validate(CommandType.PICK_UP_ORDER, user, command);
+        VALIDATOR.validate(CommandType.PICK_UP_ORDER, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
         order.pickUp();
-        dispatchQueue.removeFromDispatch(order.restaurantId(), order.id());
+        DISPATCH_QUEUE.removeFromDispatch(order.restaurantId(), order.id());
         return saveAndPublish(order, oldStatus, null);
     }
 
     public Order deliver(CurrentUser user, OrderCommands.OrderAction command) {
-        validator.validate(CommandType.DELIVER_ORDER, user, command);
+        VALIDATOR.validate(CommandType.DELIVER_ORDER, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
@@ -160,7 +160,7 @@ public class OrderApplicationService {
     }
 
     public Order refund(CurrentUser user, OrderCommands.OrderAction command) {
-        validator.validate(CommandType.REFUND_ORDER, user, command);
+        VALIDATOR.validate(CommandType.REFUND_ORDER, user, command);
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
@@ -173,24 +173,24 @@ public class OrderApplicationService {
     }
 
     public List<Order> allOrders() {
-        return orders.findAll();
+        return ORDERS.findAll();
     }
 
     private Order load(String orderId) {
-        return orders.findById(orderId)
+        return ORDERS.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
     private Order saveAndPublish(Order order, OrderStatus oldStatus, String reason) {
         //save the changed order, then send its event to observers
         OrderEvent event = createEvent(order, oldStatus, reason);
-        orders.save(order);
-        eventSubject.publish(event);
+        ORDERS.save(order);
+        EVENT_SUBJECT.publish(event);
         return order;
     }
 
     private OrderEvent createEvent(Order order, OrderStatus oldStatus, String reason) {
-        //each transition gets its own event ID and timestamp
+        //each transition gets its own event id and timestamp
         String eventId = UUID.randomUUID().toString();
         Instant timestamp = Instant.now();
 

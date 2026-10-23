@@ -3,17 +3,17 @@ package com.enchantea.application.ord.contracts;
 import com.enchantea.domain.reg.AccountType;
 
 public final class CurrentUser {
-    private final String id;
-    private final AccountType role;
-    private final String restaurantId;
+    private final String ID;
+    private final AccountType ROLE;
+    private final String RESTAURANT_ID;
 
-    public CurrentUser(String id, AccountType role, String restaurantId) {
-        this.id = id;
-        this.role = role;
-        this.restaurantId = restaurantId;
+    public CurrentUser(String ID, AccountType ROLE, String RESTAURANT_ID) {
+        this.ID = ID;
+        this.ROLE = ROLE;
+        this.RESTAURANT_ID = RESTAURANT_ID;
     }
 
-    public String id() { return id; }
-    public AccountType role() { return role; }
-    public String restaurantId() { return restaurantId; }
+    public String id() { return ID; }
+    public AccountType role() { return ROLE; }
+    public String restaurantId() { return RESTAURANT_ID; }
 }

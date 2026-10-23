@@ -11,15 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/restaurants")
 public class MenuController {
-    private final MenuCatalog menuCatalog;
+    private final MenuCatalog MENU_CATALOG;
 
-    public MenuController(MenuCatalog menuCatalog) {
-        this.menuCatalog = menuCatalog;
+    public MenuController(MenuCatalog MENU_CATALOG) {
+        this.MENU_CATALOG = MENU_CATALOG;
     }
 
     @GetMapping("/{restaurantId}/menu")
     public List<MenuItemView> menu(@PathVariable String restaurantId) {
-        return menuCatalog.menu(restaurantId).stream()
+        return MENU_CATALOG.menu(restaurantId).stream()
                 .map(item -> new MenuItemView(item.id(), item.name(), item.price(), item.status()))
                 .toList();
     }

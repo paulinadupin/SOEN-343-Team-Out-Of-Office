@@ -8,49 +8,49 @@ import java.util.Objects;
 import java.util.UUID;
 
 public final class Order {
-    private final String orderId;
+    private final String ORDER_ID;
     private OrderState status;
-    private final Instant placedAt; //Instant data type is better to capture specific moments
+    private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
     private String rejectionReason;
-    private final String customerId;
-    private final String restaurantId;
-    private final List<OrderLine> lines;
-    private final List<StateTransition> transitions = new ArrayList<>();
+    private final String CUSTOMER_ID;
+    private final String RESTAURANT_ID;
+    private final List<OrderLine> LINES;
+    private final List<StateTransition> TRANSITIONS = new ArrayList<>();
     
     // constructor
-    public Order(String OrderId, String customerId, String restaurantId, List<OrderLine> lines) {
-        this.orderId = Objects.requireNonNull(OrderId, "id");
-        this.customerId = Objects.requireNonNull(customerId, "customerId");
-        this.restaurantId = Objects.requireNonNull(restaurantId, "restaurantId");
-        this.lines = List.copyOf(lines);
-        if (this.lines.isEmpty()) {
+    public Order(String OrderId, String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
+        this.ORDER_ID = Objects.requireNonNull(OrderId, "id");
+        this.CUSTOMER_ID = Objects.requireNonNull(CUSTOMER_ID, "CUSTOMER_ID");
+        this.RESTAURANT_ID = Objects.requireNonNull(RESTAURANT_ID, "RESTAURANT_ID");
+        this.LINES = List.copyOf(LINES);
+        if (this.LINES.isEmpty()) {
             throw new IllegalArgumentException("An order must contain at least one line");
         }
-        this.placedAt = Instant.now();
+        this.PLACED_AT = Instant.now();
         this.status = new PlacedState(); //first state when order is created
     }
 
     // is called when order is placed
-    public static Order create(String customerId, String restaurantId, List<OrderLine> lines) {
-        return new Order(UUID.randomUUID().toString(), customerId, restaurantId, lines); //UUID stands for 'Universally Unique Identifier'
+    public static Order create(String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
+        return new Order(UUID.randomUUID().toString(), CUSTOMER_ID, RESTAURANT_ID, LINES); //UUID stands for 'Universally Unique Identifier'
     }
 
     //getters
-    public String id() { return orderId; }
-    public String customerId() { return customerId; }
-    public String restaurantId() { return restaurantId; }
-    public List<OrderLine> lines() { return lines; }
-    public Instant placedAt() { return placedAt; }
+    public String id() { return ORDER_ID; }
+    public String customerId() { return CUSTOMER_ID; }
+    public String restaurantId() { return RESTAURANT_ID; }
+    public List<OrderLine> lines() { return LINES; }
+    public Instant placedAt() { return PLACED_AT; }
     public Instant closedAt() { return closedAt; }
     public OrderStatus status() { return status.status(); }
     public String rejectionReason() { return rejectionReason; }
-    public List<StateTransition> transitions() { return List.copyOf(transitions); }
+    public List<StateTransition> transitions() { return List.copyOf(TRANSITIONS); }
 
     // calculates the order's total (before fees and taxes)
     public double total() {
         double total = 0;
-        for (OrderLine line : lines) {
+        for (OrderLine line : LINES) {
             total += line.total();
         }
         return total;
@@ -89,7 +89,7 @@ public final class Order {
 
     // records transitions (R-ORD-05)
     public void recordTransition(StateTransition transition) {
-        transitions.add(transition);
+        TRANSITIONS.add(transition);
         // if at the last state of the order lifecycle, then the order is closed
         if (transition.toStatus() == OrderStatus.DELIVERED
                 || transition.toStatus() == OrderStatus.REJECTED

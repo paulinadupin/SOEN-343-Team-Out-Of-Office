@@ -23,23 +23,23 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final AccountFacade accountFacade;
+    private final AccountFacade ACCOUNT_FACADE;
 
-    public AuthController(AccountFacade accountFacade) {
-        this.accountFacade = accountFacade;
+    public AuthController(AccountFacade ACCOUNT_FACADE) {
+        this.ACCOUNT_FACADE = ACCOUNT_FACADE;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public AccountResponse register(@Valid @RequestBody RegisterRequest request) {
-        return accountFacade.register(request);
+        return ACCOUNT_FACADE.register(request);
     }
 
     @PostMapping("/login")
     public AccountResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest servletRequest) {
-        User user = accountFacade.authenticate(request);
+        User user = ACCOUNT_FACADE.authenticate(request);
 
-        // Keep the logged-in user's ID and type in the browser's session.
+        // Keep the logged-in user's id and type in the browser's session.
         HttpSession session = servletRequest.getSession();
         servletRequest.changeSessionId();
         session.setAttribute("userId", user.getUserId());
@@ -59,7 +59,7 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
         }
 
-        return AccountResponse.from(accountFacade.findById((Long) userId));
+        return AccountResponse.from(ACCOUNT_FACADE.findById((Long) userId));
     }
 
     @GetMapping("/restaurant/me")
@@ -74,14 +74,14 @@ public class AuthController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in");
         }
 
-        return accountFacade.findRestaurantById((Long) userId);
+        return ACCOUNT_FACADE.findRestaurantById((Long) userId);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void logout(HttpServletRequest servletRequest) {
         HttpSession session = servletRequest.getSession(false);
-        accountFacade.requireLoggedIn(session);
+        ACCOUNT_FACADE.requireLoggedIn(session);
         session.invalidate();
     }
 }

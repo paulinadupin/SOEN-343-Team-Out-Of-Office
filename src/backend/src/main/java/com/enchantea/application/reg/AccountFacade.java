@@ -27,25 +27,25 @@ import jakarta.servlet.http.HttpSession;
  */
 @Service
 public class AccountFacade {
-    private final UserRepository users;
-    private final PasswordEncoder passwordEncoder;
+    private final UserRepository USERS;
+    private final PasswordEncoder PASSWORD_ENCODER;
 
-    public AccountFacade(UserRepository users, PasswordEncoder passwordEncoder) {
-        this.users = users;
-        this.passwordEncoder = passwordEncoder;
+    public AccountFacade(UserRepository USERS, PasswordEncoder PASSWORD_ENCODER) {
+        this.USERS = USERS;
+        this.PASSWORD_ENCODER = PASSWORD_ENCODER;
     }
 
     @Transactional
     public AccountResponse register(RegisterRequest request) {
-        if (users.existsByUsername(request.getUsername())) {
+        if (USERS.existsByUsername(request.getUsername())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already registered");
         }
 
-        String passwordHash = passwordEncoder.encode(request.getPassword());
+        String passwordHash = PASSWORD_ENCODER.encode(request.getPassword());
         User user = createUser(request, passwordHash);
 
         try {
-            return AccountResponse.from(users.saveAndFlush(user));
+            return AccountResponse.from(USERS.saveAndFlush(user));
         } catch (DataIntegrityViolationException exception) {
             // The database also checks uniqueness in case two registrations happen at once.
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Username is already registered", exception);
@@ -54,9 +54,9 @@ public class AccountFacade {
 
     @Transactional(readOnly = true)
     public User authenticate(LoginRequest request) {
-        User user = users.findByUsername(request.getUsername()).orElse(null);
+        User user = USERS.findByUsername(request.getUsername()).orElse(null);
 
-        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+        if (user == null || !PASSWORD_ENCODER.matches(request.getPassword(), user.getPasswordHash())) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
         }
 
@@ -65,7 +65,7 @@ public class AccountFacade {
 
     @Transactional(readOnly = true)
     public User findById(Long userId) {
-        return users.findById(userId)
+        return USERS.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not logged in"));
     }
 
@@ -89,7 +89,7 @@ public class AccountFacade {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
         }
 
-        return users.findById((Long) userId)
+        return USERS.findById((Long) userId)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.UNAUTHORIZED, "Authentication required"));
     }

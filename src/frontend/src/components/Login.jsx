@@ -11,10 +11,12 @@ export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError("");
+    setIsSubmitting(true);
     try {
       const user = await login(username, password);
       // Send them back to the page they tried to visit, else their role's home
@@ -22,6 +24,8 @@ export function Login() {
       navigate(from || HOME_BY_ACCOUNT_TYPE[user.accountType], { replace: true });
     } catch {
       setError("Invalid username or password");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -45,8 +49,10 @@ export function Login() {
         placeholder="Password"
         required
       />
-      {error && <p>{error}</p>}
-      <button className="login button" type="submit">Log in</button>
+      {error && <p role="alert">{error}</p>}
+      <button className="login button" type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Logging in..." : "Log in"}
+      </button>
     </form>
     <a href="/register">Don't have an account? Register</a>
     </div>

@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "account_type")
 public abstract class User {
-    // The database assigns a new increasing ID whenever an account is saved.
+    // The database assigns a new increasing id whenever an account is saved.
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
