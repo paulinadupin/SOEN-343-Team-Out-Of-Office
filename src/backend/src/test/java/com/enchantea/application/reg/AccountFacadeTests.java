@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -75,6 +76,34 @@ class AccountFacadeTests {
         assertNotEquals("password123", stored.getPasswordHash());
         assertEquals(stored.getUserId(), authenticated.getUserId());
         assertFalse(stored.getPasswordHash().isBlank());
+    }
+
+    @Test
+    void requiresExistingUserInSessionToBeLoggedIn() {
+        AccountResponse created = accountFacade.register(new RegisterRequest(
+                "session-user", "password123", AccountType.OPERATOR, null, null, null));
+        MockHttpSession session = new MockHttpSession();
+        session.setAttribute("userId", created.getUserId());
+
+        User loggedInUser = accountFacade.requireLoggedIn(session);
+
+        assertEquals(created.getUserId(), loggedInUser.getUserId());
+    }
+
+    @Test
+    void rejectsMissingOrStaleLoginSession() {
+        MockHttpSession session = new MockHttpSession();
+        ResponseStatusException missingSessionException = assertThrows(
+                ResponseStatusException.class, () -> accountFacade.requireLoggedIn(null));
+        ResponseStatusException missingUserException = assertThrows(
+                ResponseStatusException.class, () -> accountFacade.requireLoggedIn(session));
+        session.setAttribute("userId", Long.MAX_VALUE);
+        ResponseStatusException staleUserException = assertThrows(
+                ResponseStatusException.class, () -> accountFacade.requireLoggedIn(session));
+
+        assertEquals(401, missingSessionException.getStatusCode().value());
+        assertEquals(401, missingUserException.getStatusCode().value());
+        assertEquals(401, staleUserException.getStatusCode().value());
     }
 
     @Test
