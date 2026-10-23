@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CityRestaurantQuery implements RestaurantQuery {
-    private final UserRepository users;
-    private final MenuCatalog menuCatalog;
+    private final UserRepository USERS;
+    private final MenuCatalog MENU_CATALOG;
 
-    public CityRestaurantQuery(UserRepository users, MenuCatalog menuCatalog) {
-        this.users = users;
-        this.menuCatalog = menuCatalog;
+    public CityRestaurantQuery(UserRepository USERS, MenuCatalog MENU_CATALOG) {
+        this.USERS = USERS;
+        this.MENU_CATALOG = MENU_CATALOG;
     }
 
     @Override
@@ -28,21 +28,21 @@ public class CityRestaurantQuery implements RestaurantQuery {
 
     @Override
     public boolean isItemAvailable(String restaurantId, String itemId) {
-        return menuCatalog.find(restaurantId, itemId)
+        return MENU_CATALOG.find(restaurantId, itemId)
                 .map(MenuItem::isAvailable)
                 .orElse(false);
     }
 
     @Override
     public double itemPrice(String restaurantId, String itemId) {
-        return menuCatalog.find(restaurantId, itemId)
+        return MENU_CATALOG.find(restaurantId, itemId)
                 .map(MenuItem::price)
                 .orElseThrow(() -> new CommandRejectedException("Unknown menu item: " + itemId));
     }
 
     private Optional<Restaurant> findRestaurant(String restaurantId) {
         try {
-            return users.findById(Long.valueOf(restaurantId))
+            return USERS.findById(Long.valueOf(restaurantId))
                     .filter(Restaurant.class::isInstance)
                     .map(Restaurant.class::cast);
         } catch (NumberFormatException e) {

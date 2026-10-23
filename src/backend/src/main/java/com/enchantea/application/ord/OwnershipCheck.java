@@ -13,10 +13,10 @@ public class OwnershipCheck extends CommandCheck {
             CommandType.PREPARE_ORDER,
             CommandType.MARK_ORDER_READY);
 
-    private final OrderRepository orders;
+    private final OrderRepository ORDERS;
 
-    public OwnershipCheck(OrderRepository orders) {
-        this.orders = orders;
+    public OwnershipCheck(OrderRepository ORDERS) {
+        this.ORDERS = ORDERS;
     }
 
     @Override
@@ -36,6 +36,6 @@ public class OwnershipCheck extends CommandCheck {
 
     private Order load(Object command) {
         String orderId = ((OrderCommands.OrderAction) command).orderId();
-        return orders.findById(orderId).orElseThrow(() -> new OrderNotFoundException(orderId));
+        return ORDERS.findById(orderId).orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 }

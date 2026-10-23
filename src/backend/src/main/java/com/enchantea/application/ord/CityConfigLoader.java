@@ -18,37 +18,37 @@ import tools.jackson.databind.json.JsonMapper;
 public class CityConfigLoader {
     private static final String CONFIG_FILE = "city.json";
 
-    private final JsonMapper jsonMapper;
-    private final UserRepository users;
-    private final MenuCatalog menuCatalog;
+    private final JsonMapper JSON_MAPPER;
+    private final UserRepository USERS;
+    private final MenuCatalog MENU_CATALOG;
 
-    public CityConfigLoader(JsonMapper jsonMapper, UserRepository users, MenuCatalog menuCatalog) {
-        this.jsonMapper = jsonMapper;
-        this.users = users;
-        this.menuCatalog = menuCatalog;
+    public CityConfigLoader(JsonMapper JSON_MAPPER, UserRepository USERS, MenuCatalog MENU_CATALOG) {
+        this.JSON_MAPPER = JSON_MAPPER;
+        this.USERS = USERS;
+        this.MENU_CATALOG = MENU_CATALOG;
     }
 
     @EventListener(ApplicationReadyEvent.class)
     public void load() {
         for (CityConfig.RestaurantConfig config : readConfig().restaurants()) {
-            if (!(users.findByUsername(config.username()).orElse(null) instanceof Restaurant restaurant)) {
+            if (!(USERS.findByUsername(config.username()).orElse(null) instanceof Restaurant restaurant)) {
                 continue;
             }
 
             restaurant.setStatus(config.status());
             restaurant.setPosition(new Location(config.position().lat(), config.position().lng()));
-            users.save(restaurant);
+            USERS.save(restaurant);
 
             List<MenuItem> items = config.menu().stream()
                     .map(item -> new MenuItem(item.id(), item.name(), item.price(), item.status()))
                     .toList();
-            menuCatalog.setMenu(String.valueOf(restaurant.getUserId()), items);
+            MENU_CATALOG.setMenu(String.valueOf(restaurant.getUserId()), items);
         }
     }
 
     private CityConfig readConfig() {
         try (InputStream input = new ClassPathResource(CONFIG_FILE).getInputStream()) {
-            return jsonMapper.readValue(input, CityConfig.class);
+            return JSON_MAPPER.readValue(input, CityConfig.class);
         } catch (IOException e) {
             throw new UncheckedIOException("Could not read " + CONFIG_FILE, e);
         }

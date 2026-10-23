@@ -1,0 +1,99 @@
+.menu-item {
+    background-color: var(--secondary-color);
+    border-radius: 15px;
+    max-width:280px;
+    height:400px;
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    position: relative;
+
+    .img {
+        max-width:260px;
+        height:260px;
+        border-radius: var(--default-radius);
+        padding: 10px;
+    }
+
+    .content {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .title {
+        font-size: var(--header2);
+        padding-top: 12px;
+    }
+
+    .description {
+        color: var(--accent-color);
+    }
+
+    .price {
+        padding-top: 9px;
+        color: var(--accent-color);
+        font-size: 20px;
+    }
+
+    .add-cart {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background-color: var(--primary-color);
+        border: none;
+        border-radius: 50%;
+        color: var(--text-color);
+        font-size: var(--header1);
+        width: 62px;
+        height: 62px;
+        text-align: center;
+        scale: 1;
+        cursor: pointer;
+
+        &:hover {
+            scale: 1.1;
+            transition: scale 0.2s ease-in-out;
+        }
+
+        &:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
+    }
+
+    .cart-feedback {
+        position: fixed;
+        top: 24px;
+        left: 50%;
+        z-index: 10;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        border-radius: var(--default-radius);
+        background-color: var(--primary-color);
+        color: var(--text-color);
+        font-weight: bold;
+        white-space: nowrap;
+        box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+        animation: cart-feedback-in 0.2s ease-out;
+    }
+
+    .edit-icon {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 30px;
+        height: 30px;
+    }
+}
+
+@keyframes cart-feedback-in {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}

@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MenuCatalog {
-    private final Map<String, List<MenuItem>> menus = new HashMap<>();
+    private final Map<String, List<MenuItem>> MENUS = new HashMap<>();
 
     public synchronized void setMenu(String restaurantId, List<MenuItem> items) {
-        menus.put(restaurantId, List.copyOf(items));
+        MENUS.put(restaurantId, List.copyOf(items));
     }
 
     public synchronized List<MenuItem> menu(String restaurantId) {
-        return menus.getOrDefault(restaurantId, List.of());
+        return MENUS.getOrDefault(restaurantId, List.of());
     }
 
     public synchronized Optional<MenuItem> find(String restaurantId, String itemId) {

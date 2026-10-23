@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommandValidationChain implements CommandValidator {
-    private final CommandCheck first;
+    private final CommandCheck FIRST;
 
     public CommandValidationChain(OrderRepository orders, RestaurantQuery restaurantQuery) {
-        first = new LoggedInCheck();
-        first.then(new RoleCheck())
+        FIRST = new LoggedInCheck();
+        FIRST.then(new RoleCheck())
                 .then(new OwnershipCheck(orders))
                 .then(new RestaurantRulesCheck(orders, restaurantQuery));
     }
 
     @Override
     public void validate(CommandType type, CurrentUser user, Object command) {
-        first.check(type, user, command);
+        FIRST.check(type, user, command);
     }
 }

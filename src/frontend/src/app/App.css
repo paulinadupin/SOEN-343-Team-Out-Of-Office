@@ -1,0 +1,7 @@
+.app-content {
+    padding: 60px;
+    display: flex;
+    flex-direction: row;
+    gap: 90px;
+    width: 100%;
+}

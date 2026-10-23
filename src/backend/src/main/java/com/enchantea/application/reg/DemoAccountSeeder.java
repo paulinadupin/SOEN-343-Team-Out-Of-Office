@@ -13,62 +13,62 @@ import com.enchantea.foundation.reg.UserRepository;
 
 @Component
 public class DemoAccountSeeder implements ApplicationRunner {
-    private static final Logger logger = LoggerFactory.getLogger(DemoAccountSeeder.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DemoAccountSeeder.class);
 
-    private final AccountFacade accountFacade;
-    private final UserRepository users;
-    private final String password;
-    private final String customerUsername;
-    private final String restaurantUsername;
-    private final String courierUsername;
-    private final String operatorUsername;
+    private final AccountFacade ACCOUNT_FACADE;
+    private final UserRepository USERS;
+    private final String PASSWORD;
+    private final String CUSTOMER_USERNAME;
+    private final String RESTAURANT_USERNAME;
+    private final String COURIER_USERNAME;
+    private final String OPERATOR_USERNAME;
 
     public DemoAccountSeeder(
-            AccountFacade accountFacade,
-            UserRepository users,
-            @Value("${demo.accounts.password}") String password,
-            @Value("${demo.accounts.customer.username}") String customerUsername,
-            @Value("${demo.accounts.restaurant.username}") String restaurantUsername,
-            @Value("${demo.accounts.courier.username}") String courierUsername,
-            @Value("${demo.accounts.operator.username}") String operatorUsername) {
-        this.accountFacade = accountFacade;
-        this.users = users;
-        this.password = password;
-        this.customerUsername = customerUsername;
-        this.restaurantUsername = restaurantUsername;
-        this.courierUsername = courierUsername;
-        this.operatorUsername = operatorUsername;
+            AccountFacade ACCOUNT_FACADE,
+            UserRepository USERS,
+            @Value("${demo.accounts.password}") String PASSWORD,
+            @Value("${demo.accounts.customer.username}") String CUSTOMER_USERNAME,
+            @Value("${demo.accounts.restaurant.username}") String RESTAURANT_USERNAME,
+            @Value("${demo.accounts.courier.username}") String COURIER_USERNAME,
+            @Value("${demo.accounts.operator.username}") String OPERATOR_USERNAME) {
+        this.ACCOUNT_FACADE = ACCOUNT_FACADE;
+        this.USERS = USERS;
+        this.PASSWORD = PASSWORD;
+        this.CUSTOMER_USERNAME = CUSTOMER_USERNAME;
+        this.RESTAURANT_USERNAME = RESTAURANT_USERNAME;
+        this.COURIER_USERNAME = COURIER_USERNAME;
+        this.OPERATOR_USERNAME = OPERATOR_USERNAME;
     }
 
     @Override
     public void run(ApplicationArguments args) {
         seed(new RegisterRequest(
-                customerUsername,
-                password,
+                CUSTOMER_USERNAME,
+                PASSWORD,
                 AccountType.CUSTOMER,
                 "Demo Customer",
                 new Location(45.5017, -73.5673),
                 null));
 
         seed(new RegisterRequest(
-                restaurantUsername,
-                password,
+                RESTAURANT_USERNAME,
+                PASSWORD,
                 AccountType.RESTAURANT,
                 "Demo Restaurant",
                 null,
                 new Location(45.5017, -73.5673)));
 
         seed(new RegisterRequest(
-                courierUsername,
-                password,
+                COURIER_USERNAME,
+                PASSWORD,
                 AccountType.COURIER,
                 null,
                 null,
                 new Location(45.5017, -73.5673)));
 
         seed(new RegisterRequest(
-                operatorUsername,
-                password,
+                OPERATOR_USERNAME,
+                PASSWORD,
                 AccountType.OPERATOR,
                 null,
                 null,
@@ -76,12 +76,12 @@ public class DemoAccountSeeder implements ApplicationRunner {
     }
 
     private void seed(RegisterRequest request) {
-        if (users.existsByUsername(request.getUsername())) {
-            logger.info("Demo account '{}' already exists; leaving it unchanged.", request.getUsername());
+        if (USERS.existsByUsername(request.getUsername())) {
+            LOGGER.info("Demo account '{}' already exists; leaving it unchanged.", request.getUsername());
             return;
         }
 
-        accountFacade.register(request);
-        logger.info("Created demo {} account '{}'.", request.getAccountType(), request.getUsername());
+        ACCOUNT_FACADE.register(request);
+        LOGGER.info("Created demo {} account '{}'.", request.getAccountType(), request.getUsername());
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InMemoryPreparationQueue implements PreparationQueue {
-    private final Map<String, OrderQueue> queues = new HashMap<>();
+    private final Map<String, OrderQueue> QUEUES = new HashMap<>();
 
     @Override
     public synchronized void enqueue(String restaurantId, Order order) {
@@ -19,17 +19,17 @@ public class InMemoryPreparationQueue implements PreparationQueue {
 
     @Override
     public synchronized Optional<Order> peek(String restaurantId) {
-        OrderQueue queue = queues.get(restaurantId);
+        OrderQueue queue = QUEUES.get(restaurantId);
         return queue == null ? Optional.empty() : queue.first();
     }
 
     @Override
     public synchronized boolean remove(String restaurantId, String orderId) {
-        OrderQueue queue = queues.get(restaurantId);
+        OrderQueue queue = QUEUES.get(restaurantId);
         return queue != null && queue.remove(orderId);
     }
 
     private OrderQueue queueFor(String restaurantId) {
-        return queues.computeIfAbsent(restaurantId, id -> new OrderQueue());
+        return QUEUES.computeIfAbsent(restaurantId, id -> new OrderQueue());
     }
 }

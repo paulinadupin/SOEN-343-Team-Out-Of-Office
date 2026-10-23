@@ -1,10 +1,14 @@
 import './UserMenu.css'
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../app/AuthContext'
 
 function UserMenu() {
     const [open, setOpen] = useState(false)
+    const { user, logout } = useAuth();
     const menuRef = useRef(null)
+    const navigate = useNavigate()
 
     // close when clicking outside the menu, or pressing Escape
     useEffect(() => {
@@ -24,6 +28,12 @@ function UserMenu() {
         }
     }, [])
 
+    async function handleLogout() {
+        await logout();
+        setOpen(false);
+        navigate('/login');
+    }
+
     return (
         <div className="user-menu" ref={menuRef}>
             <button
@@ -37,14 +47,15 @@ function UserMenu() {
 
             {open && (
                 <div className="user-menu-dropdown" role="menu">
-                    <Link to="/profile" onClick={() => setOpen(false)}>Profile</Link>
+                    <p>{user?.username}</p>
+                    {/* <Link to="/profile" onClick={() => setOpen(false)}>Profile</Link>
                     <Link to="/settings" onClick={() => setOpen(false)}>Settings</Link>
                     <hr />
                     <Link to="/" onClick={() => setOpen(false)}>Customer View</Link>
                     <Link to="/op-dash" onClick={() => setOpen(false)}>Operator View</Link>
-                    <Link to="/courier" onClick={() => setOpen(false)}>Courier View</Link>
+                    <Link to="/courier" onClick={() => setOpen(false)}>Courier View</Link> */}
                     <hr />
-                    <button onClick={() => setOpen(false)}>Log out</button>
+                    <button onClick={() => handleLogout()}>Log out</button>
                 </div>
             )}
         </div>

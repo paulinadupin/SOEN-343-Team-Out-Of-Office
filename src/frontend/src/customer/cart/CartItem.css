@@ -1,0 +1,14 @@
+.cart-item {
+    display:flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 5px;
+    width:100%;
+    border-bottom: 1px solid var(--accent-color);
+
+    .price {
+        color: var(--accent-color);
+    }
+
+}

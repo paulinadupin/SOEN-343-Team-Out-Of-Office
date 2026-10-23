@@ -6,12 +6,12 @@ import com.enchantea.application.ord.contracts.CurrentUser;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
 
 public class RestaurantRulesCheck extends CommandCheck {
-    private final OrderRepository orders;
-    private final RestaurantQuery restaurantQuery;
+    private final OrderRepository ORDERS;
+    private final RestaurantQuery RESTAURANT_QUERY;
 
-    public RestaurantRulesCheck(OrderRepository orders, RestaurantQuery restaurantQuery) {
-        this.orders = orders;
-        this.restaurantQuery = restaurantQuery;
+    public RestaurantRulesCheck(OrderRepository ORDERS, RestaurantQuery RESTAURANT_QUERY) {
+        this.ORDERS = ORDERS;
+        this.RESTAURANT_QUERY = RESTAURANT_QUERY;
     }
 
     @Override
@@ -20,10 +20,10 @@ public class RestaurantRulesCheck extends CommandCheck {
             verifyPlaceOrder((OrderCommands.PlaceOrder) command);
         } else if (type == CommandType.ACCEPT_ORDER) {
             String orderId = ((OrderCommands.OrderAction) command).orderId();
-            String restaurantId = orders.findById(orderId)
+            String restaurantId = ORDERS.findById(orderId)
                     .orElseThrow(() -> new OrderNotFoundException(orderId))
                     .restaurantId();
-            if (!restaurantQuery.isOpen(restaurantId)) {
+            if (!RESTAURANT_QUERY.isOpen(restaurantId)) {
                 throw new CommandRejectedException("The restaurant is closed");
             }
         }
@@ -33,7 +33,7 @@ public class RestaurantRulesCheck extends CommandCheck {
         if (place.restaurantId() == null || place.restaurantId().isBlank()) {
             throw new CommandRejectedException("A restaurant is required");
         }
-        if (!restaurantQuery.isOpen(place.restaurantId())) {
+        if (!RESTAURANT_QUERY.isOpen(place.restaurantId())) {
             throw new CommandRejectedException("The restaurant is closed");
         }
         if (place.lines().isEmpty()) {
@@ -44,7 +44,7 @@ public class RestaurantRulesCheck extends CommandCheck {
             if (line.itemId() == null || line.itemId().isBlank()) {
                 throw new CommandRejectedException("An item is required");
             }
-            if (!restaurantQuery.isItemAvailable(place.restaurantId(), line.itemId())) {
+            if (!RESTAURANT_QUERY.isItemAvailable(place.restaurantId(), line.itemId())) {
                 throw new CommandRejectedException("Item is not available: " + line.itemId());
             }
         }

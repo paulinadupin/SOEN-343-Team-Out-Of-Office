@@ -18,24 +18,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/restaurants")
 public class MenuController {
-    private final MenuCatalog menuCatalog;
-    private final AccountFacade accountFacade;
+    private final MenuCatalog MENU_CATALOG;
+    private final AccountFacade ACCOUNT_FACADE;
 
-    public MenuController(MenuCatalog menuCatalog, AccountFacade accountFacade) {
-        this.menuCatalog = menuCatalog;
-        this.accountFacade=accountFacade;
+    public MenuController(MenuCatalog MENU_CATALOG, AccountFacade ACCOUNT_FACADE) {
+        this.MENU_CATALOG = MENU_CATALOG;
+        this.ACCOUNT_FACADE = ACCOUNT_FACADE;
     }
 
     @GetMapping("/{restaurantId}/menu")
     public List<MenuItemView> menu(@PathVariable String restaurantId, HttpServletRequest servletRequest) {
         currentUser(servletRequest);
-        return menuCatalog.menu(restaurantId).stream()
+        return MENU_CATALOG.menu(restaurantId).stream()
                 .map(item -> new MenuItemView(item.id(), item.name(), item.price(), item.status()))
                 .toList();
     }
 
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
-        User user = accountFacade.requireLoggedIn(servletRequest.getSession(false));
+        User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();
         String restaurantId = user instanceof Restaurant ? user.getUserId().toString() : null;
         return new CurrentUser(user.getUserId().toString(), accountType, restaurantId);

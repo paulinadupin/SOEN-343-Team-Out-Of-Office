@@ -1,0 +1,10 @@
+.restaurant-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid var(--accent-color);
+    border-radius: var(--default-radius);
+    background-color: #f4f4f4;
+    cursor: pointer;
+}
