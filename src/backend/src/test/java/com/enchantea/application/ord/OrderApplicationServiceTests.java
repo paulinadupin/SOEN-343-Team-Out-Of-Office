@@ -1,11 +1,12 @@
 package com.enchantea.application.ord;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -99,7 +100,8 @@ class OrderApplicationServiceTests {
         for (OrderEvent event : events) {
             assertNotNull(event.eventId());
         }
-        assertNotEquals(events.get(0).eventId(), events.get(1).eventId());
-        assertNotEquals(events.get(1).eventId(), events.get(2).eventId());
+
+        Set<String> eventIds = events.stream().map(OrderEvent::eventId).collect(Collectors.toSet());
+        assertEquals(events.size(), eventIds.size()); // every event id is unique, not just adjacent ones
     }
 }
