@@ -26,7 +26,8 @@ import com.enchantea.foundation.reg.UserRepository;
         "spring.datasource.url=jdbc:h2:mem:ord-service-tests;DB_CLOSE_DELAY=-1",
         "spring.jpa.hibernate.ddl-auto=create-drop"
 })
-// Reloads the Spring context (and the in-memory queues/history, which are singleton beans)
+// Reloads the Spring context (and the in-memory queues/history, which are
+// singleton beans)
 // between tests, so orders left queued by one test can't affect another.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class OrderApplicationServiceTests {
@@ -46,7 +47,8 @@ class OrderApplicationServiceTests {
 
     @BeforeEach
     void setUp() {
-        // "restaurant" is one of the seeded demo accounts, OPEN with a real menu in city.json.
+        // "restaurant" is one of the seeded demo accounts, OPEN with a real menu in
+        // city.json.
         restaurantId = users.findByUsername("restaurant").orElseThrow().getUserId().toString();
         customer = new CurrentUser("customer-1", AccountType.CUSTOMER, null);
         restaurantUser = new CurrentUser("restaurant-staff-1", AccountType.RESTAURANT, restaurantId);
