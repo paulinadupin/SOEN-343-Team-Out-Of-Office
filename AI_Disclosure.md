@@ -8,3 +8,4 @@ For ORD requirements, GenAI was used to help implement the order lifecycle using
 GenAI was also used to connect the REG implementation to the ORD implementation in various controllers such as AuthController, OrderController and MenuController.
 
 For the Frontend of the project GenAI was used to create the user type specific page elements for the developed web page pattern. GenAi was also used to proofread, debug code and connect the different FrontEnd elements to their Backend implementation.
+For the Customer and Restaurant specific pages, GenAi was used to help with some basic styling for certain elements.
