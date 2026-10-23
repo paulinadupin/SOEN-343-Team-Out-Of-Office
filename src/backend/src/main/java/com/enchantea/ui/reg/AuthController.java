@@ -19,6 +19,7 @@ import com.enchantea.domain.reg.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -75,6 +76,11 @@ public class AuthController {
         }
 
         return ACCOUNT_FACADE.findRestaurantById((Long) userId);
+    }
+
+    @GetMapping("/restaurants")
+    public List<RestaurantResponse> restaurants() {
+        return ACCOUNT_FACADE.findRestaurants();
     }
 
     @PostMapping("/logout")

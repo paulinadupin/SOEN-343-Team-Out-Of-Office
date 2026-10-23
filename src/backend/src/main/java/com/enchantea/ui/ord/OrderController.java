@@ -103,6 +103,18 @@ public class OrderController {
         return SERVICE.allOrders().stream().map(OrderController::toView).toList();
     }
 
+    @GetMapping("/restaurant")
+    public List<OrderView> restaurantOrders(HttpServletRequest servletRequest) {
+        CurrentUser user = currentUser(servletRequest);
+        if (user.restaurantId() == null) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Restaurant account required");
+        }
+        return SERVICE.ordersForRestaurant(user.restaurantId()).stream()
+                .map(OrderController::toView)
+                .toList();
+    }
+
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();

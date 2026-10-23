@@ -1,15 +1,18 @@
 import './RestaurantHeader.css';
+import { formatRestaurantStatus } from '../app/formatRestaurantStatus';
 
 function RestaurantHeader({name, address, status}) {
+  const statusLabel = formatRestaurantStatus(status);
+
   return (
     <div className="restaurant-header">
       <h1 className="title">{name}</h1>
       <p className="address">{address}</p>
-      <div className={`status ${status}`}>
+      <div className={`status ${statusLabel}`}>
         <svg width="19" height="19">
           <circle cx="8" cy="8" r="6"/>
         </svg>
-        {status}
+        {statusLabel}
         </div>
     </div>
   );

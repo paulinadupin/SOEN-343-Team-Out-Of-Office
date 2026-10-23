@@ -29,7 +29,7 @@ export function AppRouter() {
 
           <Route element={<ProtectedRoute role={ROLES.CUSTOMER} />}>
             <Route path="/" element={<CustomerDashboard />} />
-            <Route path="/browse" element={<Browse />} />
+            <Route path="/restaurants/:restaurantId" element={<Browse />} />
             <Route path="/cart" element={<Cart />} />
           </Route>
 

@@ -1,6 +1,33 @@
 .order-item {
     display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
+    align-items: center;
+    min-height: 44px;
+    border-bottom: 1px solid #eee8e3;
+    color: var(--text-color);
+    font-size: 14px;
+}
+
+.order-item:last-child {
+    border-bottom: 0;
+}
+
+.order-item p {
+    margin: 0;
+}
+
+.order-item-name {
+    flex: 1;
+    font-weight: 600;
+}
+
+.order-item-quantity {
+    width: 48px;
+    color: #766a6c;
+    text-align: center;
+}
+
+.order-item-price {
+    width: 72px;
+    font-weight: 600;
+    text-align: right;
 }

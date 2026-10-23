@@ -26,7 +26,11 @@ const accountFields = {
             name: 'status',
             label: 'Status',
             type: 'select',
-            options: ['OPEN', 'PAUSED', 'CLOSED'],
+            options: [
+                { value: 'OPEN', label: 'Open' },
+                { value: 'PAUSED', label: 'Paused' },
+                { value: 'CLOSED', label: 'Closed' },
+            ],
         },
         { name: 'position', label: 'Position', type: 'text', placeholder: 'Latitude, Longitude' },
     ],
@@ -128,7 +132,7 @@ function Register() {
                                 <select id={field.name} name={field.name} defaultValue="" required>
                                     <option value="" disabled>Select {field.label}</option>
                                     {field.options.map((option) => (
-                                        <option value={option} key={option}>{option}</option>
+                                        <option value={option.value} key={option.value}>{option.label}</option>
                                     ))}
                                 </select>
                             ) : (

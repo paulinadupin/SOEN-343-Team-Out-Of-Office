@@ -6,7 +6,6 @@ import "../Sidebar.css";
 const linksByRole = {
     [ROLES.CUSTOMER]: [
         { to: "/", label: "Dashboard", end: true },
-        { to: "/browse", label: "Browse" },
         { to: "/cart", label: "Cart" },
     ],
     [ROLES.RESTAURANT]: [

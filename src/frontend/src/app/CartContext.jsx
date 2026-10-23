@@ -7,7 +7,9 @@ export function CartProvider({ children }) {
     function addItem(item) {
         setItems((currentItems) => {
             const existingItem = currentItems.find(
-                (currentItem) => currentItem.name === item.name
+                (currentItem) =>
+                    currentItem.restaurantId === item.restaurantId
+                    && currentItem.itemId === item.itemId
             );
 
             if (existingItem) {

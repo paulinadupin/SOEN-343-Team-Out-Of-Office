@@ -1,6 +1,14 @@
 package com.enchantea.domain.ord;
 
 import com.enchantea.domain.ord.state.PlacedState;
+import com.enchantea.domain.ord.state.AcceptedState;
+import com.enchantea.domain.ord.state.CancelledState;
+import com.enchantea.domain.ord.state.DeliveredState;
+import com.enchantea.domain.ord.state.PickedUpState;
+import com.enchantea.domain.ord.state.PreparingState;
+import com.enchantea.domain.ord.state.ReadyState;
+import com.enchantea.domain.ord.state.RefundedState;
+import com.enchantea.domain.ord.state.RejectedState;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +28,47 @@ public final class Order {
     
     // constructor
     public Order(String OrderId, String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
-        this.ORDER_ID = Objects.requireNonNull(OrderId, "id");
-        this.CUSTOMER_ID = Objects.requireNonNull(CUSTOMER_ID, "CUSTOMER_ID");
-        this.RESTAURANT_ID = Objects.requireNonNull(RESTAURANT_ID, "RESTAURANT_ID");
-        this.LINES = List.copyOf(LINES);
+        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null);
+    }
+
+    private Order(
+            String orderId,
+            String customerId,
+            String restaurantId,
+            List<OrderLine> lines,
+            Instant placedAt,
+            OrderStatus orderStatus,
+            Instant closedAt,
+            String rejectionReason) {
+        this.ORDER_ID = Objects.requireNonNull(orderId, "id");
+        this.CUSTOMER_ID = Objects.requireNonNull(customerId, "CUSTOMER_ID");
+        this.RESTAURANT_ID = Objects.requireNonNull(restaurantId, "RESTAURANT_ID");
+        this.LINES = List.copyOf(lines);
         if (this.LINES.isEmpty()) {
             throw new IllegalArgumentException("An order must contain at least one line");
         }
-        this.PLACED_AT = Instant.now();
-        this.status = new PlacedState(); //first state when order is created
+        this.PLACED_AT = Objects.requireNonNull(placedAt, "placedAt");
+        this.status = stateFor(orderStatus);
+        this.closedAt = closedAt;
+        this.rejectionReason = rejectionReason;
     }
 
     // is called when order is placed
     public static Order create(String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
         return new Order(UUID.randomUUID().toString(), CUSTOMER_ID, RESTAURANT_ID, LINES); //UUID stands for 'Universally Unique Identifier'
+    }
+
+    public static Order rehydrate(
+            String orderId,
+            String customerId,
+            String restaurantId,
+            List<OrderLine> lines,
+            Instant placedAt,
+            OrderStatus status,
+            Instant closedAt,
+            String rejectionReason) {
+        return new Order(
+                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, rejectionReason);
     }
 
     //getters
@@ -105,5 +140,19 @@ public final class Order {
             throw new IllegalArgumentException("A reason is required");
         }
         return value;
+    }
+
+    private static OrderState stateFor(OrderStatus orderStatus) {
+        return switch (Objects.requireNonNull(orderStatus, "status")) {
+            case PLACED -> new PlacedState();
+            case ACCEPTED -> new AcceptedState();
+            case PREPARING -> new PreparingState();
+            case READY -> new ReadyState();
+            case PICKED_UP -> new PickedUpState();
+            case DELIVERED -> new DeliveredState();
+            case REFUNDED -> new RefundedState();
+            case REJECTED -> new RejectedState();
+            case CANCELLED -> new CancelledState();
+        };
     }
 }

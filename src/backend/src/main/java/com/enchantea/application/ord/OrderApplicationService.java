@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 //runs the order use cases and connects the domain to validation, queues, storage, and events.
@@ -44,6 +45,7 @@ public class OrderApplicationService {
         this.EVENT_SUBJECT = EVENT_SUBJECT;
     }
 
+    @Transactional
     public Order place(CurrentUser user, OrderCommands.PlaceOrder command) {
         //check the request before creating the order
         VALIDATOR.validate(CommandType.PLACE_ORDER, user, command);
@@ -63,6 +65,7 @@ public class OrderApplicationService {
         return order;
     }
 
+    @Transactional
     public Order accept(CurrentUser user, OrderCommands.OrderAction command) {
         //accepted ORDERS go to the end of the preparation queue
         VALIDATOR.validate(CommandType.ACCEPT_ORDER, user, command);
@@ -74,6 +77,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
     public Order reject(CurrentUser user, OrderCommands.OrderAction command) {
         //the restaurant gives a reason when it rejects an order
         VALIDATOR.validate(CommandType.REJECT_ORDER, user, command);
@@ -84,6 +88,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, command.reason());
     }
 
+    @Transactional
     public Order cancelByCustomer(CurrentUser user, OrderCommands.OrderAction command) {
         VALIDATOR.validate(CommandType.CANCEL_ORDER_CUSTOMER, user, command);
         Order order = load(command.orderId());
@@ -93,6 +98,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
     public Order cancelByOperator(CurrentUser user, OrderCommands.OrderAction command) {
         //remove a cancelled order from queues and its courier assignment
         VALIDATOR.validate(CommandType.CANCEL_ORDER_OPERATOR, user, command);
@@ -106,6 +112,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
     public Order prepare(CurrentUser user, OrderCommands.OrderAction command) {
         //only the first order in the preparation queue can be prepared
         VALIDATOR.validate(CommandType.PREPARE_ORDER, user, command);
@@ -122,6 +129,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
     public Order markReady(CurrentUser user, OrderCommands.OrderAction command) {
         //move the first preparing order from preparation to dispatch
         VALIDATOR.validate(CommandType.MARK_ORDER_READY, user, command);
@@ -140,6 +148,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
     public Order pickUp(CurrentUser user, OrderCommands.OrderAction command) {
         VALIDATOR.validate(CommandType.PICK_UP_ORDER, user, command);
         Order order = load(command.orderId());
@@ -150,6 +159,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
     public Order deliver(CurrentUser user, OrderCommands.OrderAction command) {
         VALIDATOR.validate(CommandType.DELIVER_ORDER, user, command);
         Order order = load(command.orderId());
@@ -159,6 +169,7 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
     public Order refund(CurrentUser user, OrderCommands.OrderAction command) {
         VALIDATOR.validate(CommandType.REFUND_ORDER, user, command);
         Order order = load(command.orderId());
@@ -174,6 +185,11 @@ public class OrderApplicationService {
 
     public List<Order> allOrders() {
         return ORDERS.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Order> ordersForRestaurant(String restaurantId) {
+        return ORDERS.findByRestaurantId(restaurantId);
     }
 
     private Order load(String orderId) {

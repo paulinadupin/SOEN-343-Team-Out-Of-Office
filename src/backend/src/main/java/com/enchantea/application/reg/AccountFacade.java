@@ -19,6 +19,8 @@ import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Facade for account registration and login.
@@ -77,6 +79,15 @@ public class AccountFacade {
         }
         return RestaurantResponse.from(restaurant);
 
+    }
+
+    @Transactional(readOnly = true)
+    public List<RestaurantResponse> findRestaurants() {
+        return USERS.findAll().stream()
+                .filter(Restaurant.class::isInstance)
+                .map(Restaurant.class::cast)
+                .map(RestaurantResponse::from)
+                .collect(Collectors.toList());
     }
     
     public User requireLoggedIn(HttpSession session) {

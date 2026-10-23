@@ -53,6 +53,32 @@ export async function getCurrentRestaurant() {
   return request("/api/auth/restaurant/me");
 }
 
+export async function getRestaurants() {
+  return request("/api/auth/restaurants");
+}
+
+export async function getRestaurantMenu(restaurantId) {
+  return request(`/api/restaurants/${encodeURIComponent(restaurantId)}/menu`);
+}
+
+export async function getRestaurantOrders() {
+  return request("/api/orders/restaurant");
+}
+
+export async function placeOrder(restaurantId, lines) {
+  return request("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({ restaurantId, lines }),
+  });
+}
+
+export async function updateOrder(orderId, action, reason) {
+  return request(`/api/orders/${encodeURIComponent(orderId)}/${action}`, {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+}
+
 export async function logout() {
   await request("/api/auth/logout", { method: "POST" });
 }

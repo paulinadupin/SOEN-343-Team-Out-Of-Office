@@ -5,9 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.stereotype.Repository;
 
-@Repository
 //stores ORDERS in memory while the app is running.
 public class InMemoryOrderRepository implements OrderRepository {
     private final Map<String, Order> ORDERS = new HashMap<>();
@@ -29,5 +27,12 @@ public class InMemoryOrderRepository implements OrderRepository {
     //return every order currently stored
     public List<Order> findAll() {
         return new ArrayList<>(ORDERS.values());
+    }
+
+    @Override
+    public List<Order> findByRestaurantId(String restaurantId) {
+        return findAll().stream()
+                .filter(order -> order.restaurantId().equals(restaurantId))
+                .toList();
     }
 }

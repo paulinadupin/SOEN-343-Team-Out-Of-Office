@@ -19,7 +19,7 @@
         border-radius: var(--default-radius);
         font-size: var(--header4);
 
-        &.Open {
+        &.Open  {
             border-color: var(--primary-color);
             
             svg circle {
