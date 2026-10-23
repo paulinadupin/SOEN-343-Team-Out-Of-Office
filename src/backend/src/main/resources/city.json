@@ -3,6 +3,7 @@
     {
       "username": "restaurant",
       "status": "OPEN",
+      "position": { "lat": 45.4972, "lng": -73.5790 },
       "menu": [
         { "id": "classic-milk-tea", "name": "Classic Milk Tea", "price": 4.99, "status": "AVAILABLE" },
         { "id": "taro-milk-tea", "name": "Taro Milk Tea", "price": 5.99, "status": "AVAILABLE" },
