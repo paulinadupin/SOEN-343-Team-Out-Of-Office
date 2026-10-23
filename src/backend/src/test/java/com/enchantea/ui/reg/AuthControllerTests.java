@@ -2,6 +2,7 @@ package com.enchantea.ui.reg;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -93,11 +94,61 @@ class AuthControllerTests {
                 .andExpect(status().isConflict());
     }
 
+    @Test
+    void gettingCurrentUserRequiresLogin() throws Exception {
+        mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void gettingCurrentUserReturnsTheLoggedInAccount() throws Exception {
+        register("http-me");
+        MockHttpSession session = loginAndGetSession("http-me");
+
+        mockMvc.perform(get("/api/auth/me").session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("http-me"));
+    }
+
+    @Test
+    void gettingCurrentRestaurantRequiresLogin() throws Exception {
+        mockMvc.perform(get("/api/auth/restaurant/me"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void gettingCurrentRestaurantFailsForNonRestaurantAccounts() throws Exception {
+        register("http-not-a-restaurant");
+        MockHttpSession session = loginAndGetSession("http-not-a-restaurant");
+
+        mockMvc.perform(get("/api/auth/restaurant/me").session(session))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void gettingCurrentRestaurantReturnsItsOwnProfile() throws Exception {
+        registerRestaurant("http-resto-me");
+        MockHttpSession session = loginAndGetSession("http-resto-me");
+
+        mockMvc.perform(get("/api/auth/restaurant/me").session(session))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("http-resto-me"));
+    }
+
     private void register(String username) throws Exception {
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"username\":\"%s\",\"password\":\"password123\",\"accountType\":\"OPERATOR\"}"
                         .formatted(username)));
+    }
+
+    private void registerRestaurant(String username) throws Exception {
+        mockMvc.perform(post("/api/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"username":"%s","password":"password123","accountType":"RESTAURANT",
+                         "name":"Test Tea House","position":{"lat":45.5,"lng":-73.6}}
+                        """.formatted(username)));
     }
 
     private MockHttpSession loginAndGetSession(String username) throws Exception {

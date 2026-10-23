@@ -1,5 +1,6 @@
 package com.enchantea.ui.ord;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -60,6 +61,35 @@ class OrderControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customerId")
                         .value(customerSession.getAttribute("userId").toString()));
+    }
+
+    @Test
+    void restaurantOrdersRequiresLogin() throws Exception {
+        mockMvc.perform(get("/api/orders/restaurant"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void restaurantOrdersRequiresARestaurantAccount() throws Exception {
+        MockHttpSession customerSession = loginAndGetSession("customer", "pass1234");
+
+        mockMvc.perform(get("/api/orders/restaurant").session(customerSession))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void restaurantOrdersReturnsTheOrdersPlacedAtThatRestaurant() throws Exception {
+        MockHttpSession customerSession = loginAndGetSession("customer", "pass1234");
+        mockMvc.perform(post("/api/orders")
+                .session(customerSession)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(placeOrderJson()));
+
+        MockHttpSession restaurantSession = loginAndGetSession("restaurant", "pass1234");
+
+        mockMvc.perform(get("/api/orders/restaurant").session(restaurantSession))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].restaurantId").value(restaurantId));
     }
 
     private String placeOrderJson() {

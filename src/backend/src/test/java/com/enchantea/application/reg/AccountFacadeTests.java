@@ -49,7 +49,7 @@ class AccountFacadeTests {
                 "restaurant", "password123", AccountType.RESTAURANT, "Tea House",
                 null, new Location(45.6, -73.7)));
         AccountResponse courier = accountFacade.register(new RegisterRequest(
-                "courier", "password123", AccountType.COURIER, null, null, null));
+                "courier", "password123", AccountType.COURIER, null, null, new Location(45.4, -73.5)));
         AccountResponse operator = accountFacade.register(new RegisterRequest(
                 "operator", "password123", AccountType.OPERATOR, null, null, null));
 
