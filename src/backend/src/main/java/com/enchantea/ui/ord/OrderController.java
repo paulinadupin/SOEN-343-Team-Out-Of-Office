@@ -4,7 +4,6 @@ import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.application.ord.OrderApplicationService;
 import com.enchantea.application.ord.OrderCommands;
 import com.enchantea.application.ord.contracts.CurrentUser;
-import com.enchantea.application.ord.contracts.Role;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.reg.AccountType;
@@ -107,14 +106,8 @@ public class OrderController {
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = accountFacade.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();
-        Role role = switch (accountType) {
-            case CUSTOMER -> Role.CUSTOMER;
-            case RESTAURANT -> Role.RESTAURANT_OPERATOR;
-            case COURIER -> Role.DELIVERY_OPERATOR;
-            case OPERATOR -> Role.SYSTEM;
-        };
         String restaurantId = user instanceof Restaurant ? user.getUserId().toString() : null;
-        return new CurrentUser(user.getUserId().toString(), role, restaurantId);
+        return new CurrentUser(user.getUserId().toString(), accountType, restaurantId);
     }
 
     private OrderCommands.OrderAction action(String id, ActionRequest request) {
