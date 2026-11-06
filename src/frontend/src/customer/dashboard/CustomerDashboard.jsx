@@ -1,5 +1,6 @@
 import './Dashboard.css'
 import RestaurantProfile from '../../components/RestaurantProfile'
+import Map from '../../components/Map'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getRestaurants } from '../../app/api'
@@ -36,6 +37,7 @@ function CustomerDashboard() {
                     />
                 ))}
             </div>
+            <Map restaurants={restaurants} />
         </div>
     )
 }
