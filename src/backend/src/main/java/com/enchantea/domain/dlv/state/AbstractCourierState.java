@@ -2,8 +2,6 @@ package com.enchantea.domain.dlv.state;
 import com.enchantea.domain.dlv.CourierState;
 import com.enchantea.domain.dlv.CourierStatus;
 import com.enchantea.domain.dlv.InvalidCourierTransitionException;
-import com.enchantea.domain.ord.InvalidOrderTransitionException;
-import com.enchantea.domain.ord.OrderState;
 
 public class AbstractCourierState implements CourierState {
 
