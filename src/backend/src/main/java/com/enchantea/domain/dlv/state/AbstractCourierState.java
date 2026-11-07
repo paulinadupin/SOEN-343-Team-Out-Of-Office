@@ -1,9 +1,8 @@
 package com.enchantea.domain.dlv.state;
 import com.enchantea.domain.dlv.CourierState;
-import com.enchantea.domain.dlv.CourierStatus;
 import com.enchantea.domain.dlv.InvalidCourierTransitionException;
 
-public class AbstractCourierState implements CourierState {
+abstract class AbstractCourierState implements CourierState {
 
     @Override
     public CourierState goOffline() { return illegal("go offline"); }
