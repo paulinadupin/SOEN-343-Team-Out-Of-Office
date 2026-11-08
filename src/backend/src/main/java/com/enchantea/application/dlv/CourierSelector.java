@@ -46,6 +46,11 @@ public class CourierSelector {
         }
 
         Courier candidate = allIdleCouriers.get(0);
+
+        if(allIdleCouriers.size()==1){
+            return candidate;
+        }
+
         double x1=restaurantLocation.getLat();
         double y1=restaurantLocation.getLng();
         double currentx=candidate.getPosition().getLat();
@@ -63,7 +68,7 @@ public class CourierSelector {
                 candidate=allIdleCouriers.get(i);
                 currentDistance=distance;
             }else if (distance==currentDistance){
-                if(candidate.getUserId()<allIdleCouriers.get(i).getUserId()){
+                if(candidate.getUserId()>allIdleCouriers.get(i).getUserId()){
                     candidate=allIdleCouriers.get(i);
                     currentDistance=distance;
                 }
