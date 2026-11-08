@@ -70,9 +70,10 @@ public final class Order {
             Instant placedAt,
             OrderStatus status,
             Instant closedAt,
-            String rejectionReason) {
+            String rejectionReason,
+            Charge charge) {
         return new Order(
-                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, rejectionReason, null);
+                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, rejectionReason, charge);
     }
 
     //getters
