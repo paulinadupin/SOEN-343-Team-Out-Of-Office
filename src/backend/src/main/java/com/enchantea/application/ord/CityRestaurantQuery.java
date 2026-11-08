@@ -3,6 +3,7 @@ package com.enchantea.application.ord;
 import com.enchantea.application.ord.contracts.CommandRejectedException;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
 import com.enchantea.domain.ord.MenuItem;
+import com.enchantea.domain.reg.Location;
 import com.enchantea.domain.reg.Restaurant;
 import com.enchantea.domain.reg.RestaurantStatus;
 import com.enchantea.foundation.reg.UserRepository;
@@ -49,4 +50,10 @@ public class CityRestaurantQuery implements RestaurantQuery {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<Location> location(String restaurantId) {
+        return findRestaurant(restaurantId).map(Restaurant::getPosition);
+    }
+    
 }
