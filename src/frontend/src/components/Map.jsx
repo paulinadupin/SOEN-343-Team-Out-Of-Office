@@ -4,6 +4,12 @@ import { Icon } from 'leaflet';
 import "leaflet/dist/leaflet.css";
 import './Map.css';
 
+// Reference: https://www.youtube.com/watch?v=jD6813wGdBA
+
+//NOTE: Make the markers toggable 
+
+//Map Canvas: canvas scaled to [minLon, maxLon] × [minLat, maxLat]
+
 function Map({restaurants}) {
     const icon = new Icon({
         iconUrl:'./pin.png',
@@ -13,6 +19,8 @@ function Map({restaurants}) {
         <MapContainer
             center={[45.49694, -73.57806]}
             zoom={14}
+            maxZoom={18}
+            minZoom={10}
             class="container"
         >
             <TileLayer
