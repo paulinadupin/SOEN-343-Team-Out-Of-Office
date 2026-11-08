@@ -130,10 +130,14 @@ public class OrderController {
         List<LineView> lines = order.lines().stream()
                 .map(line -> new LineView(line.itemId(), line.quantity(), line.unitPrice()))
                 .toList();
+        ChargeView charge = order.charge() == null ? null : new ChargeView(
+                order.charge().subtotal(), order.charge().deliveryFee(),
+                order.charge().serviceFee(), order.charge().smallOrderSurcharge(), order.charge().total());
 
         return new OrderView(
                 order.id(), order.customerId(), order.restaurantId(), lines,
-                order.total(), order.status(), order.placedAt(), order.closedAt(), order.rejectionReason());
+                order.total(), order.status(), order.placedAt(), order.closedAt(),
+                order.rejectionReason(), charge);
     }
 
     public record PlaceRequest(
@@ -144,6 +148,13 @@ public class OrderController {
 
     public record LineView(String itemId, int quantity, double unitPrice) { }
 
+    public record ChargeView(
+            double subtotal,
+            double deliveryFee,
+            double serviceFee,
+            double smallOrderSurcharge,
+            double total) { }
+
     public record OrderView(
             String id,
             String customerId,
@@ -153,5 +164,6 @@ public class OrderController {
             OrderStatus status,
             Instant placedAt,
             Instant closedAt,
-            String rejectionReason) { }
+            String rejectionReason,
+            ChargeView charge) { }
 }
