@@ -29,6 +29,12 @@ public class InMemoryPreparationQueue implements PreparationQueue {
         return queue != null && queue.remove(orderId);
     }
 
+    @Override
+    public synchronized int size(String restaurantId) {
+        OrderQueue queue = QUEUES.get(restaurantId);
+        return queue == null ? 0 : queue.size();
+    }
+
     private OrderQueue queueFor(String restaurantId) {
         return QUEUES.computeIfAbsent(restaurantId, id -> new OrderQueue());
     }
