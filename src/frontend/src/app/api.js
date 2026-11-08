@@ -83,6 +83,10 @@ export async function updateOrder(orderId, action, reason) {
   });
 }
 
+export async function getOnDutyCouriers() {
+  return request("/api/on-duty-couriers");
+}
+
 export async function logout() {
   await request("/api/auth/logout", { method: "POST" });
 }

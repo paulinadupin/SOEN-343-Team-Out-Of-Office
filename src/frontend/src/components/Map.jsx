@@ -10,11 +10,17 @@ import './Map.css';
 
 //Map Canvas: canvas scaled to [minLon, maxLon] × [minLat, maxLat]
 
-function Map({restaurants}) {
-    const icon = new Icon({
+function Map({restaurants, onDutyCouriers=[]}) {
+    const restaurantIcon = new Icon({
         iconUrl:'./pin.png',
-        iconSize:[30,30]}
-    );
+        iconSize:[30,30]
+    });
+
+    const courierIcon = new Icon({
+        iconUrl: './courier.png',
+        iconSize: [30,30]
+    });
+
     return (
         <MapContainer
             center={[45.49694, -73.57806]}
@@ -28,9 +34,16 @@ function Map({restaurants}) {
                 url='https://tile.openstreetmap.org/{z}/{x}/{y}.png'
             />
             {restaurants.map((restaurant) => (
-                <Marker position={restaurant.position} icon={icon}>
+                <Marker position={restaurant.position} icon={restaurantIcon}>
                     <Popup>
                         {restaurant.name}
+                    </Popup>
+                </Marker>
+            ))}
+            {onDutyCouriers.map((courier)=> (
+                <Marker position={courier.position} icon={courierIcon}>
+                    <Popup>
+                        {courier.username}
                     </Popup>
                 </Marker>
             ))}

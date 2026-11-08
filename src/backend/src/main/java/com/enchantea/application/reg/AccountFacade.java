@@ -89,6 +89,15 @@ public class AccountFacade {
                 .map(RestaurantResponse::from)
                 .collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public List<CourierResponse> findOnDutyCouriers() {
+        return USERS.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .map(CourierResponse::from)
+                .collect(Collectors.toList());
+    }
     
     public User requireLoggedIn(HttpSession session) {
         if (session == null) {

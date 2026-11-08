@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.enchantea.application.reg.AccountResponse;
+import com.enchantea.application.reg.CourierResponse;
 import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.application.reg.LoginRequest;
 import com.enchantea.application.reg.RegisterRequest;
@@ -81,6 +82,11 @@ public class AuthController {
     @GetMapping("/restaurants")
     public List<RestaurantResponse> restaurants() {
         return ACCOUNT_FACADE.findRestaurants();
+    }
+
+    @GetMapping("/api/on-duty-couriers")
+    public List<CourierResponse> onDutyCouriers(HttpServletRequest servletRequest) {
+        return ACCOUNT_FACADE.findOnDutyCouriers();
     }
 
     @PostMapping("/logout")
