@@ -1,5 +1,7 @@
 package com.enchantea.domain.dlv;
 
+import com.enchantea.domain.reg.CourierStatus;
+
 //all actions related to courier's status
 public interface CourierState {
     CourierStatus status();

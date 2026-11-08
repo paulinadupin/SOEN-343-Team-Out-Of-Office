@@ -1,7 +1,7 @@
 package com.enchantea.domain.dlv.state;
 
 import com.enchantea.domain.dlv.CourierState;
-import com.enchantea.domain.dlv.CourierStatus;
+import com.enchantea.domain.reg.CourierStatus;
 
 public class OfflineState extends AbstractCourierState{
 
