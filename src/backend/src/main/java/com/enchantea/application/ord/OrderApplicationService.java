@@ -197,6 +197,10 @@ public class OrderApplicationService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
+    public int preparationQueueSize(String restaurantId) {
+        return PREPARATION_QUEUE.size(restaurantId);
+    }
+
     private Order saveAndPublish(Order order, OrderStatus oldStatus, String reason) {
         //save the changed order, then send its event to observers
         OrderEvent event = createEvent(order, oldStatus, reason);

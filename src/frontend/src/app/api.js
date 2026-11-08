@@ -72,6 +72,10 @@ export async function placeOrder(restaurantId, lines) {
   });
 }
 
+export async function getPreperationQueueSize() {
+  return request('/api/orders/restaurant/queue/size');
+}
+
 export async function updateOrder(orderId, action, reason) {
   return request(`/api/orders/${encodeURIComponent(orderId)}/${action}`, {
     method: "POST",
