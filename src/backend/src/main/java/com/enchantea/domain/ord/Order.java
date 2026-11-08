@@ -9,6 +9,7 @@ import com.enchantea.domain.ord.state.PreparingState;
 import com.enchantea.domain.ord.state.ReadyState;
 import com.enchantea.domain.ord.state.RefundedState;
 import com.enchantea.domain.ord.state.RejectedState;
+import com.enchantea.domain.prc.Charge;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +22,15 @@ public final class Order {
     private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
     private String rejectionReason;
+    private Charge charge;
     private final String CUSTOMER_ID;
     private final String RESTAURANT_ID;
     private final List<OrderLine> LINES;
     private final List<StateTransition> TRANSITIONS = new ArrayList<>();
-    
+
     // constructor
     public Order(String OrderId, String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
-        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null);
+        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null);
     }
 
     private Order(
@@ -39,7 +41,8 @@ public final class Order {
             Instant placedAt,
             OrderStatus orderStatus,
             Instant closedAt,
-            String rejectionReason) {
+            String rejectionReason,
+            Charge charge) {
         this.ORDER_ID = Objects.requireNonNull(orderId, "id");
         this.CUSTOMER_ID = Objects.requireNonNull(customerId, "CUSTOMER_ID");
         this.RESTAURANT_ID = Objects.requireNonNull(restaurantId, "RESTAURANT_ID");
@@ -51,6 +54,7 @@ public final class Order {
         this.status = stateFor(orderStatus);
         this.closedAt = closedAt;
         this.rejectionReason = rejectionReason;
+        this.charge = charge;
     }
 
     // is called when order is placed
@@ -68,7 +72,7 @@ public final class Order {
             Instant closedAt,
             String rejectionReason) {
         return new Order(
-                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, rejectionReason);
+                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, rejectionReason, null);
     }
 
     //getters
@@ -81,6 +85,12 @@ public final class Order {
     public OrderStatus status() { return status.status(); }
     public String rejectionReason() { return rejectionReason; }
     public List<StateTransition> transitions() { return List.copyOf(TRANSITIONS); }
+    public Charge charge() { return charge; }
+
+    // attaches the computed cost breakdown when the order is placed (R-PRC-01)
+    public void attachCharge(Charge charge) {
+        this.charge = Objects.requireNonNull(charge, "charge");
+    }
 
     // calculates the order's total (before fees and taxes)
     public double total() {
