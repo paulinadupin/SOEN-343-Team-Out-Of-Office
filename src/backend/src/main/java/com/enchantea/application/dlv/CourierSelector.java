@@ -24,7 +24,7 @@ public class CourierSelector {
         for (User user : allUsers){
             if (user.getAccountType() == AccountType.COURIER && (user instanceof Courier)){
                 Courier c = (Courier) user;
-                if(c.getStatus() == CourierStatus.IDLE){
+                if(c.getState().status() == CourierStatus.IDLE){
                     allIdleCouriers.add(c);
                 }
             }

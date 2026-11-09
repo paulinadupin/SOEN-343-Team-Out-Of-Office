@@ -2,6 +2,11 @@ package com.enchantea.domain.reg;
 
 import com.enchantea.domain.dlv.Assignment;
 import com.enchantea.domain.dlv.CourierState;
+import com.enchantea.domain.dlv.state.AssignedState;
+import com.enchantea.domain.dlv.state.CarryingState;
+import com.enchantea.domain.dlv.state.IdleState;
+import com.enchantea.domain.dlv.state.OfflineState;
+
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -15,7 +20,7 @@ import jakarta.persistence.Enumerated;
 public class Courier extends User{
     @Enumerated(EnumType.STRING)
     @Column(name="courier_status")
-    private CourierState status;
+    private CourierStatus status;
 
     @Embedded
     @AttributeOverride(name = "lat", column = @Column(name = "courier_lat"))
@@ -27,14 +32,14 @@ public class Courier extends User{
     protected Courier() {
     }
 
-    public Courier(String username, String passwordHash, CourierState status, Location position) {
+    public Courier(String username, String passwordHash, CourierStatus status, Location position) {
         super(username, passwordHash);
         this.status = status;
         this.position = position;
     }
 
     public CourierStatus getStatus() {
-        return status.status();
+        return status;
     }
 
     public Location getPosition() {
@@ -58,4 +63,16 @@ public class Courier extends User{
         this.assignment = assignment;
     }
     
+    public CourierState getState(){
+        return switch (status){
+            case OFFLINE -> new OfflineState();
+            case IDLE -> new IdleState();
+            case ASSIGNED -> new AssignedState();
+            case CARRYING -> new CarryingState();
+        };
+    }
+
+    public void setState(CourierState state){
+        this.status=state.status();
+    }
 }

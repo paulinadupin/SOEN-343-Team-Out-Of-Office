@@ -130,8 +130,7 @@ public class AccountFacade {
                 return new Courier(
                         username,
                         passwordHash,
-                        new OfflineState(),
-                        requireLocation(request.getPosition(), "position"));
+                        request.getCourierStatus() == null ? CourierStatus.OFFLINE : request.getCourierStatus(),                        requireLocation(request.getPosition(), "position"));
             case OPERATOR:
                 return new Operator(username, passwordHash);
             default:
