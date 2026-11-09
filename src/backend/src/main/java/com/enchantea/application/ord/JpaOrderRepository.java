@@ -51,7 +51,7 @@ public class JpaOrderRepository implements OrderRepository {
                 order.charge().serviceFee(), order.charge().smallOrderSurcharge());
         return new PersistedOrder(
                 order.id(), order.customerId(), order.restaurantId(), order.placedAt(),
-                order.closedAt(), order.rejectionReason(), order.status(), lines, charge);
+                order.closedAt(), order.deliveredAt(), order.rejectionReason(), order.status(), lines, charge);
     }
 
     private static Order toDomain(PersistedOrder order) {
@@ -63,6 +63,6 @@ public class JpaOrderRepository implements OrderRepository {
                 order.charge().serviceFee(), order.charge().smallOrderSurcharge());
         return Order.rehydrate(
                 order.id(), order.customerId(), order.restaurantId(), lines, order.placedAt(),
-                order.status(), order.closedAt(), order.rejectionReason(), charge);
+                order.status(), order.closedAt(), order.deliveredAt(), order.rejectionReason(), charge);
     }
 }

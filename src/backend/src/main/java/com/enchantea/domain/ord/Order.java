@@ -21,6 +21,7 @@ public final class Order {
     private OrderState status;
     private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
+    private Instant deliveredAt; 
     private String rejectionReason;
     private Charge charge;
     private final String CUSTOMER_ID;
@@ -30,7 +31,7 @@ public final class Order {
 
     // constructor
     public Order(String OrderId, String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
-        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null);
+        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null, null);
     }
 
     private Order(
@@ -41,6 +42,7 @@ public final class Order {
             Instant placedAt,
             OrderStatus orderStatus,
             Instant closedAt,
+            Instant deliveredAt,
             String rejectionReason,
             Charge charge) {
         this.ORDER_ID = Objects.requireNonNull(orderId, "id");
@@ -53,6 +55,7 @@ public final class Order {
         this.PLACED_AT = Objects.requireNonNull(placedAt, "placedAt");
         this.status = stateFor(orderStatus);
         this.closedAt = closedAt;
+        this.deliveredAt = deliveredAt;
         this.rejectionReason = rejectionReason;
         this.charge = charge;
     }
@@ -70,10 +73,12 @@ public final class Order {
             Instant placedAt,
             OrderStatus status,
             Instant closedAt,
+            Instant deliveredAt,
             String rejectionReason,
             Charge charge) {
         return new Order(
-                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, rejectionReason, charge);
+                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, deliveredAt,
+                rejectionReason, charge);
     }
 
     //getters
@@ -83,6 +88,7 @@ public final class Order {
     public List<OrderLine> lines() { return LINES; }
     public Instant placedAt() { return PLACED_AT; }
     public Instant closedAt() { return closedAt; }
+    public Instant deliveredAt() { return deliveredAt; }
     public OrderStatus status() { return status.status(); }
     public String rejectionReason() { return rejectionReason; }
     public List<StateTransition> transitions() { return List.copyOf(TRANSITIONS); }
@@ -136,6 +142,10 @@ public final class Order {
     // records transitions (R-ORD-05)
     public void recordTransition(StateTransition transition) {
         TRANSITIONS.add(transition);
+        // keeps the delivery time even if the order is refunded later (R-PRC-03). This needs to be added bc when an order goes from delievered -> refunded, closedAt is overwritten even when the delivery time needs to be saved for the order summary.
+        if (transition.toStatus() == OrderStatus.DELIVERED) {
+            deliveredAt = transition.timestamp();
+        }
         // if at the last state of the order lifecycle, then the order is closed
         if (transition.toStatus() == OrderStatus.DELIVERED
                 || transition.toStatus() == OrderStatus.REJECTED
