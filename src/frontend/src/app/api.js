@@ -82,3 +82,31 @@ export async function updateOrder(orderId, action, reason) {
 export async function logout() {
   await request("/api/auth/logout", { method: "POST" });
 }
+
+export async function getCourierState(){
+  return request("/api/courier/assignment");
+}
+
+export async function acceptOffer(){
+  return request("/api/courier/offer/accept",{method:"POST"});
+}
+
+export async function declineOffer(){
+  return request("/api/courier/offer/decline",{method:"POST"});
+}
+
+export async function goOnline(){
+  return request("/api/courier/online",{method:"POST"});
+}
+
+export async function goOffline(){
+  return request("/api/courier/offline",{method:"POST"});
+}
+
+export async function confirmPickup(){
+  return request("/api/courier/pickup",{method:"POST"});
+}
+
+export async function confirmDelivery(){
+  return request("/api/courier/delivery",{method:"POST"});
+}
