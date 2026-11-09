@@ -38,6 +38,40 @@ public class Courier extends User{
         this.position = position;
     }
 
+    // --- state transition methods ---
+
+    public void goOnline(){
+        CourierState state = getState();
+        setState(state.goOnline());
+    }
+
+    public void goOffline(){
+        CourierState state = getState();
+        setState(state.goOffline());
+    }
+
+    public void acceptOffer(){
+        CourierState state = getState();
+        setState(state.acceptOffer());
+    }
+
+    public void declineOffer(){
+        CourierState state = getState();
+        setState(state.declineOffer());
+    }
+
+    public void confirmPickup(){
+        CourierState state = getState();
+        setState(state.confirmPickup());
+    }
+
+    public void confirmDelivery(){
+        CourierState state = getState();
+        setState(state.confirmDelivery());
+    }
+
+    // --- getters and setters ---
+
     public CourierStatus getStatus() {
         return status;
     }
@@ -72,7 +106,7 @@ public class Courier extends User{
         };
     }
 
-    public void setState(CourierState state){
+    private void setState(CourierState state){
         this.status=state.status();
     }
 }
