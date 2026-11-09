@@ -4,6 +4,7 @@ import com.enchantea.domain.ord.OrderStatus;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,6 +36,9 @@ public class PersistedOrder {
     @CollectionTable(name = "order_lines", joinColumns = @JoinColumn(name = "order_id"))
     private List<PersistedOrderLine> lines = new ArrayList<>();
 
+    @Embedded
+    private PersistedCharge charge;
+
     protected PersistedOrder() {
     }
 
@@ -46,7 +50,8 @@ public class PersistedOrder {
             Instant closedAt,
             String rejectionReason,
             OrderStatus status,
-            List<PersistedOrderLine> lines) {
+            List<PersistedOrderLine> lines,
+            PersistedCharge charge) {
         this.id = id;
         this.customerId = customerId;
         this.restaurantId = restaurantId;
@@ -55,6 +60,7 @@ public class PersistedOrder {
         this.rejectionReason = rejectionReason;
         this.status = status;
         this.lines = new ArrayList<>(lines);
+        this.charge = charge;
     }
 
     public String id() { return id; }
@@ -65,4 +71,5 @@ public class PersistedOrder {
     public String rejectionReason() { return rejectionReason; }
     public OrderStatus status() { return status; }
     public List<PersistedOrderLine> lines() { return lines; }
+    public PersistedCharge charge() { return charge; }
 }
