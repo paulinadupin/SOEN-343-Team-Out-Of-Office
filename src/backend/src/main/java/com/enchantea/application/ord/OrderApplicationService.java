@@ -167,7 +167,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
-        order.pickUp();
+        order.pickUp(user.id());
         DISPATCH_QUEUE.removeFromDispatch(order.restaurantId(), order.id());
         return saveAndPublish(order, oldStatus, null);
     }
