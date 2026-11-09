@@ -1,5 +1,6 @@
 package com.enchantea.application.reg;
 
+import com.enchantea.domain.dlv.CourierState;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.CourierStatus;
 import com.enchantea.domain.reg.Location;
@@ -24,7 +25,6 @@ public class RegisterRequest {
     private Location deliveryAddress;
     private Location position;
     private RestaurantStatus restaurantStatus;
-    private CourierStatus courierStatus;
 
     // Spring uses this constructor when it turns the JSON request into a Java object.
     public RegisterRequest() {
@@ -101,11 +101,4 @@ public class RegisterRequest {
         this.restaurantStatus = restaurantStatus;
     }
 
-    public CourierStatus getCourierStatus() {
-        return courierStatus;
-    }
-
-    public void setCourierStatus(CourierStatus courierStatus) {
-        this.courierStatus = courierStatus;
-    }
 }

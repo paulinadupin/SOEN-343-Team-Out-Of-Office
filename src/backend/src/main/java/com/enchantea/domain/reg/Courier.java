@@ -1,5 +1,7 @@
 package com.enchantea.domain.reg;
 
+import com.enchantea.domain.dlv.Assignment;
+import com.enchantea.domain.dlv.CourierState;
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -13,28 +15,26 @@ import jakarta.persistence.Enumerated;
 public class Courier extends User{
     @Enumerated(EnumType.STRING)
     @Column(name="courier_status")
-    private CourierStatus status;
+    private CourierState status;
 
     @Embedded
     @AttributeOverride(name = "lat", column = @Column(name = "courier_lat"))
     @AttributeOverride(name = "lng", column = @Column(name = "courier_lng"))
     private Location position;
 
+    private Assignment assignment = null;
+
     protected Courier() {
     }
 
-    public Courier(String username, String passwordHash, CourierStatus status, Location position) {
+    public Courier(String username, String passwordHash, CourierState status, Location position) {
         super(username, passwordHash);
         this.status = status;
         this.position = position;
     }
 
     public CourierStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CourierStatus status) {
-        this.status = status;
+        return status.status();
     }
 
     public Location getPosition() {
@@ -49,4 +49,13 @@ public class Courier extends User{
     public AccountType getAccountType() {
         return AccountType.COURIER;
     }
+
+    public Assignment getAssignment() {
+        return assignment;
+    }
+
+    public void setAssignment(Assignment assignment) {
+        this.assignment = assignment;
+    }
+    
 }

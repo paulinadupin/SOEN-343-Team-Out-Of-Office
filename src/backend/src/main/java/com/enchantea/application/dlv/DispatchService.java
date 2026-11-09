@@ -1,9 +1,12 @@
 package com.enchantea.application.dlv;
 
+import java.time.Instant;
 import java.util.Optional;
 
 import com.enchantea.application.ord.contracts.DispatchQueue;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
+import com.enchantea.domain.dlv.Assignment;
+import com.enchantea.domain.dlv.AssignmentStatus;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.Location;
@@ -38,7 +41,8 @@ public class DispatchService {
         // get selected courier
         Courier selectedCourier = COURIER_SELECTOR.select(location.get());
         
-        //TODO: implement sending offer
+        //sending offer
+        selectedCourier.setAssignment(new Assignment(AssignmentStatus.OFFERED, order, Instant.now()));
 
     }
 }
