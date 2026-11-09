@@ -12,6 +12,7 @@ import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.ord.StateTransition;
+import com.enchantea.domain.prc.Charge;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -49,17 +50,17 @@ public class OrderApplicationService {
         this.PRICING_CALCULATOR = PRICING_CALCULATOR;
     }
 
+    public Charge quote(CurrentUser user, OrderCommands.PlaceOrder command) {
+        VALIDATOR.validate(CommandType.PLACE_ORDER, user, command);
+        return PRICING_CALCULATOR.computeCharge(buildLines(command));
+    }
+
     @Transactional
     public Order place(CurrentUser user, OrderCommands.PlaceOrder command) {
         //check the request before creating the order
         VALIDATOR.validate(CommandType.PLACE_ORDER, user, command);
 
-        List<OrderLine> lines = command.lines().stream()
-                .map(line -> new OrderLine(
-                        line.itemId(),
-                        line.quantity(),
-                        RESTAURANT_QUERY.itemPrice(command.restaurantId(), line.itemId())))
-                .toList();
+        List<OrderLine> lines = buildLines(command);
 
         Order order = Order.create(user.id(), command.restaurantId(), lines);
         //compute and attach the cost breakdown before the customer confirms (R-PRC-01)
@@ -196,6 +197,15 @@ public class OrderApplicationService {
     @Transactional(readOnly = true)
     public List<Order> ordersForRestaurant(String restaurantId) {
         return ORDERS.findByRestaurantId(restaurantId);
+    }
+
+    private List<OrderLine> buildLines(OrderCommands.PlaceOrder command) {
+        return command.lines().stream()
+                .map(line -> new OrderLine(
+                        line.itemId(),
+                        line.quantity(),
+                        RESTAURANT_QUERY.itemPrice(command.restaurantId(), line.itemId())))
+                .toList();
     }
 
     private Order load(String orderId) {
