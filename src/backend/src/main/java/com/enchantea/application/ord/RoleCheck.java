@@ -18,7 +18,8 @@ public class RoleCheck extends CommandCheck {
             CommandType.PICK_UP_ORDER, AccountType.COURIER,
             CommandType.DELIVER_ORDER, AccountType.COURIER,
             CommandType.CANCEL_ORDER_OPERATOR, AccountType.OPERATOR,
-            CommandType.REFUND_ORDER, AccountType.OPERATOR));
+            CommandType.REFUND_ORDER, AccountType.OPERATOR,
+            CommandType.VIEW_ORDER_SUMMARY, AccountType.OPERATOR));
 
     @Override
     protected void verify(CommandType type, CurrentUser user, Object command) {
