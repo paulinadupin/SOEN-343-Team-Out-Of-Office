@@ -40,6 +40,16 @@ public class CityRestaurantQuery implements RestaurantQuery {
                 .orElseThrow(() -> new CommandRejectedException("Unknown menu item: " + itemId));
     }
 
+    @Override
+    public Optional<String> restaurantName(String restaurantId) {
+        return findRestaurant(restaurantId).map(Restaurant::getName);
+    }
+
+    @Override
+    public Optional<String> itemName(String restaurantId, String itemId) {
+        return MENU_CATALOG.find(restaurantId, itemId).map(MenuItem::name);
+    }
+
     private Optional<Restaurant> findRestaurant(String restaurantId) {
         try {
             return USERS.findById(Long.valueOf(restaurantId))
