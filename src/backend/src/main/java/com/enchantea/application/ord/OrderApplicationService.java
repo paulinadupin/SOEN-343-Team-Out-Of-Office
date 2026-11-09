@@ -7,12 +7,15 @@ import com.enchantea.application.ord.contracts.CourierAssignment;
 import com.enchantea.application.ord.contracts.DispatchQueue;
 import com.enchantea.application.ord.contracts.PreparationQueue;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
+import com.enchantea.application.prc.JpaLedgerRepository;
 import com.enchantea.application.prc.PricingCalculator;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.ord.StateTransition;
 import com.enchantea.domain.prc.Charge;
+import com.enchantea.domain.prc.Ledger;
+import com.enchantea.domain.prc.LedgerEntryType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +33,7 @@ public class OrderApplicationService {
     private final RestaurantQuery RESTAURANT_QUERY;
     private final OrderEventSubject EVENT_SUBJECT;
     private final PricingCalculator PRICING_CALCULATOR;
+    private final JpaLedgerRepository LEDGER_REPOSITORY;
 
     public OrderApplicationService(
             OrderRepository ORDERS,
@@ -39,7 +43,8 @@ public class OrderApplicationService {
             CourierAssignment COURIER_ASSIGNMENT,
             RestaurantQuery RESTAURANT_QUERY,
             OrderEventSubject EVENT_SUBJECT,
-            PricingCalculator PRICING_CALCULATOR) {
+            PricingCalculator PRICING_CALCULATOR,
+            JpaLedgerRepository LEDGER_REPOSITORY) {
         this.ORDERS = ORDERS;
         this.VALIDATOR = VALIDATOR;
         this.PREPARATION_QUEUE = PREPARATION_QUEUE;
@@ -48,6 +53,7 @@ public class OrderApplicationService {
         this.RESTAURANT_QUERY = RESTAURANT_QUERY;
         this.EVENT_SUBJECT = EVENT_SUBJECT;
         this.PRICING_CALCULATOR = PRICING_CALCULATOR;
+        this.LEDGER_REPOSITORY = LEDGER_REPOSITORY;
     }
 
     public Charge quote(CurrentUser user, OrderCommands.PlaceOrder command) {
@@ -173,6 +179,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.deliver();
+        LEDGER_REPOSITORY.save(new Ledger().record(order.id(), LedgerEntryType.CHARGE, order.charge().total()));
         return saveAndPublish(order, oldStatus, null);
     }
 
