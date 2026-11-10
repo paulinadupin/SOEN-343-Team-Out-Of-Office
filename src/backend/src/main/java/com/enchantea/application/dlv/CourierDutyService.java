@@ -6,6 +6,8 @@ import com.enchantea.foundation.reg.UserRepository;
 import com.enchantea.application.ord.OrderApplicationService;
 import com.enchantea.application.ord.OrderCommands;
 import com.enchantea.application.ord.contracts.CurrentUser;
+import com.enchantea.domain.dlv.Assignment;
+import com.enchantea.domain.dlv.AssignmentStatus;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.User;
@@ -61,6 +63,7 @@ public class CourierDutyService {
 
         if(courier.getAssignment().isExpired()){
             declineOffer(courierId);
+            return;
         }
 
         courier.acceptOffer();
@@ -85,11 +88,18 @@ public class CourierDutyService {
 
     }
 
-    public void confirmPickup(Long courierId, Long orderId){
+    public void confirmPickup(Long courierId, String orderId){
         User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!(user instanceof Courier courier)) {
             throw new IllegalArgumentException("User is not a courier");
+        }
+
+        Assignment assignment = courier.getAssignment();
+
+        //checks if the order the courier is trying to pick up, corresponds to the order it's assigned to
+        if (assignment == null || assignment.getStatus() != AssignmentStatus.ACCEPTED || !assignment.getOrder().id().equals(orderId)){
+            throw new IllegalStateException("Order is not assigned to this courier");
         }
 
         ORDER_APPLICATION_SERVICE.pickUp(
