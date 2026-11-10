@@ -32,7 +32,7 @@ public class Assignment {
 
     }
 
-    public void declineOfffer(){
+    public void declineOffer(){
         status=AssignmentStatus.DECLINED;
 
     }
