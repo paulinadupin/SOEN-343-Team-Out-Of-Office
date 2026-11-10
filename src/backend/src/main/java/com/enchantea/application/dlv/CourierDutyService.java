@@ -29,4 +29,67 @@ public class CourierDutyService {
         USER_REPOSITORY.save(courier);
     }
 
+    public void goOffline(Long courierId){
+        User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!(user instanceof Courier courier)) {
+            throw new IllegalArgumentException("User is not a courier");
+        }
+
+        if (courier.getPosition() == null){
+            throw new IllegalArgumentException("Courier does not have a valid location on the map");
+        }
+
+        courier.goOffline();
+        USER_REPOSITORY.save(courier);
+
+    }
+
+
+    public void acceptOffer(Long courierId){
+        User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!(user instanceof Courier courier)) {
+            throw new IllegalArgumentException("User is not a courier");
+        }
+
+        courier.acceptOffer();
+        USER_REPOSITORY.save(courier);
+    }
+
+    public void declineOffer(Long courierId){
+        User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!(user instanceof Courier courier)) {
+            throw new IllegalArgumentException("User is not a courier");
+        }
+
+        courier.declineOffer();
+        USER_REPOSITORY.save(courier);
+
+    }
+
+    public void confirmPickup(Long courierId){
+        User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!(user instanceof Courier courier)) {
+            throw new IllegalArgumentException("User is not a courier");
+        }
+
+        courier.confirmPickup();
+        USER_REPOSITORY.save(courier);
+
+    }
+
+    public void confirmDelivery(Long courierId){
+        User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!(user instanceof Courier courier)) {
+            throw new IllegalArgumentException("User is not a courier");
+        }
+
+        courier.confirmDelivery();
+        USER_REPOSITORY.save(courier);
+    }
+
 }
