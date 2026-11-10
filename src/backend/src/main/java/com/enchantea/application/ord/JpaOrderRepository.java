@@ -34,7 +34,7 @@ public class JpaOrderRepository implements OrderRepository {
     }
 
     @Override
-    public List<Order> findByRestaurantId(String restaurantId) {
+    public List<Order> findByRestaurantId(Long restaurantId) {
         return ORDERS.findByRestaurantId(restaurantId).stream()
                 .map(JpaOrderRepository::toDomain)
                 .toList();

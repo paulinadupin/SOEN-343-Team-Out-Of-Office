@@ -21,38 +21,37 @@ public class CityRestaurantQuery implements RestaurantQuery {
     }
 
     @Override
-    public boolean isOpen(String restaurantId) {
+    public boolean isOpen(Long restaurantId) {
         return findRestaurant(restaurantId)
                 .map(restaurant -> restaurant.getStatus() == RestaurantStatus.OPEN)
                 .orElse(false);
     }
 
     @Override
-    public boolean isItemAvailable(String restaurantId, String itemId) {
+    public boolean isItemAvailable(Long restaurantId, String itemId) {
         return MENU_CATALOG.find(restaurantId, itemId)
                 .map(MenuItem::isAvailable)
                 .orElse(false);
     }
 
     @Override
-    public double itemPrice(String restaurantId, String itemId) {
+    public double itemPrice(Long restaurantId, String itemId) {
         return MENU_CATALOG.find(restaurantId, itemId)
                 .map(MenuItem::price)
                 .orElseThrow(() -> new CommandRejectedException("Unknown menu item: " + itemId));
     }
 
-    private Optional<Restaurant> findRestaurant(String restaurantId) {
-        try {
-            return USERS.findById(Long.valueOf(restaurantId))
-                    .filter(Restaurant.class::isInstance)
-                    .map(Restaurant.class::cast);
-        } catch (NumberFormatException e) {
+    private Optional<Restaurant> findRestaurant(Long restaurantId) {
+        if (restaurantId == null) {
             return Optional.empty();
         }
+        return USERS.findById(restaurantId)
+                .filter(Restaurant.class::isInstance)
+                .map(Restaurant.class::cast);
     }
 
     @Override
-    public Optional<Location> location(String restaurantId) {
+    public Optional<Location> location(Long restaurantId) {
         return findRestaurant(restaurantId).map(Restaurant::getPosition);
     }
     

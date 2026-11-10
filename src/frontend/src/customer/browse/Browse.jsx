@@ -23,7 +23,7 @@ function Browse() {
         Promise.all([getRestaurants(), getRestaurantMenu(restaurantId)])
             .then(([restaurants, restaurantMenu]) => {
                 const selectedRestaurant = restaurants.find(
-                    (candidate) => String(candidate.userId) === restaurantId
+                    (candidate) => candidate.userId === Number(restaurantId)
                 );
 
                 if (!selectedRestaurant) {

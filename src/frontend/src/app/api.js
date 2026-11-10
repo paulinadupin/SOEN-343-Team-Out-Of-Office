@@ -68,7 +68,7 @@ export async function getRestaurantOrders() {
 export async function placeOrder(restaurantId, lines) {
   return request("/api/orders", {
     method: "POST",
-    body: JSON.stringify({ restaurantId, lines }),
+    body: JSON.stringify({ restaurantId: Number(restaurantId), lines }),
   });
 }
 

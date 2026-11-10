@@ -188,7 +188,7 @@ public class OrderApplicationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Order> ordersForRestaurant(String restaurantId) {
+    public List<Order> ordersForRestaurant(Long restaurantId) {
         return ORDERS.findByRestaurantId(restaurantId);
     }
 

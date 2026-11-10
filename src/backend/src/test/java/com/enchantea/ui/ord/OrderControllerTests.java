@@ -34,12 +34,12 @@ class OrderControllerTests {
     @Autowired
     private UserRepository users;
 
-    private String restaurantId;
+    private Long restaurantId;
 
     @BeforeEach
     void setUp() {
         // "restaurant" is one of the seeded demo accounts, OPEN with a real menu in city.json.
-        restaurantId = users.findByUsername("restaurant").orElseThrow().getUserId().toString();
+        restaurantId = users.findByUsername("restaurant").orElseThrow().getUserId();
     }
 
     @Test
@@ -60,7 +60,7 @@ class OrderControllerTests {
                         .content(placeOrderJson()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.customerId")
-                        .value(customerSession.getAttribute("userId").toString()));
+                        .value(((Long) customerSession.getAttribute("userId")).intValue()));
     }
 
     @Test
@@ -89,11 +89,11 @@ class OrderControllerTests {
 
         mockMvc.perform(get("/api/orders/restaurant").session(restaurantSession))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].restaurantId").value(restaurantId));
+                .andExpect(jsonPath("$[0].restaurantId").value(restaurantId.intValue()));
     }
 
     private String placeOrderJson() {
-        return "{\"restaurantId\":\"%s\",\"lines\":[{\"itemId\":\"classic-milk-tea\",\"quantity\":1}]}"
+        return "{\"restaurantId\":%s,\"lines\":[{\"itemId\":\"classic-milk-tea\",\"quantity\":1}]}"
                 .formatted(restaurantId);
     }
 

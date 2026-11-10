@@ -42,7 +42,7 @@ public class CityConfigLoader {
             List<MenuItem> items = config.menu().stream()
                     .map(item -> new MenuItem(item.id(), item.name(), item.price(), item.status()))
                     .toList();
-            MENU_CATALOG.setMenu(String.valueOf(restaurant.getUserId()), items);
+            MENU_CATALOG.setMenu(restaurant.getUserId(), items);
         }
     }
 

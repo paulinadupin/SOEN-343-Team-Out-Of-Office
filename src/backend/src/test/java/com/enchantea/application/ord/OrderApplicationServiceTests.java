@@ -40,7 +40,7 @@ class OrderApplicationServiceTests {
     @Autowired
     private UserRepository users;
 
-    private String restaurantId;
+    private Long restaurantId;
     private CurrentUser customer;
     private CurrentUser restaurantUser;
     private CurrentUser operator;
@@ -49,10 +49,10 @@ class OrderApplicationServiceTests {
     void setUp() {
         // "restaurant" is one of the seeded demo accounts, OPEN with a real menu in
         // city.json.
-        restaurantId = users.findByUsername("restaurant").orElseThrow().getUserId().toString();
-        customer = new CurrentUser("customer-1", AccountType.CUSTOMER, null);
-        restaurantUser = new CurrentUser("restaurant-staff-1", AccountType.RESTAURANT, restaurantId);
-        operator = new CurrentUser("operator-1", AccountType.OPERATOR, null);
+        restaurantId = users.findByUsername("restaurant").orElseThrow().getUserId();
+        customer = new CurrentUser(1L, AccountType.CUSTOMER, null);
+        restaurantUser = new CurrentUser(2L, AccountType.RESTAURANT, restaurantId);
+        operator = new CurrentUser(3L, AccountType.OPERATOR, null);
     }
 
     private Order place() {

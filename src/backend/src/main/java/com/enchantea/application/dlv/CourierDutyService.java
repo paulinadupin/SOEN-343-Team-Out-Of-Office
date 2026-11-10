@@ -110,7 +110,7 @@ public class CourierDutyService {
         courier.confirmPickup();
 
         ORDER_APPLICATION_SERVICE.pickUp(
-            new CurrentUser(user.getUserId().toString(), AccountType.COURIER, null), 
+            new CurrentUser(user.getUserId(), AccountType.COURIER, null),
             new OrderCommands.OrderAction(orderId.toString(), null) 
         );
 
@@ -119,7 +119,7 @@ public class CourierDutyService {
     }
 
     @Transactional 
-    public void confirmDelivery(Long courierId, String customerId){
+    public void confirmDelivery(Long courierId, Long customerId){
         User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!(user instanceof Courier courier)) {
@@ -140,7 +140,7 @@ public class CourierDutyService {
         courier.confirmDelivery();
 
         ORDER_APPLICATION_SERVICE.deliver(
-            new CurrentUser(user.getUserId().toString(), AccountType.COURIER, null), 
+            new CurrentUser(user.getUserId(), AccountType.COURIER, null),
             new OrderCommands.OrderAction(order.id(), null) 
         );
 

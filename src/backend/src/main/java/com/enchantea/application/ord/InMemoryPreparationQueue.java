@@ -10,26 +10,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InMemoryPreparationQueue implements PreparationQueue {
-    private final Map<String, OrderQueue> QUEUES = new HashMap<>();
+    private final Map<Long, OrderQueue> QUEUES = new HashMap<>();
 
     @Override
-    public synchronized void enqueue(String restaurantId, Order order) {
+    public synchronized void enqueue(Long restaurantId, Order order) {
         queueFor(restaurantId).add(order);
     }
 
     @Override
-    public synchronized Optional<Order> peek(String restaurantId) {
+    public synchronized Optional<Order> peek(Long restaurantId) {
         OrderQueue queue = QUEUES.get(restaurantId);
         return queue == null ? Optional.empty() : queue.first();
     }
 
     @Override
-    public synchronized boolean remove(String restaurantId, String orderId) {
+    public synchronized boolean remove(Long restaurantId, String orderId) {
         OrderQueue queue = QUEUES.get(restaurantId);
         return queue != null && queue.remove(orderId);
     }
 
-    private OrderQueue queueFor(String restaurantId) {
+    private OrderQueue queueFor(Long restaurantId) {
         return QUEUES.computeIfAbsent(restaurantId, id -> new OrderQueue());
     }
 }
