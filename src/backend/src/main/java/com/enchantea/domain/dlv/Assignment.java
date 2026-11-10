@@ -20,6 +20,13 @@ public class Assignment {
         expiresAt = offeredAt.plus(TIME_LIMIT);
     }
 
+    public boolean isExpired(){
+        if (Instant.now().isAfter(expiresAt)){
+            return true;
+        }
+        return false;
+    }
+
     public void acceptOffer(){
         status=AssignmentStatus.ACCEPTED;
 

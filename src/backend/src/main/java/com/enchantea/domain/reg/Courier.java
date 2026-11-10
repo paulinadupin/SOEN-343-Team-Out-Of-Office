@@ -14,8 +14,6 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.Transient;//FOR TESTING ONLY PLEASE REMOVE FOR FINAL VERSION------------------------------------<<<<<<<<<<<<<<<
-
 
 @Entity
 @DiscriminatorValue("COURIER")
@@ -29,7 +27,6 @@ public class Courier extends User{
     @AttributeOverride(name = "lng", column = @Column(name = "courier_lng"))
     private Location position;
 
-    @Transient //FOR TESTING ONLY PLEASE REMOVE FOR FINAL VERSION------------------------------------<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     private Assignment assignment = null;
 
     protected Courier() {

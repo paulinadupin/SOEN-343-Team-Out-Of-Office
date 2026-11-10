@@ -3,15 +3,21 @@ package com.enchantea.application.dlv;
 import org.springframework.stereotype.Service;
 
 import com.enchantea.foundation.reg.UserRepository;
+import com.enchantea.application.ord.OrderApplicationService;
+import com.enchantea.application.ord.OrderCommands;
+import com.enchantea.application.ord.contracts.CurrentUser;
+import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.User;
 
 @Service 
 public class CourierDutyService {
     private final UserRepository USER_REPOSITORY;
+    private final OrderApplicationService ORDER_APPLICATION_SERVICE;
 
-    public CourierDutyService(UserRepository USER_REPOSITORY) {
+    public CourierDutyService(UserRepository USER_REPOSITORY, OrderApplicationService ORDER_APPLICATION_SERVICE) {
         this.USER_REPOSITORY = USER_REPOSITORY;
+        this.ORDER_APPLICATION_SERVICE = ORDER_APPLICATION_SERVICE;
     }
 
     public void goOnline(Long courierId) {
@@ -36,10 +42,6 @@ public class CourierDutyService {
             throw new IllegalArgumentException("User is not a courier");
         }
 
-        if (courier.getPosition() == null){
-            throw new IllegalArgumentException("Courier does not have a valid location on the map");
-        }
-
         courier.goOffline();
         USER_REPOSITORY.save(courier);
 
@@ -53,7 +55,16 @@ public class CourierDutyService {
             throw new IllegalArgumentException("User is not a courier");
         }
 
+        if(courier.getAssignment() == null){
+            throw new IllegalStateException("Courier has no assignment to accept");
+        }
+
+        if(courier.getAssignment().isExpired()){
+            declineOffer(courierId);
+        }
+
         courier.acceptOffer();
+        courier.getAssignment().acceptOffer();
         USER_REPOSITORY.save(courier);
     }
 
@@ -64,28 +75,42 @@ public class CourierDutyService {
             throw new IllegalArgumentException("User is not a courier");
         }
 
+        if(courier.getAssignment() == null){
+            throw new IllegalStateException("Courier has no assignment to accept");
+        }
+
         courier.declineOffer();
+        courier.getAssignment().declineOfffer();
         USER_REPOSITORY.save(courier);
 
     }
 
-    public void confirmPickup(Long courierId){
+    public void confirmPickup(Long courierId, Long orderId){
         User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!(user instanceof Courier courier)) {
             throw new IllegalArgumentException("User is not a courier");
         }
 
+        ORDER_APPLICATION_SERVICE.pickUp(
+            new CurrentUser(user.getUserId().toString(), AccountType.COURIER, null), 
+            new OrderCommands.OrderAction(orderId.toString(), null) 
+        );
+
         courier.confirmPickup();
         USER_REPOSITORY.save(courier);
 
     }
 
-    public void confirmDelivery(Long courierId){
+    public void confirmDelivery(Long courierId, String customerId){
         User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (!(user instanceof Courier courier)) {
             throw new IllegalArgumentException("User is not a courier");
+        }
+
+        if(!(courier.getAssignment().getOrder().customerId().equals(customerId))){
+            throw new IllegalArgumentException("Customer ID does not match the customer ID of the assigned order");
         }
 
         courier.confirmDelivery();
