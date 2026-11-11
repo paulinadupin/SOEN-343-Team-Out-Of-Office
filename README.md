@@ -76,3 +76,9 @@ npm run dev
 ```
 
 The dashboard runs on http://localhost:5173
+
+
+# Docker Implemented 
+
+- `docker compose up` to run the website (frontend and backend)
+- `docker compose down` to stop the website
