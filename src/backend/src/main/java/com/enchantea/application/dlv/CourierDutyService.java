@@ -8,20 +8,25 @@ import com.enchantea.application.ord.OrderCommands;
 import com.enchantea.application.ord.contracts.CurrentUser;
 import com.enchantea.domain.dlv.Assignment;
 import com.enchantea.domain.dlv.AssignmentStatus;
+import com.enchantea.domain.dlv.Handoff;
+import com.enchantea.domain.dlv.HandoffType;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
+import java.time.Instant;
 
 @Service
 public class CourierDutyService {
     private final UserRepository USER_REPOSITORY;
     private final OrderApplicationService ORDER_APPLICATION_SERVICE;
+    private final HandoffRepository HANDOFF_REPOSITORY;
 
-    public CourierDutyService(UserRepository userRepository, OrderApplicationService orderApplicationService) {
+    public CourierDutyService(UserRepository userRepository, OrderApplicationService orderApplicationService, HandoffRepository handoffRepository) {
         this.USER_REPOSITORY = userRepository;
         this.ORDER_APPLICATION_SERVICE = orderApplicationService;
+        this.HANDOFF_REPOSITORY = handoffRepository;
     }
 
     @Transactional
@@ -88,6 +93,7 @@ public class CourierDutyService {
 
         courier.confirmPickup(); // State design pattern allows this action only from ASSIGNED.
         ORDER_APPLICATION_SERVICE.pickUp(currentUser(courier), new OrderCommands.OrderAction(orderId, null));
+        HANDOFF_REPOSITORY.save(new Handoff(orderId, courier.getUserId(), HandoffType.PICKUP, Instant.now()));
         USER_REPOSITORY.save(courier);
     }
 
@@ -111,6 +117,7 @@ public class CourierDutyService {
 
         courier.confirmDelivery(); // State design pattern allows this action only from CARRYING.
         ORDER_APPLICATION_SERVICE.deliver(currentUser(courier), new OrderCommands.OrderAction(order.id(), null));
+        HANDOFF_REPOSITORY.save(new Handoff(order.id(), courier.getUserId(), HandoffType.DELIVERY, Instant.now()));
         courier.setAssignment(null);
         USER_REPOSITORY.save(courier);
     }
