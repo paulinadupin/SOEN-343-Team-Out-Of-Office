@@ -10,5 +10,6 @@ public enum CommandType {
     MARK_ORDER_READY,
     PICK_UP_ORDER,
     DELIVER_ORDER,
-    REFUND_ORDER
+    REFUND_ORDER,
+    VIEW_ORDER_SUMMARY
 }

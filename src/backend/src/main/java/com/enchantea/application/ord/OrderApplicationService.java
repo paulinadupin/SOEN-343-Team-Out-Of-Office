@@ -7,10 +7,15 @@ import com.enchantea.application.ord.contracts.CourierAssignment;
 import com.enchantea.application.ord.contracts.DispatchQueue;
 import com.enchantea.application.ord.contracts.PreparationQueue;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
+import com.enchantea.application.prc.JpaLedgerRepository;
+import com.enchantea.application.prc.PricingCalculator;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.ord.StateTransition;
+import com.enchantea.domain.prc.Charge;
+import com.enchantea.domain.prc.Ledger;
+import com.enchantea.domain.prc.LedgerEntryType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +32,8 @@ public class OrderApplicationService {
     private final CourierAssignment COURIER_ASSIGNMENT;
     private final RestaurantQuery RESTAURANT_QUERY;
     private final OrderEventSubject EVENT_SUBJECT;
+    private final PricingCalculator PRICING_CALCULATOR;
+    private final JpaLedgerRepository LEDGER_REPOSITORY;
 
     public OrderApplicationService(
             OrderRepository ORDERS,
@@ -35,7 +42,9 @@ public class OrderApplicationService {
             DispatchQueue DISPATCH_QUEUE,
             CourierAssignment COURIER_ASSIGNMENT,
             RestaurantQuery RESTAURANT_QUERY,
-            OrderEventSubject EVENT_SUBJECT) {
+            OrderEventSubject EVENT_SUBJECT,
+            PricingCalculator PRICING_CALCULATOR,
+            JpaLedgerRepository LEDGER_REPOSITORY) {
         this.ORDERS = ORDERS;
         this.VALIDATOR = VALIDATOR;
         this.PREPARATION_QUEUE = PREPARATION_QUEUE;
@@ -43,6 +52,13 @@ public class OrderApplicationService {
         this.COURIER_ASSIGNMENT = COURIER_ASSIGNMENT;
         this.RESTAURANT_QUERY = RESTAURANT_QUERY;
         this.EVENT_SUBJECT = EVENT_SUBJECT;
+        this.PRICING_CALCULATOR = PRICING_CALCULATOR;
+        this.LEDGER_REPOSITORY = LEDGER_REPOSITORY;
+    }
+
+    public Charge quote(CurrentUser user, OrderCommands.PlaceOrder command) {
+        VALIDATOR.validate(CommandType.PLACE_ORDER, user, command);
+        return PRICING_CALCULATOR.computeCharge(buildLines(command));
     }
 
     @Transactional
@@ -50,14 +66,11 @@ public class OrderApplicationService {
         //check the request before creating the order
         VALIDATOR.validate(CommandType.PLACE_ORDER, user, command);
 
-        List<OrderLine> lines = command.lines().stream()
-                .map(line -> new OrderLine(
-                        line.itemId(),
-                        line.quantity(),
-                        RESTAURANT_QUERY.itemPrice(command.restaurantId(), line.itemId())))
-                .toList();
+        List<OrderLine> lines = buildLines(command);
 
         Order order = Order.create(user.id(), command.restaurantId(), lines);
+        //compute and attach the cost breakdown before the customer confirms (R-PRC-01)
+        order.attachCharge(PRICING_CALCULATOR.computeCharge(lines));
         //record the placed state and let observers know the order was created
         OrderEvent event = createEvent(order, null, null);
         ORDERS.save(order);
@@ -107,7 +120,7 @@ public class OrderApplicationService {
 
         order.cancelByOperator();
         PREPARATION_QUEUE.remove(order.restaurantId(), order.id());
-        DISPATCH_QUEUE.removeFromDispatch(order.restaurantId(), order.id());
+        DISPATCH_QUEUE.removeFromDispatch(order.id());
         COURIER_ASSIGNMENT.removeOrderAssignment(order.id());
         return saveAndPublish(order, oldStatus, null);
     }
@@ -144,8 +157,10 @@ public class OrderApplicationService {
 
         order.markReady();
         PREPARATION_QUEUE.remove(order.restaurantId(), order.id());
-        DISPATCH_QUEUE.add(order.restaurantId(), order);
-        return saveAndPublish(order, oldStatus, null);
+        DISPATCH_QUEUE.add(order);
+        Order readyOrder = saveAndPublish(order, oldStatus, null);
+        COURIER_ASSIGNMENT.dispatchNext();
+        return readyOrder;
     }
 
     @Transactional
@@ -155,7 +170,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.pickUp();
-        DISPATCH_QUEUE.removeFromDispatch(order.restaurantId(), order.id());
+        DISPATCH_QUEUE.removeFromDispatch(order.id());
         return saveAndPublish(order, oldStatus, null);
     }
 
@@ -166,6 +181,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.deliver();
+        LEDGER_REPOSITORY.save(new Ledger().record(order.id(), LedgerEntryType.CHARGE, order.charge().total()));
         return saveAndPublish(order, oldStatus, null);
     }
 
@@ -188,8 +204,17 @@ public class OrderApplicationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Order> ordersForRestaurant(String restaurantId) {
+    public List<Order> ordersForRestaurant(Long restaurantId) {
         return ORDERS.findByRestaurantId(restaurantId);
+    }
+
+    private List<OrderLine> buildLines(OrderCommands.PlaceOrder command) {
+        return command.lines().stream()
+                .map(line -> new OrderLine(
+                        line.itemId(),
+                        line.quantity(),
+                        RESTAURANT_QUERY.itemPrice(command.restaurantId(), line.itemId())))
+                .toList();
     }
 
     private Order load(String orderId) {

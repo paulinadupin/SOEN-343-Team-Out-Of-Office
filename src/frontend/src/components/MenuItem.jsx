@@ -19,7 +19,7 @@ function MenuItem({ itemId, restaurantId, name, price, description, status, imag
     }, [added]);
 
     function handleAddToCart() {
-        addItem({ itemId, restaurantId, name, price, description: itemStatus, image });
+        addItem({ itemId, restaurantId: Number(restaurantId), name, price, description: itemStatus, image });
         setAdded(true);
     }
 

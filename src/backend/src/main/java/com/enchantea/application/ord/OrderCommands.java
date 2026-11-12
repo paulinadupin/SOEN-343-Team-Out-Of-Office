@@ -9,7 +9,7 @@ public final class OrderCommands {
     public record RequestedLine(String itemId, int quantity) { }
 
     //the restaurant and items the customer chose when placing an order.
-    public record PlaceOrder(String restaurantId, List<RequestedLine> lines) {
+    public record PlaceOrder(Long restaurantId, List<RequestedLine> lines) {
         public PlaceOrder {
             lines = List.copyOf(lines);
         }

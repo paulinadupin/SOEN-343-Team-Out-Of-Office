@@ -9,6 +9,7 @@ import com.enchantea.domain.ord.state.PreparingState;
 import com.enchantea.domain.ord.state.ReadyState;
 import com.enchantea.domain.ord.state.RefundedState;
 import com.enchantea.domain.ord.state.RejectedState;
+import com.enchantea.domain.prc.Charge;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,26 +21,29 @@ public final class Order {
     private OrderState status;
     private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
+    private Instant deliveredAt; 
     private String rejectionReason;
-    private final String CUSTOMER_ID;
-    private final String RESTAURANT_ID;
+    private final Long CUSTOMER_ID;
+    private final Long RESTAURANT_ID;
     private final List<OrderLine> LINES;
     private final List<StateTransition> TRANSITIONS = new ArrayList<>();
-    
+
     // constructor
-    public Order(String OrderId, String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
+    public Order(String OrderId, Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
         this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null);
     }
 
     private Order(
             String orderId,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             List<OrderLine> lines,
             Instant placedAt,
             OrderStatus orderStatus,
             Instant closedAt,
-            String rejectionReason) {
+            Instant deliveredAt,
+            String rejectionReason,
+            Charge charge) {
         this.ORDER_ID = Objects.requireNonNull(orderId, "id");
         this.CUSTOMER_ID = Objects.requireNonNull(customerId, "CUSTOMER_ID");
         this.RESTAURANT_ID = Objects.requireNonNull(restaurantId, "RESTAURANT_ID");
@@ -50,37 +54,49 @@ public final class Order {
         this.PLACED_AT = Objects.requireNonNull(placedAt, "placedAt");
         this.status = stateFor(orderStatus);
         this.closedAt = closedAt;
+        this.deliveredAt = deliveredAt;
         this.rejectionReason = rejectionReason;
+        this.charge = charge;
     }
 
     // is called when order is placed
-    public static Order create(String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
+    public static Order create(Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
         return new Order(UUID.randomUUID().toString(), CUSTOMER_ID, RESTAURANT_ID, LINES); //UUID stands for 'Universally Unique Identifier'
     }
 
     public static Order rehydrate(
             String orderId,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             List<OrderLine> lines,
             Instant placedAt,
             OrderStatus status,
             Instant closedAt,
-            String rejectionReason) {
+            Instant deliveredAt,
+            String rejectionReason,
+            Charge charge) {
         return new Order(
-                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, rejectionReason);
+                orderId, customerId, restaurantId, lines, placedAt, status, closedAt, deliveredAt,
+                rejectionReason, charge);
     }
 
     //getters
     public String id() { return ORDER_ID; }
-    public String customerId() { return CUSTOMER_ID; }
-    public String restaurantId() { return RESTAURANT_ID; }
+    public Long customerId() { return CUSTOMER_ID; }
+    public Long restaurantId() { return RESTAURANT_ID; }
     public List<OrderLine> lines() { return LINES; }
     public Instant placedAt() { return PLACED_AT; }
     public Instant closedAt() { return closedAt; }
+    public Instant deliveredAt() { return deliveredAt; }
     public OrderStatus status() { return status.status(); }
     public String rejectionReason() { return rejectionReason; }
     public List<StateTransition> transitions() { return List.copyOf(TRANSITIONS); }
+    public Charge charge() { return charge; }
+
+    // attaches the computed cost breakdown when the order is placed (R-PRC-01)
+    public void attachCharge(Charge charge) {
+        this.charge = Objects.requireNonNull(charge, "charge");
+    }
 
     // calculates the order's total (before fees and taxes)
     public double total() {
@@ -125,6 +141,10 @@ public final class Order {
     // records transitions (R-ORD-05)
     public void recordTransition(StateTransition transition) {
         TRANSITIONS.add(transition);
+        // keeps the delivery time even if the order is refunded later (R-PRC-03). This needs to be added bc when an order goes from delievered -> refunded, closedAt is overwritten even when the delivery time needs to be saved for the order summary.
+        if (transition.toStatus() == OrderStatus.DELIVERED) {
+            deliveredAt = transition.timestamp();
+        }
         // if at the last state of the order lifecycle, then the order is closed
         if (transition.toStatus() == OrderStatus.DELIVERED
                 || transition.toStatus() == OrderStatus.REJECTED

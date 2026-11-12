@@ -108,4 +108,5 @@ public class RegisterRequest {
     public void setCourierStatus(CourierStatus courierStatus) {
         this.courierStatus = courierStatus;
     }
+
 }
