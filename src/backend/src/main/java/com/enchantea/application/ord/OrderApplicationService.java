@@ -14,8 +14,8 @@ import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.ord.StateTransition;
 import com.enchantea.domain.prc.Charge;
-import com.enchantea.domain.prc.Ledger;
-import com.enchantea.domain.prc.LedgerEntryType;
+import com.enchantea.domain.prc.ChargeRecording;
+import com.enchantea.domain.prc.RefundRecording;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -181,7 +181,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.deliver();
-        LEDGER_REPOSITORY.save(new Ledger().record(order.id(), LedgerEntryType.CHARGE, order.charge().total()));
+        LEDGER_REPOSITORY.save(new ChargeRecording().record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 
@@ -192,6 +192,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.refund();
+        LEDGER_REPOSITORY.save(new RefundRecording().record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 
