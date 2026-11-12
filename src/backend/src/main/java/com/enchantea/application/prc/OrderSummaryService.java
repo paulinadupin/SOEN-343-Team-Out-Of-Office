@@ -37,7 +37,7 @@ public class OrderSummaryService {
             throw new CommandRejectedException("The order summary is available once the order is delivered");
         }
 
-        String restaurantId = order.restaurantId();
+        Long restaurantId = order.restaurantId();
         List<OrderSummary.Line> lines = order.lines().stream()
                 .map(line -> new OrderSummary.Line(
                         line.itemId(),
@@ -50,7 +50,7 @@ public class OrderSummaryService {
         return new OrderSummary(
                 order.id(),
                 restaurantId,
-                RESTAURANT_QUERY.restaurantName(restaurantId).orElse(restaurantId),
+                RESTAURANT_QUERY.restaurantName(restaurantId).orElse(String.valueOf(restaurantId)),
                 lines,
                 order.charge(),
                 order.placedAt(),
