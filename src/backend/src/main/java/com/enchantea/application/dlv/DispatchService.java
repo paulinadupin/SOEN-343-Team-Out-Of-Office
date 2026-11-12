@@ -10,7 +10,6 @@ import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.CourierStatus;
 import com.enchantea.domain.reg.Location;
-import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 import java.time.Instant;
 import java.util.List;
@@ -25,22 +24,19 @@ public class DispatchService implements CourierAssignment {
     private final RestaurantQuery RESTAURANT_QUERY;
     private final UserRepository USER_REPOSITORY;
     private final OrderRepository ORDER_REPOSITORY;
-    private final CourierAssignmentStore ASSIGNMENTS;
 
     public DispatchService(
             DispatchQueue dispatchQueue,
             CourierSelector courierSelector,
             RestaurantQuery restaurantQuery,
             UserRepository userRepository,
-            OrderRepository orderRepository,
-            CourierAssignmentStore assignments) {
+            OrderRepository orderRepository) {
 
         this.DISPATCH_QUEUE = dispatchQueue;
         this.COURIER_SELECTOR = courierSelector;
         this.RESTAURANT_QUERY = restaurantQuery;
         this.USER_REPOSITORY = userRepository;
         this.ORDER_REPOSITORY = orderRepository;
-        this.ASSIGNMENTS = assignments;
     }
 
     @Transactional
@@ -65,10 +61,6 @@ public class DispatchService implements CourierAssignment {
 
             availableCouriers.remove(courier);
             Assignment assignment = new Assignment(AssignmentStatus.OFFERED, order.id(), Instant.now());
-            boolean assigned = ASSIGNMENTS.offer(courier.getUserId(), assignment);
-            if (!assigned) {
-                continue;
-            }
             courier.setAssignment(assignment);
             USER_REPOSITORY.save(courier);
             DISPATCH_QUEUE.removeFromDispatch(order.id());
@@ -88,20 +80,22 @@ public class DispatchService implements CourierAssignment {
     @Override
     @Transactional
     public void removeOrderAssignment(String orderId) { // for when operator cancels order
-        List<Long> courierIds = ASSIGNMENTS.courierIdsForOrder(orderId);
+        List<Courier> couriers = USER_REPOSITORY.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .filter(courier -> courier.getAssignment() != null
+                        && orderId.equals(courier.getAssignment().getOrderId()))
+                .toList();
 
-        for (Long courierId : courierIds) {
-            User user = USER_REPOSITORY.findById(courierId).orElse(null);
-            if (user instanceof Courier courier && courier.getStatus() == CourierStatus.ASSIGNED) {
+        for (Courier courier : couriers) {
+            if (courier.getStatus() == CourierStatus.ASSIGNED
+                    || courier.getStatus() == CourierStatus.CARRYING) {
                 courier.operatorCancelAssignment();
             }
-            if (user instanceof Courier courier) {
-                courier.setAssignment(null);
-                USER_REPOSITORY.save(courier);
-            }
-            ASSIGNMENTS.remove(courierId);
+            courier.setAssignment(null);
+            USER_REPOSITORY.save(courier);
         }
-        if (!courierIds.isEmpty()) {
+        if (!couriers.isEmpty()) {
             dispatchNext();
         }
     }

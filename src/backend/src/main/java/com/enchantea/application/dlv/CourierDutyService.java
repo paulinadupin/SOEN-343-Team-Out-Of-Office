@@ -23,20 +23,17 @@ public class CourierDutyService {
     private final OrderApplicationService ORDER_APPLICATION_SERVICE;
     private final HandoffRepository HANDOFF_REPOSITORY;
     private final DispatchService DISPATCH_SERVICE;
-    private final CourierAssignmentStore ASSIGNMENTS;
 
     public CourierDutyService(
             UserRepository userRepository,
             OrderApplicationService orderApplicationService,
             HandoffRepository handoffRepository,
-            DispatchService dispatchService,
-            CourierAssignmentStore assignments) {
+            DispatchService dispatchService) {
                 
         this.USER_REPOSITORY = userRepository;
         this.ORDER_APPLICATION_SERVICE = orderApplicationService;
         this.HANDOFF_REPOSITORY = handoffRepository;
         this.DISPATCH_SERVICE = dispatchService;
-        this.ASSIGNMENTS = assignments;
     }
 
     @Transactional
@@ -60,7 +57,6 @@ public class CourierDutyService {
         if (assignment != null && assignment.getStatus() == AssignmentStatus.OFFERED) {
             returnedOrderId = assignment.getOrderId();
             assignment.declineOffer();
-            ASSIGNMENTS.remove(courierId);
             courier.setAssignment(null);
         }
 
@@ -138,7 +134,6 @@ public class CourierDutyService {
         ORDER_APPLICATION_SERVICE.deliver(currentUser(courier), new OrderCommands.OrderAction(order.id(), null));
         Instant occurredAt = Instant.now();
         HANDOFF_REPOSITORY.save(new Handoff(order.id(), courier.getUserId(), HandoffType.DELIVERY, occurredAt));
-        ASSIGNMENTS.remove(courierId);
         courier.setAssignment(null);
         USER_REPOSITORY.save(courier);
         DISPATCH_SERVICE.dispatchNext();
@@ -154,7 +149,6 @@ public class CourierDutyService {
             throw new IllegalArgumentException("User is not a courier");
         }
 
-        courier.setAssignment(ASSIGNMENTS.get(courierId));
         return courier;
     }
 
@@ -170,7 +164,6 @@ public class CourierDutyService {
 
     private void returnOffer(Courier courier, Assignment assignment) { //when the courier has an offer but wants to go offline
         assignment.declineOffer();
-        ASSIGNMENTS.remove(courier.getUserId());
         courier.setAssignment(null);
         USER_REPOSITORY.save(courier);
     }

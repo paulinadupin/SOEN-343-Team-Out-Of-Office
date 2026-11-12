@@ -1,7 +1,6 @@
 package com.enchantea.ui.dlv;
 
 import com.enchantea.application.dlv.CourierDutyService;
-import com.enchantea.application.dlv.CourierAssignmentStore;
 import com.enchantea.application.ord.OrderApplicationService;
 import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.domain.dlv.Assignment;
@@ -30,20 +29,17 @@ public class CourierController {
     private final CourierDutyService COURIER_DUTY_SERVICE;
     private final OrderApplicationService ORDER_APPLICATION_SERVICE;
     private final UserRepository USER_REPOSITORY;
-    private final CourierAssignmentStore ASSIGNMENTS;
 
     public CourierController(
             AccountFacade accountFacade,
             CourierDutyService courierDutyService,
             OrderApplicationService orderApplicationService,
-            UserRepository userRepository,
-            CourierAssignmentStore assignments) {
+            UserRepository userRepository) {
 
         this.ACCOUNT_FACADE = accountFacade;
         this.COURIER_DUTY_SERVICE = courierDutyService;
         this.ORDER_APPLICATION_SERVICE = orderApplicationService;
         this.USER_REPOSITORY = userRepository;
-        this.ASSIGNMENTS = assignments;
     }
 
     @GetMapping("/assignment")
@@ -107,8 +103,7 @@ public class CourierController {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Courier account required");
         }
 
-        Assignment assignment = ASSIGNMENTS.get(courierId);
-        courier.setAssignment(assignment);
+        Assignment assignment = courier.getAssignment();
         DeliveryView offer = null;
         DeliveryView active = null;
         if (assignment != null && assignment.getOrderId() != null) {

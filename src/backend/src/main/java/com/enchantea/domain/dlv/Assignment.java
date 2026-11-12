@@ -2,11 +2,21 @@ package com.enchantea.domain.dlv;
 
 import java.time.Duration;
 import java.time.Instant;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
+@Embeddable
 public class Assignment {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "assignment_status")
     private AssignmentStatus status;
+    @Column(name = "assigned_order_id")
     private String orderId;
+    @Column(name = "offer_created_at")
     private Instant offeredAt;
+    @Column(name = "offer_expires_at")
     private Instant expiresAt;
 
     private static final Duration TIME_LIMIT = Duration.ofSeconds(60);
@@ -52,9 +62,5 @@ public class Assignment {
 
     public String getOrderId() {
         return orderId;
-    }
-
-    
-    
-    
+    }     
 }

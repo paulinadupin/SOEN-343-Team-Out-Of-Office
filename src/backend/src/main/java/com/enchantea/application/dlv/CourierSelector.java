@@ -11,11 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CourierSelector {
     private final UserRepository USER_REPOSITORY;
-    private final CourierAssignmentStore ASSIGNMENTS;
 
-    public CourierSelector(UserRepository userRepository, CourierAssignmentStore assignments) {
+    public CourierSelector(UserRepository userRepository) {
         this.USER_REPOSITORY = userRepository;
-        this.ASSIGNMENTS = assignments;
     }
 
     public List<Courier> idleCouriers() {
@@ -24,7 +22,7 @@ public class CourierSelector {
                 .map(Courier.class::cast)
                 .filter(courier -> courier.getStatus() == CourierStatus.IDLE)
                 .filter(courier -> courier.getPosition() != null)
-                .filter(courier -> !ASSIGNMENTS.hasAssignment(courier.getUserId()))
+                .filter(courier -> courier.getAssignment() == null)
                 .toList();
     }
 
