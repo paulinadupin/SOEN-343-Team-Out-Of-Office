@@ -9,4 +9,6 @@ public interface OrderRepository {
     Optional<Order> findById(String id);
     List<Order> findAll();
     List<Order> findByRestaurantId(String restaurantId);
+    List<Order> findByCustomerId(String customerId);
+    List<Order> findByCourierId(String courierId);
 }

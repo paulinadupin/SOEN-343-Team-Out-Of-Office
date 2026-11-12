@@ -41,6 +41,20 @@ public class JpaOrderRepository implements OrderRepository {
                 .map(JpaOrderRepository::toDomain)
                 .toList();
     }
+    
+    @Override
+    public List<Order> findByCustomerId(String customerId) {
+        return ORDERS.findByCustomerId(customerId).stream()
+                .map(JpaOrderRepository::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Order> findByCourierId(String courierId) {
+        return ORDERS.findByCourierId(courierId).stream()
+                .map(JpaOrderRepository::toDomain)
+                .toList();
+    }
 
     private static PersistedOrder toEntity(Order order) {
         List<PersistedOrderLine> lines = order.lines().stream()
