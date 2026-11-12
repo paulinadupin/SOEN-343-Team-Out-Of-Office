@@ -40,7 +40,7 @@ public class OrderSummaryController {
         return new CurrentUser(user.getUserId().toString(), user.getAccountType(), restaurantId);
     }
 
-    private static OrderSummaryView toView(OrderSummary summary) {
+    static OrderSummaryView toView(OrderSummary summary) { 
         return new OrderSummaryView(
                 summary.orderId(), summary.restaurantId(), summary.restaurantName(),
                 summary.lines(), toChargeView(summary.charge()),
