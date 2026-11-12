@@ -7,15 +7,22 @@ import com.enchantea.application.ord.contracts.RestaurantQuery;
 import com.enchantea.domain.dlv.Assignment;
 import com.enchantea.domain.dlv.AssignmentStatus;
 import com.enchantea.domain.ord.Order;
+import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.CourierStatus;
 import com.enchantea.domain.reg.Location;
+import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 public class DispatchService implements CourierAssignment {
@@ -24,19 +31,25 @@ public class DispatchService implements CourierAssignment {
     private final RestaurantQuery RESTAURANT_QUERY;
     private final UserRepository USER_REPOSITORY;
     private final OrderRepository ORDER_REPOSITORY;
+    private final TaskScheduler TASK_SCHEDULER;
+    private final TransactionTemplate TRANSACTION_TEMPLATE;
 
     public DispatchService(
             DispatchQueue dispatchQueue,
             CourierSelector courierSelector,
             RestaurantQuery restaurantQuery,
             UserRepository userRepository,
-            OrderRepository orderRepository) {
+            OrderRepository orderRepository,
+            TaskScheduler taskScheduler,
+            PlatformTransactionManager transactionManager) {
 
         this.DISPATCH_QUEUE = dispatchQueue;
         this.COURIER_SELECTOR = courierSelector;
         this.RESTAURANT_QUERY = restaurantQuery;
         this.USER_REPOSITORY = userRepository;
         this.ORDER_REPOSITORY = orderRepository;
+        this.TASK_SCHEDULER = taskScheduler;
+        this.TRANSACTION_TEMPLATE = new TransactionTemplate(transactionManager);
     }
 
     @Transactional
@@ -64,6 +77,7 @@ public class DispatchService implements CourierAssignment {
             courier.setAssignment(assignment);
             USER_REPOSITORY.save(courier);
             DISPATCH_QUEUE.removeFromDispatch(order.id());
+            scheduleOfferExpiry(courier.getUserId(), assignment);
         }
     }
 
@@ -74,6 +88,52 @@ public class DispatchService implements CourierAssignment {
         if (!DISPATCH_QUEUE.contains(orderId)) {
             DISPATCH_QUEUE.add(order);
         }
+        dispatchNext();
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void scheduleExistingOfferExpirations() {
+        USER_REPOSITORY.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .filter(courier -> courier.getAssignment() != null)
+                .filter(courier -> courier.getAssignment().getStatus() == AssignmentStatus.OFFERED)
+                .forEach(courier -> scheduleOfferExpiry(courier.getUserId(), courier.getAssignment()));
+    }
+
+    private void scheduleOfferExpiry(Long courierId, Assignment assignment) {
+        String orderId = assignment.getOrderId();
+        Instant offeredAt = assignment.getOfferedAt();
+        Instant expiresAt = assignment.getExpiresAt();
+        TASK_SCHEDULER.schedule(
+                () -> TRANSACTION_TEMPLATE.executeWithoutResult(
+                        transaction -> expireOffer(courierId, orderId, offeredAt)),
+                expiresAt);
+    }
+
+    private synchronized void expireOffer(Long courierId, String orderId, Instant offeredAt) {
+        User user = USER_REPOSITORY.findById(courierId).orElse(null);
+        if (!(user instanceof Courier courier)) {
+            return;
+        }
+
+        Assignment assignment = courier.getAssignment();
+        if (assignment == null
+                || assignment.getStatus() != AssignmentStatus.OFFERED
+                || !orderId.equals(assignment.getOrderId())
+                || !offeredAt.equals(assignment.getOfferedAt())
+                || !assignment.isExpired()) {
+            return;
+        }
+
+        assignment.declineOffer();
+        courier.setAssignment(null);
+        USER_REPOSITORY.save(courier);
+
+        ORDER_REPOSITORY.findById(orderId)
+                .filter(order -> order.status() == OrderStatus.READY)
+                .filter(order -> !DISPATCH_QUEUE.contains(orderId))
+                .ifPresent(DISPATCH_QUEUE::add);
         dispatchNext();
     }
 

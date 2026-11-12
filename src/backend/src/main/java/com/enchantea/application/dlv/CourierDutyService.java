@@ -162,7 +162,7 @@ public class CourierDutyService {
         return assignment;
     }
 
-    private void returnOffer(Courier courier, Assignment assignment) { //when the courier has an offer but wants to go offline
+    private void returnOffer(Courier courier, Assignment assignment) { //when the courier has an offer but wants to go offline or when the offer expires
         assignment.declineOffer();
         courier.setAssignment(null);
         USER_REPOSITORY.save(courier);
