@@ -28,7 +28,7 @@ public class PersistedOrder {
     private Instant placedAt;
     private Instant closedAt;
     private Instant deliveredAt;
-    private String courierId;
+    private Long courierId;
     private String rejectionReason;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -51,7 +51,7 @@ public class PersistedOrder {
             Instant placedAt,
             Instant closedAt,
             Instant deliveredAt,
-            String courierId,
+            Long courierId,
             String rejectionReason,
             OrderStatus status,
             List<PersistedOrderLine> lines,
@@ -75,7 +75,7 @@ public class PersistedOrder {
     public Instant placedAt() { return placedAt; }
     public Instant closedAt() { return closedAt; }
     public Instant deliveredAt() { return deliveredAt; }
-    public String courierId() { return courierId; }
+    public Long courierId() { return courierId; }
     public String rejectionReason() { return rejectionReason; }
     public OrderStatus status() { return status; }
     public List<PersistedOrderLine> lines() { return lines; }

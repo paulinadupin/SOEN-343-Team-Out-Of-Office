@@ -37,14 +37,14 @@ public class InMemoryOrderRepository implements OrderRepository {
     }
 
     @Override
-    public List<Order> findByCustomerId(String customerId) {
+    public List<Order> findByCustomerId(Long customerId) {
         return findAll().stream()
                 .filter(order -> order.customerId().equals(customerId))
                 .toList();
     }
 
     @Override
-    public List<Order> findByCourierId(String courierId) {
+    public List<Order> findByCourierId(Long courierId) {
         return findAll().stream()
                 .filter(order -> courierId.equals(order.courierId()))
                 .toList();

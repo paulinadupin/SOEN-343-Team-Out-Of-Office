@@ -35,8 +35,8 @@ public class OrderHistoryController {
 
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
-        String restaurantId = user instanceof Restaurant ? user.getUserId().toString() : null;
-        return new CurrentUser(user.getUserId().toString(), user.getAccountType(), restaurantId);
+        Long restaurantId = user instanceof Restaurant ? user.getUserId() : null;
+        return new CurrentUser(user.getUserId(), user.getAccountType(), restaurantId);
     }
 
     private static OrderHistoryView toView(OrderHistoryEntry entry) {

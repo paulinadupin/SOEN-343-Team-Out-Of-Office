@@ -43,14 +43,14 @@ public class JpaOrderRepository implements OrderRepository {
     }
     
     @Override
-    public List<Order> findByCustomerId(String customerId) {
+    public List<Order> findByCustomerId(Long customerId) {
         return ORDERS.findByCustomerId(customerId).stream()
                 .map(JpaOrderRepository::toDomain)
                 .toList();
     }
 
     @Override
-    public List<Order> findByCourierId(String courierId) {
+    public List<Order> findByCourierId(Long courierId) {
         return ORDERS.findByCourierId(courierId).stream()
                 .map(JpaOrderRepository::toDomain)
                 .toList();

@@ -20,7 +20,7 @@ class OrderTests {
         assertEquals(OrderStatus.ACCEPTED, order.accept());
         assertEquals(OrderStatus.PREPARING, order.prepare());
         assertEquals(OrderStatus.READY, order.markReady());
-        assertEquals(OrderStatus.PICKED_UP, order.pickUp("courier-1"));
+        assertEquals(OrderStatus.PICKED_UP, order.pickUp(3L));
         assertEquals(OrderStatus.DELIVERED, order.deliver());
     }
 
