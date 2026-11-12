@@ -23,21 +23,20 @@ public final class Order {
     private Instant closedAt;
     private Instant deliveredAt; 
     private String rejectionReason;
-    private Charge charge;
-    private final String CUSTOMER_ID;
-    private final String RESTAURANT_ID;
+    private final Long CUSTOMER_ID;
+    private final Long RESTAURANT_ID;
     private final List<OrderLine> LINES;
     private final List<StateTransition> TRANSITIONS = new ArrayList<>();
 
     // constructor
-    public Order(String OrderId, String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
-        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null, null);
+    public Order(String OrderId, Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
+        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null);
     }
 
     private Order(
             String orderId,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             List<OrderLine> lines,
             Instant placedAt,
             OrderStatus orderStatus,
@@ -61,14 +60,14 @@ public final class Order {
     }
 
     // is called when order is placed
-    public static Order create(String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
+    public static Order create(Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
         return new Order(UUID.randomUUID().toString(), CUSTOMER_ID, RESTAURANT_ID, LINES); //UUID stands for 'Universally Unique Identifier'
     }
 
     public static Order rehydrate(
             String orderId,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             List<OrderLine> lines,
             Instant placedAt,
             OrderStatus status,
@@ -83,8 +82,8 @@ public final class Order {
 
     //getters
     public String id() { return ORDER_ID; }
-    public String customerId() { return CUSTOMER_ID; }
-    public String restaurantId() { return RESTAURANT_ID; }
+    public Long customerId() { return CUSTOMER_ID; }
+    public Long restaurantId() { return RESTAURANT_ID; }
     public List<OrderLine> lines() { return LINES; }
     public Instant placedAt() { return PLACED_AT; }
     public Instant closedAt() { return closedAt; }

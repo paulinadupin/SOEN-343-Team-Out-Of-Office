@@ -21,9 +21,9 @@ public class PersistedOrder {
     @Id
     private String id;
     @Column(nullable = false)
-    private String customerId;
+    private Long customerId;
     @Column(nullable = false)
-    private String restaurantId;
+    private Long restaurantId;
     @Column(nullable = false)
     private Instant placedAt;
     private Instant closedAt;
@@ -45,8 +45,8 @@ public class PersistedOrder {
 
     public PersistedOrder(
             String id,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             Instant placedAt,
             Instant closedAt,
             Instant deliveredAt,
@@ -67,8 +67,8 @@ public class PersistedOrder {
     }
 
     public String id() { return id; }
-    public String customerId() { return customerId; }
-    public String restaurantId() { return restaurantId; }
+    public Long customerId() { return customerId; }
+    public Long restaurantId() { return restaurantId; }
     public Instant placedAt() { return placedAt; }
     public Instant closedAt() { return closedAt; }
     public Instant deliveredAt() { return deliveredAt; }

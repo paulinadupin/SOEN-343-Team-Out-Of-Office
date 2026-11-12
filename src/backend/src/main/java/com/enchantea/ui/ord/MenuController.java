@@ -27,7 +27,7 @@ public class MenuController {
     }
 
     @GetMapping("/{restaurantId}/menu")
-    public List<MenuItemView> menu(@PathVariable String restaurantId, HttpServletRequest servletRequest) {
+    public List<MenuItemView> menu(@PathVariable Long restaurantId, HttpServletRequest servletRequest) {
         currentUser(servletRequest);
         return MENU_CATALOG.menu(restaurantId).stream()
                 .map(item -> new MenuItemView(item.id(), item.name(), item.price(), item.status()))
@@ -37,8 +37,8 @@ public class MenuController {
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();
-        String restaurantId = user instanceof Restaurant ? user.getUserId().toString() : null;
-        return new CurrentUser(user.getUserId().toString(), accountType, restaurantId);
+        Long restaurantId = user instanceof Restaurant ? user.getUserId() : null;
+        return new CurrentUser(user.getUserId(), accountType, restaurantId);
     }
 
     public record MenuItemView(String id, String name, double price, MenuItemStatus status) { }
