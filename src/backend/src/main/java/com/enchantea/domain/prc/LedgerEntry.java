@@ -17,6 +17,10 @@ public final class LedgerEntry {
         this.CREATED_AT = createdAt;
     }
 
+    public static LedgerEntry fromDatabase(String entryId, String orderId, LedgerEntryType type, double amount, Instant createdAt) {
+        return new LedgerEntry(entryId, orderId, type, amount, createdAt);
+    }
+
     public String entryId() {
         return ENTRY_ID;
     }
