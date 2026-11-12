@@ -6,6 +6,7 @@ import com.enchantea.application.ord.OrderCommands;
 import com.enchantea.application.ord.contracts.CurrentUser;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderStatus;
+import com.enchantea.domain.prc.Charge;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Restaurant;
 import com.enchantea.domain.reg.User;
@@ -35,6 +36,13 @@ public class OrderController {
         OrderCommands.PlaceOrder command = new OrderCommands.PlaceOrder(
                 request.restaurantId(), request.lines());
         return toView(SERVICE.place(currentUser(servletRequest), command));
+    }
+
+    @PostMapping("/quote")
+    public ChargeView quote(@RequestBody PlaceRequest request, HttpServletRequest servletRequest) {
+        OrderCommands.PlaceOrder command = new OrderCommands.PlaceOrder(
+                request.restaurantId(), request.lines());
+        return toChargeView(SERVICE.quote(currentUser(servletRequest), command));
     }
 
     @PostMapping("/{id}/accept")
@@ -130,10 +138,16 @@ public class OrderController {
         List<LineView> lines = order.lines().stream()
                 .map(line -> new LineView(line.itemId(), line.quantity(), line.unitPrice()))
                 .toList();
-
         return new OrderView(
                 order.id(), order.customerId(), order.restaurantId(), lines,
-                order.total(), order.status(), order.placedAt(), order.closedAt(), order.rejectionReason());
+                order.total(), order.status(), order.placedAt(), order.closedAt(),
+                order.rejectionReason(), toChargeView(order.charge()));
+    }
+
+    private static ChargeView toChargeView(Charge charge) {
+        return new ChargeView(
+                charge.subtotal(), charge.deliveryFee(), charge.serviceFee(),
+                charge.smallOrderSurcharge(), charge.total());
     }
 
     public record PlaceRequest(
@@ -144,6 +158,13 @@ public class OrderController {
 
     public record LineView(String itemId, int quantity, double unitPrice) { }
 
+    public record ChargeView(
+            double subtotal,
+            double deliveryFee,
+            double serviceFee,
+            double smallOrderSurcharge,
+            double total) { }
+
     public record OrderView(
             String id,
             Long customerId,
@@ -153,5 +174,6 @@ public class OrderController {
             OrderStatus status,
             Instant placedAt,
             Instant closedAt,
-            String rejectionReason) { }
+            String rejectionReason,
+            ChargeView charge) { }
 }

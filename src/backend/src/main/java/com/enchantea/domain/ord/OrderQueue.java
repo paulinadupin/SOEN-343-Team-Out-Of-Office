@@ -30,4 +30,9 @@ public final class OrderQueue {
     public List<Order> orders() {
         return List.copyOf(ORDERS);
     }
+
+    public int size(){
+        return ORDERS.size();
+    }
+
 }

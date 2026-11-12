@@ -4,6 +4,7 @@ import com.enchantea.domain.ord.OrderStatus;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,6 +27,7 @@ public class PersistedOrder {
     @Column(nullable = false)
     private Instant placedAt;
     private Instant closedAt;
+    private Instant deliveredAt;
     private String rejectionReason;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -34,6 +36,9 @@ public class PersistedOrder {
     @ElementCollection
     @CollectionTable(name = "order_lines", joinColumns = @JoinColumn(name = "order_id"))
     private List<PersistedOrderLine> lines = new ArrayList<>();
+
+    @Embedded
+    private PersistedCharge charge;
 
     protected PersistedOrder() {
     }
@@ -44,17 +49,21 @@ public class PersistedOrder {
             Long restaurantId,
             Instant placedAt,
             Instant closedAt,
+            Instant deliveredAt,
             String rejectionReason,
             OrderStatus status,
-            List<PersistedOrderLine> lines) {
+            List<PersistedOrderLine> lines,
+            PersistedCharge charge) {
         this.id = id;
         this.customerId = customerId;
         this.restaurantId = restaurantId;
         this.placedAt = placedAt;
         this.closedAt = closedAt;
+        this.deliveredAt = deliveredAt;
         this.rejectionReason = rejectionReason;
         this.status = status;
         this.lines = new ArrayList<>(lines);
+        this.charge = charge;
     }
 
     public String id() { return id; }
@@ -62,7 +71,9 @@ public class PersistedOrder {
     public Long restaurantId() { return restaurantId; }
     public Instant placedAt() { return placedAt; }
     public Instant closedAt() { return closedAt; }
+    public Instant deliveredAt() { return deliveredAt; }
     public String rejectionReason() { return rejectionReason; }
     public OrderStatus status() { return status; }
     public List<PersistedOrderLine> lines() { return lines; }
+    public PersistedCharge charge() { return charge; }
 }

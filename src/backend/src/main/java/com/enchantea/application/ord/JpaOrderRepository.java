@@ -2,6 +2,8 @@ package com.enchantea.application.ord;
 
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
+import com.enchantea.domain.prc.Charge;
+import com.enchantea.foundation.ord.PersistedCharge;
 import com.enchantea.foundation.ord.PersistedOrder;
 import com.enchantea.foundation.ord.PersistedOrderLine;
 import com.enchantea.foundation.ord.PersistedOrderRepository;
@@ -44,17 +46,23 @@ public class JpaOrderRepository implements OrderRepository {
         List<PersistedOrderLine> lines = order.lines().stream()
                 .map(line -> new PersistedOrderLine(line.itemId(), line.quantity(), line.unitPrice()))
                 .toList();
+        PersistedCharge charge = order.charge() == null ? null : new PersistedCharge(
+                order.charge().subtotal(), order.charge().deliveryFee(),
+                order.charge().serviceFee(), order.charge().smallOrderSurcharge());
         return new PersistedOrder(
                 order.id(), order.customerId(), order.restaurantId(), order.placedAt(),
-                order.closedAt(), order.rejectionReason(), order.status(), lines);
+                order.closedAt(), order.deliveredAt(), order.rejectionReason(), order.status(), lines, charge);
     }
 
     private static Order toDomain(PersistedOrder order) {
         List<OrderLine> lines = order.lines().stream()
                 .map(line -> new OrderLine(line.itemId(), line.quantity(), line.unitPrice()))
                 .toList();
+        Charge charge = order.charge() == null ? null : new Charge(
+                order.charge().subtotal(), order.charge().deliveryFee(),
+                order.charge().serviceFee(), order.charge().smallOrderSurcharge());
         return Order.rehydrate(
                 order.id(), order.customerId(), order.restaurantId(), lines, order.placedAt(),
-                order.status(), order.closedAt(), order.rejectionReason());
+                order.status(), order.closedAt(), order.deliveredAt(), order.rejectionReason(), charge);
     }
 }
