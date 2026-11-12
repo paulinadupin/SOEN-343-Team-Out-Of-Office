@@ -145,7 +145,7 @@ public class CourierDutyService {
     private Courier requireCourier(Long courierId) {
         User user = USER_REPOSITORY.findById(courierId).orElseThrow(() -> new IllegalArgumentException("User not found"));
         
-        if (!(user instanceof Courier courier)) { // if the user is a courier
+        if (!(user instanceof Courier courier)) { // if the user is not a courier
             throw new IllegalArgumentException("User is not a courier");
         }
 
