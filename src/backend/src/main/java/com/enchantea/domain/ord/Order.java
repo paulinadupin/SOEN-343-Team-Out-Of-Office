@@ -21,8 +21,9 @@ public final class Order {
     private OrderState status;
     private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
-    private Instant deliveredAt; 
+    private Instant deliveredAt;
     private String rejectionReason;
+    private Charge charge;
     private final Long CUSTOMER_ID;
     private final Long RESTAURANT_ID;
     private final List<OrderLine> LINES;
@@ -30,7 +31,7 @@ public final class Order {
 
     // constructor
     public Order(String OrderId, Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
-        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null);
+        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null, null);
     }
 
     private Order(
