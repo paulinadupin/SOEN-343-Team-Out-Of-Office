@@ -145,7 +145,9 @@ public class OrderApplicationService {
         order.markReady();
         PREPARATION_QUEUE.remove(order.restaurantId(), order.id());
         DISPATCH_QUEUE.add(order);
-        return saveAndPublish(order, oldStatus, null);
+        Order readyOrder = saveAndPublish(order, oldStatus, null);
+        COURIER_ASSIGNMENT.dispatchNext();
+        return readyOrder;
     }
 
     @Transactional

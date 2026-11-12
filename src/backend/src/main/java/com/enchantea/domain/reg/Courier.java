@@ -1,7 +1,7 @@
 package com.enchantea.domain.reg;
 
-import com.enchantea.domain.dlv.Assignment;
 import com.enchantea.domain.dlv.CourierState;
+import com.enchantea.domain.dlv.Assignment;
 import com.enchantea.domain.dlv.state.AssignedState;
 import com.enchantea.domain.dlv.state.CarryingState;
 import com.enchantea.domain.dlv.state.IdleState;
@@ -14,6 +14,7 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.Transient;
 
 @Entity
 @DiscriminatorValue("COURIER")
@@ -27,7 +28,8 @@ public class Courier extends User{
     @AttributeOverride(name = "lng", column = @Column(name = "courier_lng"))
     private Location position;
 
-    private Assignment assignment = null;
+    @Transient
+    private Assignment assignment;
 
     protected Courier() {
     }
@@ -70,6 +72,11 @@ public class Courier extends User{
         setState(state.confirmDelivery());
     }
 
+    public void operatorCancelAssignment() {
+        CourierState state = getState();
+        setState(state.operatorCancelAssignment());
+    }
+
     // --- getters and setters ---
 
     public CourierStatus getStatus() {
@@ -84,11 +91,6 @@ public class Courier extends User{
         this.position = position;
     }
 
-    @Override
-    public AccountType getAccountType() {
-        return AccountType.COURIER;
-    }
-
     public Assignment getAssignment() {
         return assignment;
     }
@@ -96,7 +98,12 @@ public class Courier extends User{
     public void setAssignment(Assignment assignment) {
         this.assignment = assignment;
     }
-    
+
+    @Override
+    public AccountType getAccountType() {
+        return AccountType.COURIER;
+    }
+
     public CourierState getState(){
         return switch (status){
             case OFFLINE -> new OfflineState();

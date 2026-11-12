@@ -3,19 +3,20 @@ package com.enchantea.domain.dlv;
 import java.time.Duration;
 import java.time.Instant;
 
-import com.enchantea.domain.ord.Order;
-
 public class Assignment {
     private AssignmentStatus status;
-    private Order order;
+    private String orderId;
     private Instant offeredAt;
     private Instant expiresAt;
 
-    private final Duration TIME_LIMIT = Duration.ofSeconds(60);
+    private static final Duration TIME_LIMIT = Duration.ofSeconds(60);
 
-    public Assignment(AssignmentStatus status, Order order, Instant offeredAt) {
+    protected Assignment() {
+    }
+
+    public Assignment(AssignmentStatus status, String orderId, Instant offeredAt) {
         this.status = status;
-        this.order = order;
+        this.orderId = orderId;
         this.offeredAt = offeredAt;
         expiresAt = offeredAt.plus(TIME_LIMIT);
     }
@@ -49,8 +50,8 @@ public class Assignment {
         return expiresAt;
     }
 
-    public Order getOrder() {
-        return order;
+    public String getOrderId() {
+        return orderId;
     }
 
     

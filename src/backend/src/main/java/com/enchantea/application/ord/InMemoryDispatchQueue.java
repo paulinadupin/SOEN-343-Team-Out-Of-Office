@@ -25,4 +25,9 @@ public class InMemoryDispatchQueue implements DispatchQueue {
     public synchronized Optional<Order> peek() {
         return QUEUE.first();
     }
+
+    @Override
+    public synchronized boolean contains(String orderId) {
+        return QUEUE.contains(orderId);
+    }
 }

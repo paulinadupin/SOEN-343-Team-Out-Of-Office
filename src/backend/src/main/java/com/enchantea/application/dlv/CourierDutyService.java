@@ -22,11 +22,21 @@ public class CourierDutyService {
     private final UserRepository USER_REPOSITORY;
     private final OrderApplicationService ORDER_APPLICATION_SERVICE;
     private final HandoffRepository HANDOFF_REPOSITORY;
+    private final DispatchService DISPATCH_SERVICE;
+    private final CourierAssignmentStore ASSIGNMENTS;
 
-    public CourierDutyService(UserRepository userRepository, OrderApplicationService orderApplicationService, HandoffRepository handoffRepository) {
+    public CourierDutyService(
+            UserRepository userRepository,
+            OrderApplicationService orderApplicationService,
+            HandoffRepository handoffRepository,
+            DispatchService dispatchService,
+            CourierAssignmentStore assignments) {
+                
         this.USER_REPOSITORY = userRepository;
         this.ORDER_APPLICATION_SERVICE = orderApplicationService;
         this.HANDOFF_REPOSITORY = handoffRepository;
+        this.DISPATCH_SERVICE = dispatchService;
+        this.ASSIGNMENTS = assignments;
     }
 
     @Transactional
@@ -38,6 +48,7 @@ public class CourierDutyService {
 
         courier.goOnline(); // State design pattern allows this action only from OFFLINE.
         USER_REPOSITORY.save(courier);
+        DISPATCH_SERVICE.dispatchNext();
     }
 
     @Transactional
@@ -45,13 +56,19 @@ public class CourierDutyService {
         Courier courier = requireCourier(courierId);
 
         Assignment assignment = courier.getAssignment();
+        String returnedOrderId = null;
         if (assignment != null && assignment.getStatus() == AssignmentStatus.OFFERED) {
+            returnedOrderId = assignment.getOrderId();
             assignment.declineOffer();
+            ASSIGNMENTS.remove(courierId);
             courier.setAssignment(null);
         }
 
         courier.goOffline(); // State design pattern allows this action only from IDLE.
         USER_REPOSITORY.save(courier);
+        if (returnedOrderId != null) {
+            DISPATCH_SERVICE.requeueAndDispatch(returnedOrderId);
+        }
     }
 
     @Transactional
@@ -60,7 +77,9 @@ public class CourierDutyService {
         Assignment assignment = requireOfferedAssignment(courier);
 
         if (assignment.isExpired()) {  //checks if time allocated is up
+            String returnedOrderId = assignment.getOrderId();
             returnOffer(courier, assignment);
+            DISPATCH_SERVICE.requeueAndDispatch(returnedOrderId);
             return;
         }
 
@@ -75,51 +94,54 @@ public class CourierDutyService {
         Assignment assignment = requireOfferedAssignment(courier);
 
         courier.declineOffer(); // IDLE remains IDLE. other states reject the action.
+        String returnedOrderId = assignment.getOrderId();
         returnOffer(courier, assignment);
+        DISPATCH_SERVICE.requeueAndDispatch(returnedOrderId);
     }
 
     @Transactional
-    public void confirmPickup(Long courierId, String orderId) {
+    public void confirmPickup(Long courierId) {
         Courier courier = requireCourier(courierId);
         Assignment assignment = courier.getAssignment();
 
         if (assignment == null
                 || assignment.getStatus() != AssignmentStatus.ACCEPTED
-                || assignment.getOrder() == null
-                || !assignment.getOrder().id().equals(orderId)) {
+                || assignment.getOrderId() == null) {
 
             throw new IllegalStateException("Order is not assigned to this courier");
         }
 
+        String orderId = assignment.getOrderId();
+        Order order = ORDER_APPLICATION_SERVICE.get(orderId);
         courier.confirmPickup(); // State design pattern allows this action only from ASSIGNED.
-        ORDER_APPLICATION_SERVICE.pickUp(currentUser(courier), new OrderCommands.OrderAction(orderId, null));
-        HANDOFF_REPOSITORY.save(new Handoff(orderId, courier.getUserId(), HandoffType.PICKUP, Instant.now()));
+        ORDER_APPLICATION_SERVICE.pickUp(currentUser(courier), new OrderCommands.OrderAction(order.id(), null));
+        Instant occurredAt = Instant.now();
+        HANDOFF_REPOSITORY.save(new Handoff(orderId, courier.getUserId(), HandoffType.PICKUP, occurredAt));
         USER_REPOSITORY.save(courier);
     }
 
     @Transactional
-    public void confirmDelivery(Long courierId, Long customerId) {
+    public void confirmDelivery(Long courierId) {
         Courier courier = requireCourier(courierId);
         Assignment assignment = courier.getAssignment();
 
         if (assignment == null 
             || assignment.getStatus() != AssignmentStatus.ACCEPTED 
-            || assignment.getOrder() == null) {
+            || assignment.getOrderId() == null) {
 
             throw new IllegalStateException("Courier has no accepted order");
         }
 
-        Order order = assignment.getOrder();
-        if (!order.customerId().equals(customerId)) {
-            throw new IllegalArgumentException(
-                    "Customer ID does not match the customer of the assigned order");
-        }
+        Order order = ORDER_APPLICATION_SERVICE.get(assignment.getOrderId());
 
         courier.confirmDelivery(); // State design pattern allows this action only from CARRYING.
         ORDER_APPLICATION_SERVICE.deliver(currentUser(courier), new OrderCommands.OrderAction(order.id(), null));
-        HANDOFF_REPOSITORY.save(new Handoff(order.id(), courier.getUserId(), HandoffType.DELIVERY, Instant.now()));
+        Instant occurredAt = Instant.now();
+        HANDOFF_REPOSITORY.save(new Handoff(order.id(), courier.getUserId(), HandoffType.DELIVERY, occurredAt));
+        ASSIGNMENTS.remove(courierId);
         courier.setAssignment(null);
         USER_REPOSITORY.save(courier);
+        DISPATCH_SERVICE.dispatchNext();
     }
 
 
@@ -132,6 +154,7 @@ public class CourierDutyService {
             throw new IllegalArgumentException("User is not a courier");
         }
 
+        courier.setAssignment(ASSIGNMENTS.get(courierId));
         return courier;
     }
 
@@ -147,6 +170,7 @@ public class CourierDutyService {
 
     private void returnOffer(Courier courier, Assignment assignment) { //when the courier has an offer but wants to go offline
         assignment.declineOffer();
+        ASSIGNMENTS.remove(courier.getUserId());
         courier.setAssignment(null);
         USER_REPOSITORY.save(courier);
     }
@@ -154,4 +178,5 @@ public class CourierDutyService {
     private static CurrentUser currentUser(Courier courier) { //to recieve the current user
         return new CurrentUser(courier.getUserId(), AccountType.COURIER, null);
     }
+
 }

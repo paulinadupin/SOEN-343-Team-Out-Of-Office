@@ -6,4 +6,5 @@ public interface DispatchQueue {
     void add(Order order);
     Optional<Order> peek();
     boolean removeFromDispatch(String orderId);
+    boolean contains(String orderId);
 }

@@ -11,4 +11,7 @@ public class CarryingState extends AbstractCourierState{
     @Override
     public CourierState confirmDelivery() { return new IdleState(); }
 
+    @Override
+    public CourierState operatorCancelAssignment() { return new IdleState(); }
+
 }

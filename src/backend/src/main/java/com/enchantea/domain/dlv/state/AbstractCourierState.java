@@ -22,6 +22,9 @@ abstract class AbstractCourierState implements CourierState {
     @Override
     public CourierState confirmPickup() { return illegal("confirm pickup"); }
 
+    @Override
+    public CourierState operatorCancelAssignment() { return illegal("cancel assignment"); }
+
 
     private CourierState illegal(String action) {
         throw new InvalidCourierTransitionException(status(), action);

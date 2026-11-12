@@ -10,5 +10,8 @@ public class AssignedState extends AbstractCourierState {
 
     @Override
     public CourierState confirmPickup() { return new CarryingState(); }
+
+    @Override
+    public CourierState operatorCancelAssignment() { return new IdleState(); }
     
 }

@@ -11,4 +11,5 @@ public interface CourierState {
     CourierState declineOffer(); // TODO : check if this is useful
     CourierState confirmPickup();
     CourierState confirmDelivery();
+    CourierState operatorCancelAssignment();
 }
