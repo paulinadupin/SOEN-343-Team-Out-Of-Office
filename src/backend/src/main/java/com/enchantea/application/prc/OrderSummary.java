@@ -8,7 +8,7 @@ import java.util.List;
 //what the customer sees for a delivered or refunded order (R-PRC-03)
 public record OrderSummary(
         String orderId,
-        String restaurantId,
+        Long restaurantId,
         String restaurantName,
         List<Line> lines,
         Charge charge,
