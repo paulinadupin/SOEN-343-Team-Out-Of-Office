@@ -120,7 +120,7 @@ public class OrderApplicationService {
 
         order.cancelByOperator();
         PREPARATION_QUEUE.remove(order.restaurantId(), order.id());
-        DISPATCH_QUEUE.removeFromDispatch(order.restaurantId(), order.id());
+        DISPATCH_QUEUE.removeFromDispatch(order.id());
         COURIER_ASSIGNMENT.removeOrderAssignment(order.id());
         return saveAndPublish(order, oldStatus, null);
     }
@@ -157,8 +157,10 @@ public class OrderApplicationService {
 
         order.markReady();
         PREPARATION_QUEUE.remove(order.restaurantId(), order.id());
-        DISPATCH_QUEUE.add(order.restaurantId(), order);
-        return saveAndPublish(order, oldStatus, null);
+        DISPATCH_QUEUE.add(order);
+        Order readyOrder = saveAndPublish(order, oldStatus, null);
+        COURIER_ASSIGNMENT.dispatchNext();
+        return readyOrder;
     }
 
     @Transactional
@@ -168,7 +170,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.pickUp(user.id());
-        DISPATCH_QUEUE.removeFromDispatch(order.restaurantId(), order.id());
+        DISPATCH_QUEUE.removeFromDispatch(order.id());
         return saveAndPublish(order, oldStatus, null);
     }
 
@@ -202,7 +204,7 @@ public class OrderApplicationService {
     }
 
     @Transactional(readOnly = true)
-    public List<Order> ordersForRestaurant(String restaurantId) {
+    public List<Order> ordersForRestaurant(Long restaurantId) {
         return ORDERS.findByRestaurantId(restaurantId);
     }
 

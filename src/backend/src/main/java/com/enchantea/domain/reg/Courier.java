@@ -1,5 +1,12 @@
 package com.enchantea.domain.reg;
 
+import com.enchantea.domain.dlv.CourierState;
+import com.enchantea.domain.dlv.Assignment;
+import com.enchantea.domain.dlv.state.AssignedState;
+import com.enchantea.domain.dlv.state.CarryingState;
+import com.enchantea.domain.dlv.state.IdleState;
+import com.enchantea.domain.dlv.state.OfflineState;
+
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
@@ -20,6 +27,9 @@ public class Courier extends User{
     @AttributeOverride(name = "lng", column = @Column(name = "courier_lng"))
     private Location position;
 
+    @Embedded
+    private Assignment assignment;
+
     protected Courier() {
     }
 
@@ -29,12 +39,47 @@ public class Courier extends User{
         this.position = position;
     }
 
-    public CourierStatus getStatus() {
-        return status;
+    // --- state transition methods ---
+
+    public void goOnline(){
+        CourierState state = getState();
+        setState(state.goOnline());
     }
 
-    public void setStatus(CourierStatus status) {
-        this.status = status;
+    public void goOffline(){
+        CourierState state = getState();
+        setState(state.goOffline());
+    }
+
+    public void acceptOffer(){
+        CourierState state = getState();
+        setState(state.acceptOffer());
+    }
+
+    public void declineOffer(){
+        CourierState state = getState();
+        setState(state.declineOffer());
+    }
+
+    public void confirmPickup(){
+        CourierState state = getState();
+        setState(state.confirmPickup());
+    }
+
+    public void confirmDelivery(){
+        CourierState state = getState();
+        setState(state.confirmDelivery());
+    }
+
+    public void operatorCancelAssignment() {
+        CourierState state = getState();
+        setState(state.operatorCancelAssignment());
+    }
+
+    // --- getters and setters ---
+
+    public CourierStatus getStatus() {
+        return status;
     }
 
     public Location getPosition() {
@@ -45,8 +90,29 @@ public class Courier extends User{
         this.position = position;
     }
 
+    public Assignment getAssignment() {
+        return assignment;
+    }
+
+    public void setAssignment(Assignment assignment) {
+        this.assignment = assignment;
+    }
+
     @Override
     public AccountType getAccountType() {
         return AccountType.COURIER;
+    }
+
+    public CourierState getState(){
+        return switch (status){
+            case OFFLINE -> new OfflineState();
+            case IDLE -> new IdleState();
+            case ASSIGNED -> new AssignedState();
+            case CARRYING -> new CarryingState();
+        };
+    }
+
+    private void setState(CourierState state){
+        this.status=state.status();
     }
 }

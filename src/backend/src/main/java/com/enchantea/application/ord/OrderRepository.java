@@ -8,7 +8,7 @@ public interface OrderRepository {
     Order save(Order order);
     Optional<Order> findById(String id);
     List<Order> findAll();
-    List<Order> findByRestaurantId(String restaurantId);
-    List<Order> findByCustomerId(String customerId);
-    List<Order> findByCourierId(String courierId);
+    List<Order> findByRestaurantId(Long restaurantId);
+    List<Order> findByCustomerId(Long customerId);
+    List<Order> findByCourierId(Long courierId);
 }

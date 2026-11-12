@@ -22,29 +22,29 @@ public final class Order {
     private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
     private Instant deliveredAt; 
-    private String courierId; 
+    private Long courierId;
     private String rejectionReason;
     private Charge charge;
-    private final String CUSTOMER_ID;
-    private final String RESTAURANT_ID;
+    private final Long CUSTOMER_ID;
+    private final Long RESTAURANT_ID;
     private final List<OrderLine> LINES;
     private final List<StateTransition> TRANSITIONS = new ArrayList<>();
 
     // constructor
-    public Order(String OrderId, String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
+    public Order(String OrderId, Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
         this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null, null, null);
     }
 
     private Order(
             String orderId,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             List<OrderLine> lines,
             Instant placedAt,
             OrderStatus orderStatus,
             Instant closedAt,
             Instant deliveredAt,
-            String courierId,
+            Long courierId,
             String rejectionReason,
             Charge charge) {
         this.ORDER_ID = Objects.requireNonNull(orderId, "id");
@@ -64,20 +64,20 @@ public final class Order {
     }
 
     // is called when order is placed
-    public static Order create(String CUSTOMER_ID, String RESTAURANT_ID, List<OrderLine> LINES) {
+    public static Order create(Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
         return new Order(UUID.randomUUID().toString(), CUSTOMER_ID, RESTAURANT_ID, LINES); //UUID stands for 'Universally Unique Identifier'
     }
 
     public static Order rehydrate(
             String orderId,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             List<OrderLine> lines,
             Instant placedAt,
             OrderStatus status,
             Instant closedAt,
             Instant deliveredAt,
-            String courierId,
+            Long courierId,
             String rejectionReason,
             Charge charge) {
         return new Order(
@@ -87,13 +87,13 @@ public final class Order {
 
     //getters
     public String id() { return ORDER_ID; }
-    public String customerId() { return CUSTOMER_ID; }
-    public String restaurantId() { return RESTAURANT_ID; }
+    public Long customerId() { return CUSTOMER_ID; }
+    public Long restaurantId() { return RESTAURANT_ID; }
     public List<OrderLine> lines() { return LINES; }
     public Instant placedAt() { return PLACED_AT; }
     public Instant closedAt() { return closedAt; }
     public Instant deliveredAt() { return deliveredAt; }
-    public String courierId() { return courierId; }
+    public Long courierId() { return courierId; }
     public OrderStatus status() { return status.status(); }
     public String rejectionReason() { return rejectionReason; }
     public List<StateTransition> transitions() { return List.copyOf(TRANSITIONS); }
@@ -132,7 +132,7 @@ public final class Order {
     // when restaurant marks order as ready
     public OrderStatus markReady() { return apply(status.markReady()); }
     // when order is picked up by courier, remembers which courier has it, need this for PRC-04 so we have order history for the courier.
-    public OrderStatus pickUp(String courierId) {
+    public OrderStatus pickUp(Long courierId) {
         OrderState nextState = status.pickUp();
         this.courierId = Objects.requireNonNull(courierId, "courierId");
         return apply(nextState);

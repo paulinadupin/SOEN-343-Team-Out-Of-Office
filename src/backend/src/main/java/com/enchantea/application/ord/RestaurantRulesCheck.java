@@ -20,7 +20,7 @@ public class RestaurantRulesCheck extends CommandCheck {
             verifyPlaceOrder((OrderCommands.PlaceOrder) command);
         } else if (type == CommandType.ACCEPT_ORDER) {
             String orderId = ((OrderCommands.OrderAction) command).orderId();
-            String restaurantId = ORDERS.findById(orderId)
+            Long restaurantId = ORDERS.findById(orderId)
                     .orElseThrow(() -> new OrderNotFoundException(orderId))
                     .restaurantId();
             if (!RESTAURANT_QUERY.isOpen(restaurantId)) {
@@ -30,7 +30,7 @@ public class RestaurantRulesCheck extends CommandCheck {
     }
 
     private void verifyPlaceOrder(OrderCommands.PlaceOrder place) {
-        if (place.restaurantId() == null || place.restaurantId().isBlank()) {
+        if (place.restaurantId() == null || place.restaurantId() <= 0) {
             throw new CommandRejectedException("A restaurant is required");
         }
         if (!RESTAURANT_QUERY.isOpen(place.restaurantId())) {

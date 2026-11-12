@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.enchantea.domain.dlv.state.OfflineState;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.CourierStatus;
@@ -129,8 +130,7 @@ public class AccountFacade {
                 return new Courier(
                         username,
                         passwordHash,
-                        request.getCourierStatus() == null ? CourierStatus.OFFLINE : request.getCourierStatus(),
-                        requireLocation(request.getPosition(), "position"));
+                        request.getCourierStatus() == null ? CourierStatus.OFFLINE : request.getCourierStatus(),                        requireLocation(request.getPosition(), "position"));
             case OPERATOR:
                 return new Operator(username, passwordHash);
             default:

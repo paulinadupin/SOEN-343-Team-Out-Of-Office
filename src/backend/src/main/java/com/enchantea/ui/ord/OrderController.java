@@ -126,8 +126,8 @@ public class OrderController {
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();
-        String restaurantId = user instanceof Restaurant ? user.getUserId().toString() : null;
-        return new CurrentUser(user.getUserId().toString(), accountType, restaurantId);
+        Long restaurantId = user instanceof Restaurant ? user.getUserId() : null;
+        return new CurrentUser(user.getUserId(), accountType, restaurantId);
     }
 
     private OrderCommands.OrderAction action(String id, ActionRequest request) {
@@ -151,7 +151,7 @@ public class OrderController {
     }
 
     public record PlaceRequest(
-            String restaurantId,
+            Long restaurantId,
             List<OrderCommands.RequestedLine> lines) { }
 
     public record ActionRequest(String reason) { }
@@ -167,8 +167,8 @@ public class OrderController {
 
     public record OrderView(
             String id,
-            String customerId,
-            String restaurantId,
+            Long customerId,
+            Long restaurantId,
             List<LineView> lines,
             double total,
             OrderStatus status,

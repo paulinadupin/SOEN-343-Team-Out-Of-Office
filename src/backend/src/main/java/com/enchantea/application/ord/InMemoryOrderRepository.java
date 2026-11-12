@@ -30,7 +30,7 @@ public class InMemoryOrderRepository implements OrderRepository {
     }
 
     @Override
-    public List<Order> findByRestaurantId(String restaurantId) {
+    public List<Order> findByRestaurantId(Long restaurantId) {
         return findAll().stream()
                 .filter(order -> order.restaurantId().equals(restaurantId))
                 .toList();

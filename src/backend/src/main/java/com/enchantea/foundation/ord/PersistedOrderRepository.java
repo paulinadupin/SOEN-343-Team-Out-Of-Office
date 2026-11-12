@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PersistedOrderRepository extends JpaRepository<PersistedOrder, String> {
-    List<PersistedOrder> findByRestaurantId(String restaurantId);
-    List<PersistedOrder> findByCustomerId(String customerId);
-    List<PersistedOrder> findByCourierId(String courierId);
+    List<PersistedOrder> findByRestaurantId(Long restaurantId);
+    List<PersistedOrder> findByCustomerId(Long customerId);
+    List<PersistedOrder> findByCourierId(Long courierId);
 }

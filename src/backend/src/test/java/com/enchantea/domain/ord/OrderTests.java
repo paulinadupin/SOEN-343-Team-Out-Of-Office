@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class OrderTests {
     private Order newOrder() {
-        return Order.create("customer-1", "restaurant-1", List.of(new OrderLine("bubble-tea", 2, 5.0)));
+        return Order.create(1L, 2L, List.of(new OrderLine("bubble-tea", 2, 5.0)));
     }
 
     @Test
@@ -75,6 +75,6 @@ class OrderTests {
     @Test
     void anOrderMustHaveAtLeastOneLine() {
         assertThrows(IllegalArgumentException.class,
-                () -> Order.create("customer-1", "restaurant-1", List.of()));
+                () -> Order.create(1L, 2L, List.of()));
     }
 }
