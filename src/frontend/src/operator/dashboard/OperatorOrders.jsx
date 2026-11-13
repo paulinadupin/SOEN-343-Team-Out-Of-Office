@@ -123,9 +123,14 @@ function OperatorOrders() {
         {
             header: 'Actions',
             render: (order) => (
-                <button disabled={busyId === order.id} onClick={() => act(order.id, 'refund')}>
-                    Refund
-                </button>
+                <>
+        <button disabled={busyId === order.id} onClick={() => act(order.id, 'restore')}>
+          Make active again
+        </button>
+        <button disabled={busyId === order.id} onClick={() => act(order.id, 'cancel/operator')}>
+          Cancel
+        </button>
+      </>
             ),
         },
     ]
