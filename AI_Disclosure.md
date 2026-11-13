@@ -12,4 +12,5 @@ For the Customer and Restaurant specific pages, GenAi was used to help with some
 
 ## Phase 3 (AI Level 1)
 For DLV, AI was used to get a roadmap of the tasks needed to implement the DLV module and to get a good understanding of what was needed from the other modules.
+For Courier and Operator front end, AI was used to identify the different file dependencies and for troubleshooting.
 For PRC, AI helped outline the tasks for implementing the PRC module and clarify what the module needed from the other components.
