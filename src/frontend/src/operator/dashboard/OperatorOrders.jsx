@@ -1,5 +1,14 @@
 import { useEffect, useState } from 'react'
-import { getActiveOrders, getRejectedOrders, getCancelledOrders, updateOrder } from "../../app/api";
+import {
+    getActiveOrders,
+    getRejectedOrders,
+    getCancelledOrders,
+    getDeliveredOrders,
+    getStalledOrders,
+    getIdleCouriers,
+    updateOrder,
+    reassignOrder,
+} from "../../app/api";
 
 const POLL_INTERVAL_MS = 15000
 
@@ -40,27 +49,90 @@ function OrdersTable({ title, orders, emptyText, columns }) {
     )
 }
 
+function StalledOrdersTable({ orders, idleCouriers, selectedCourier, onSelectCourier, onReassign, busyId }) {
+    return (
+        <section>
+            <h2>Stalled orders</h2>
+            {orders.length === 0 ? (
+                <p>No stalled orders.</p>
+            ) : (
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order</th>
+                            <th>Stuck with</th>
+                            <th>Reassign to</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {orders.map((order) => (
+                            <tr key={order.orderId}>
+                                <td title={order.orderId}>{order.orderId.slice(0, 8)}</td>
+                                <td>{order.courierUsername}</td>
+                                <td>
+                                    <select
+                                        value={selectedCourier[order.orderId] ?? ''}
+                                        onChange={(e) => onSelectCourier(order.orderId, e.target.value)}
+                                    >
+                                        <option value="" disabled>Select an idle courier</option>
+                                        {idleCouriers.map((courier) => (
+                                            <option key={courier.courierId} value={courier.courierId}>
+                                                {courier.username}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </td>
+                                <td>
+                                    <button
+                                        disabled={busyId === order.orderId || !selectedCourier[order.orderId]}
+                                        onClick={() => onReassign(order.orderId)}
+                                    >
+                                        Reassign
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </section>
+    )
+}
+
 function OperatorOrders() {
     const [active, setActive] = useState([])
     const [rejected, setRejected] = useState([])
     const [cancelled, setCancelled] = useState([])
+    const [delivered, setDelivered] = useState([])
+    const [stalled, setStalled] = useState([])
+    const [idleCouriers, setIdleCouriers] = useState([])
+    const [selectedCourier, setSelectedCourier] = useState({})
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
     const [busyId, setBusyId] = useState(null)
 
-    // loads all three lists; one failing list does not blank the others
+    // loads all six lists; one failing list does not blank the others
     async function load() {
-        const [activeResult, rejectedResult, cancelledResult] = await Promise.allSettled([
-            getActiveOrders(),
-            getRejectedOrders(),
-            getCancelledOrders(),
-        ])
+        const [activeResult, rejectedResult, cancelledResult, deliveredResult, stalledResult, idleResult] =
+            await Promise.allSettled([
+                getActiveOrders(),
+                getRejectedOrders(),
+                getCancelledOrders(),
+                getDeliveredOrders(),
+                getStalledOrders(),
+                getIdleCouriers(),
+            ])
 
         if (activeResult.status === 'fulfilled') setActive(activeResult.value)
         if (rejectedResult.status === 'fulfilled') setRejected(rejectedResult.value)
         if (cancelledResult.status === 'fulfilled') setCancelled(cancelledResult.value)
+        if (deliveredResult.status === 'fulfilled') setDelivered(deliveredResult.value)
+        if (stalledResult.status === 'fulfilled') setStalled(stalledResult.value)
+        if (idleResult.status === 'fulfilled') setIdleCouriers(idleResult.value)
 
-        const failed = [activeResult, rejectedResult, cancelledResult].find((r) => r.status === 'rejected')
+        const failed = [activeResult, rejectedResult, cancelledResult, deliveredResult, stalledResult, idleResult]
+            .find((r) => r.status === 'rejected')
         setError(failed ? failed.reason.message : null)
         setLoading(false)
     }
@@ -75,6 +147,23 @@ function OperatorOrders() {
         setBusyId(orderId)
         try {
             await updateOrder(orderId, action)
+        } catch (err) {
+            setError(err.message)
+        }
+        await load()
+        setBusyId(null)
+    }
+
+    function selectCourier(orderId, courierId) {
+        setSelectedCourier((current) => ({ ...current, [orderId]: courierId }))
+    }
+
+    async function reassign(orderId) {
+        const courierId = selectedCourier[orderId]
+        if (!courierId) return
+        setBusyId(orderId)
+        try {
+            await reassignOrder(orderId, courierId)
         } catch (err) {
             setError(err.message)
         }
@@ -114,6 +203,19 @@ function OperatorOrders() {
         { header: 'Cancelled', render: (order) => formatTime(order.closedAt) },
     ]
 
+    const deliveredColumns = [
+        ...baseColumns,
+        { header: 'Delivered', render: (order) => formatTime(order.closedAt) },
+        {
+            header: 'Actions',
+            render: (order) => (
+                <button disabled={busyId === order.id} onClick={() => act(order.id, 'refund')}>
+                    Refund
+                </button>
+            ),
+        },
+    ]
+
     return (
         <div className="dashboard-content">
             <h1>Orders</h1>
@@ -123,6 +225,14 @@ function OperatorOrders() {
 
             {!loading && (
                 <>
+                    <StalledOrdersTable
+                        orders={stalled}
+                        idleCouriers={idleCouriers}
+                        selectedCourier={selectedCourier}
+                        onSelectCourier={selectCourier}
+                        onReassign={reassign}
+                        busyId={busyId}
+                    />
                     <OrdersTable
                         title="Active orders"
                         orders={active}
@@ -140,6 +250,12 @@ function OperatorOrders() {
                         orders={cancelled}
                         emptyText="No cancelled orders."
                         columns={cancelledColumns}
+                    />
+                    <OrdersTable
+                        title="Delivered orders"
+                        orders={delivered}
+                        emptyText="No delivered orders."
+                        columns={deliveredColumns}
                     />
                 </>
             )}
