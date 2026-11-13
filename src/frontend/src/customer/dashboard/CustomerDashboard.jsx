@@ -44,7 +44,7 @@ function CustomerDashboard() {
                     />
                 ))}
             </div>
-            {customerMap && (
+            {customerMap?.restaurants?.length > 0 && (
                 <Map
                     restaurants = {customerMap.restaurants}
                     onDutyCouriers = {customerMap.onDutyCouriers}

@@ -67,8 +67,7 @@ public class MapService {
         }
 
         //Filter to make sure to get the orders only associated with the current customer
-        //TODO: check that converting to string works
-        List<Order> customerOrders = ORDERS.findById(customerId.toString())
+        List<Order> customerOrders = ORDERS.findAll()
             .stream()
             .filter(order -> customerId.equals(order.customerId()))
             .filter(order -> order.status() == OrderStatus.READY || order.status() == OrderStatus.PICKED_UP)
