@@ -129,6 +129,15 @@ public class OrderController {
                 .toList();
     }
 
+    @GetMapping("/delivered")
+    public List<OrderView> deliveredOrders(HttpServletRequest servletRequest) {
+        requireOperator(servletRequest);
+        return SERVICE.allOrders().stream()
+                .filter(order -> order.status() == OrderStatus.DELIVERED)
+                .map(OrderController::toView)
+                .toList();
+    }
+
     @GetMapping("/{id}")
     public OrderView get(@PathVariable String id, HttpServletRequest servletRequest) {
         currentUser(servletRequest);
