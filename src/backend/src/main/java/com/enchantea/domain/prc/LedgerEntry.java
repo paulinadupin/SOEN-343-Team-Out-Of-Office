@@ -8,17 +8,19 @@ public final class LedgerEntry {
     private final LedgerEntryType TYPE;
     private final double AMOUNT;
     private final Instant CREATED_AT;
+    private final Long OPERATOR_ID;
 
-    LedgerEntry(String entryId, String orderId, LedgerEntryType type, double amount, Instant createdAt) {
+    LedgerEntry(String entryId, String orderId, LedgerEntryType type, double amount, Instant createdAt, Long operatorId) {
         this.ENTRY_ID = entryId;
         this.ORDER_ID = orderId;
         this.TYPE = type;
-        this.AMOUNT = amount; 
+        this.AMOUNT = amount;
         this.CREATED_AT = createdAt;
+        this.OPERATOR_ID = operatorId;
     }
 
-    public static LedgerEntry fromDatabase(String entryId, String orderId, LedgerEntryType type, double amount, Instant createdAt) {
-        return new LedgerEntry(entryId, orderId, type, amount, createdAt);
+    public static LedgerEntry fromDatabase(String entryId, String orderId, LedgerEntryType type, double amount, Instant createdAt, Long operatorId) {
+        return new LedgerEntry(entryId, orderId, type, amount, createdAt, operatorId);
     }
 
     public String entryId() {
@@ -39,5 +41,9 @@ public final class LedgerEntry {
 
     public Instant createdAt() {
         return CREATED_AT;
+    }
+
+    public Long operatorId() {
+        return OPERATOR_ID;
     }
 }

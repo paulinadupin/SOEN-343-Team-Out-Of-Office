@@ -4,6 +4,7 @@ import com.enchantea.application.ord.contracts.CommandType;
 import com.enchantea.application.ord.contracts.CommandValidator;
 import com.enchantea.application.ord.contracts.CurrentUser;
 import com.enchantea.application.ord.contracts.CourierAssignment;
+import com.enchantea.application.ord.contracts.CommandRejectedException;
 import com.enchantea.application.ord.contracts.DispatchQueue;
 import com.enchantea.application.ord.contracts.PreparationQueue;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
@@ -14,8 +15,9 @@ import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.ord.StateTransition;
 import com.enchantea.domain.prc.Charge;
-import com.enchantea.domain.prc.Ledger;
+import com.enchantea.domain.prc.ChargeRecording;
 import com.enchantea.domain.prc.LedgerEntryType;
+import com.enchantea.domain.prc.RefundRecording;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -181,7 +183,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.deliver();
-        LEDGER_REPOSITORY.save(new Ledger().record(order.id(), LedgerEntryType.CHARGE, order.charge().total()));
+        LEDGER_REPOSITORY.save(new ChargeRecording().record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 
@@ -191,7 +193,18 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
+        // check that a delivered was charged so it can be refunded 
+        if (order.status() != OrderStatus.DELIVERED) {
+            throw new CommandRejectedException("Only a delivered order can be refunded");
+        }
+        boolean charged = LEDGER_REPOSITORY.findByOrderId(order.id()).stream()
+                .anyMatch(entry -> entry.type() == LedgerEntryType.CHARGE);
+        if (!charged) {
+            throw new CommandRejectedException("Order has no charge to refund");
+        }
+
         order.refund();
+        LEDGER_REPOSITORY.save(new RefundRecording(user.id()).record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 

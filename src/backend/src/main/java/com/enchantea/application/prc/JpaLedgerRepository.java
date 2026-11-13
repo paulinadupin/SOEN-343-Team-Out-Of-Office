@@ -17,7 +17,7 @@ public class JpaLedgerRepository implements LedgerRepository {
     @Override
     public LedgerEntry save(LedgerEntry entry) {
         PersistedLedgerEntry persisted = new PersistedLedgerEntry(
-                entry.entryId(), entry.orderId(), entry.type(), entry.amount(), entry.createdAt());
+                entry.entryId(), entry.orderId(), entry.type(), entry.amount(), entry.createdAt(), entry.operatorId());
         ENTRIES.save(persisted);
         return entry;
     }
@@ -26,7 +26,7 @@ public class JpaLedgerRepository implements LedgerRepository {
     public List<LedgerEntry> findByOrderId(String orderId) {
         return ENTRIES.findByOrderId(orderId).stream()
                 .map(entry -> LedgerEntry.fromDatabase(
-                        entry.entryId(), entry.orderId(), entry.type(), entry.amount(), entry.createdAt()))
+                         entry.entryId(), entry.orderId(), entry.type(), entry.amount(), entry.createdAt(), entry.operatorId()))
                 .toList();
     }
 }
