@@ -35,4 +35,18 @@ public class InMemoryOrderRepository implements OrderRepository {
                 .filter(order -> order.restaurantId().equals(restaurantId))
                 .toList();
     }
+
+    @Override
+    public List<Order> findByCustomerId(Long customerId) {
+        return findAll().stream()
+                .filter(order -> order.customerId().equals(customerId))
+                .toList();
+    }
+
+    @Override
+    public List<Order> findByCourierId(Long courierId) {
+        return findAll().stream()
+                .filter(order -> courierId.equals(order.courierId()))
+                .toList();
+    }
 }

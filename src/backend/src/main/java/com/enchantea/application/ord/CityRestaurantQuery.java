@@ -54,5 +54,14 @@ public class CityRestaurantQuery implements RestaurantQuery {
     public Optional<Location> location(Long restaurantId) {
         return findRestaurant(restaurantId).map(Restaurant::getPosition);
     }
-    
+
+    @Override
+    public Optional<String> restaurantName(Long restaurantId) {
+        return findRestaurant(restaurantId).map(Restaurant::getName);
+    }
+
+    @Override
+    public Optional<String> itemName(Long restaurantId, String itemId) {
+        return MENU_CATALOG.find(restaurantId, itemId).map(MenuItem::name);
+    }
 }

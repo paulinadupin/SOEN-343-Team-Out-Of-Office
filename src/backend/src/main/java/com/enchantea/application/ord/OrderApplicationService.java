@@ -4,24 +4,23 @@ import com.enchantea.application.ord.contracts.CommandType;
 import com.enchantea.application.ord.contracts.CommandValidator;
 import com.enchantea.application.ord.contracts.CurrentUser;
 import com.enchantea.application.ord.contracts.CourierAssignment;
+import com.enchantea.application.ord.contracts.CommandRejectedException;
 import com.enchantea.application.ord.contracts.DispatchQueue;
 import com.enchantea.application.ord.contracts.PreparationQueue;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
-import com.enchantea.application.prc.JpaLedgerRepository;
+import com.enchantea.application.prc.LedgerRepository;
 import com.enchantea.application.prc.PricingCalculator;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.ord.StateTransition;
 import com.enchantea.domain.prc.Charge;
-import com.enchantea.domain.prc.Ledger;
+import com.enchantea.domain.prc.ChargeRecording;
 import com.enchantea.domain.prc.LedgerEntryType;
+import com.enchantea.domain.prc.RefundRecording;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +35,7 @@ public class OrderApplicationService {
     private final RestaurantQuery RESTAURANT_QUERY;
     private final OrderEventSubject EVENT_SUBJECT;
     private final PricingCalculator PRICING_CALCULATOR;
-    private final JpaLedgerRepository LEDGER_REPOSITORY;
+    private final LedgerRepository LEDGER_REPOSITORY;
 
     public OrderApplicationService(
             OrderRepository ORDERS,
@@ -47,7 +46,7 @@ public class OrderApplicationService {
             RestaurantQuery RESTAURANT_QUERY,
             OrderEventSubject EVENT_SUBJECT,
             PricingCalculator PRICING_CALCULATOR,
-            JpaLedgerRepository LEDGER_REPOSITORY) {
+            LedgerRepository LEDGER_REPOSITORY) {
         this.ORDERS = ORDERS;
         this.VALIDATOR = VALIDATOR;
         this.PREPARATION_QUEUE = PREPARATION_QUEUE;
@@ -172,7 +171,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
-        order.pickUp();
+        order.pickUp(user.id());
         DISPATCH_QUEUE.removeFromDispatch(order.id());
         return saveAndPublish(order, oldStatus, null);
     }
@@ -184,7 +183,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.deliver();
-        LEDGER_REPOSITORY.save(new Ledger().record(order.id(), LedgerEntryType.CHARGE, order.charge().total()));
+        LEDGER_REPOSITORY.save(new ChargeRecording().record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 
@@ -194,54 +193,28 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
+        // check that a delivered was charged so it can be refunded 
+        if (order.status() != OrderStatus.DELIVERED) {
+            throw new CommandRejectedException("Only a delivered order can be refunded");
+        }
+        boolean charged = LEDGER_REPOSITORY.findByOrderId(order.id()).stream()
+                .anyMatch(entry -> entry.type() == LedgerEntryType.CHARGE);
+        if (!charged) {
+            throw new CommandRejectedException("Order has no charge to refund");
+        }
+
         order.refund();
+        LEDGER_REPOSITORY.save(new RefundRecording(user.id()).record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 
-    @Transactional
-public Order restore(CurrentUser user, OrderCommands.OrderAction command) {
-    VALIDATOR.validate(CommandType.RESTORE_ORDER, user, command);
-    Order order = load(command.orderId());
-    OrderStatus oldStatus = order.status();
-
-    order.restore();
-    return saveAndPublish(order, oldStatus, null);
-}
-
-    // FIX: needs a transaction so the order's lazy lines can be loaded while the session is open
-    @Transactional(readOnly = true)
     public Order get(String orderId) {
         return load(orderId);
     }
 
-    // FIX: same reason as get()
-    @Transactional(readOnly = true)
     public List<Order> allOrders() {
         return ORDERS.findAll();
     }
-     // different states of orders for the operator dashboard, most recent first
-    @Transactional(readOnly = true)
-    public List<Order> rejectedOrders() {
-        return ORDERS.findByStatus(OrderStatus.REJECTED).stream()
-                .sorted(Comparator.comparing(Order::closedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-                .toList();
-    }
-@Transactional(readOnly = true)
-public List<Order> activeOrders() {
-    Set<OrderStatus> active = EnumSet.of(OrderStatus.PLACED, OrderStatus.ACCEPTED,
-            OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.PICKED_UP);
-    return ORDERS.findAll().stream()
-            .filter(order -> active.contains(order.status()))
-            .sorted(Comparator.comparing(Order::placedAt).reversed())
-            .toList();
-}
-
-@Transactional(readOnly = true)
-public List<Order> cancelledOrders() {
-    return ORDERS.findByStatus(OrderStatus.CANCELLED).stream()
-            .sorted(Comparator.comparing(Order::closedAt, Comparator.nullsLast(Comparator.reverseOrder())))
-            .toList();
-}
 
     @Transactional(readOnly = true)
     public List<Order> ordersForRestaurant(Long restaurantId) {

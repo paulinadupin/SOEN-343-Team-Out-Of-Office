@@ -13,13 +13,13 @@ const linksByRole = {
         { to: "/orders", label: "Orders" },
     ],
     [ROLES.COURIER]: [
-        { to: "/courier", label: "Overview", end: true },
+        //to: "/courier", label: "Overview", end: true },
         { to: "/deliveries", label: "Deliveries" },
-        { to: "/history", label: "History" },
-        { to: "/earnings", label: "Earnings" },
+       // to: "/history", label: "History" },
+       // to: "/earnings", label: "Earnings" },
     ],
     [ROLES.OPERATOR]: [
-        { to: "/operator", label: "Dashboard", end: true },
+       // to: "/operator", label: "Dashboard", end: true },
         { to: "/operator/orders", label: "Orders" },
         { to: "/operator/restaurants", label: "Restaurants"},
     ],
