@@ -18,8 +18,11 @@ public class Assignment {
     private Instant offeredAt;
     @Column(name = "offer_expires_at")
     private Instant expiresAt;
+    @Column(name = "offer_accepted_at")
+    private Instant acceptedAt;
 
     private static final Duration TIME_LIMIT = Duration.ofSeconds(60);
+    private static final Duration STALL_THRESHOLD = Duration.ofMinutes(5);
 
     protected Assignment() {
     }
@@ -40,7 +43,13 @@ public class Assignment {
 
     public void acceptOffer(){
         status=AssignmentStatus.ACCEPTED;
+        acceptedAt = Instant.now();
+    }
 
+    public boolean isStalled() {
+        return status == AssignmentStatus.ACCEPTED
+                && acceptedAt != null
+                && Instant.now().isAfter(acceptedAt.plus(STALL_THRESHOLD));
     }
 
     public void declineOffer(){

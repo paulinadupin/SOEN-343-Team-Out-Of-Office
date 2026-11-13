@@ -160,4 +160,44 @@ public class DispatchService implements CourierAssignment {
             dispatchNext();
         }
     }
+
+    
+    public List<Courier> stalledCouriers() {
+        return USER_REPOSITORY.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .filter(courier -> courier.getAssignment() != null && courier.getAssignment().isStalled())
+                .toList();
+    }
+
+    @Transactional
+    public void reassignOrder(String orderId, Long newCourierId) {
+        Courier oldCourier = USER_REPOSITORY.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .filter(courier -> courier.getAssignment() != null
+                        && orderId.equals(courier.getAssignment().getOrderId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No courier is currently assigned to this order"));
+
+        User newUser = USER_REPOSITORY.findById(newCourierId)
+                .orElseThrow(() -> new IllegalArgumentException("Courier not found"));
+        if (!(newUser instanceof Courier newCourier) || newCourier.getStatus() != CourierStatus.IDLE) {
+            throw new IllegalArgumentException("The new courier must be idle");
+        }
+
+        if (oldCourier.getStatus() == CourierStatus.ASSIGNED || oldCourier.getStatus() == CourierStatus.CARRYING) {
+            oldCourier.operatorCancelAssignment();
+        }
+        oldCourier.setAssignment(null);
+        USER_REPOSITORY.save(oldCourier);
+
+        Assignment assignment = new Assignment(AssignmentStatus.OFFERED, orderId, Instant.now());
+        assignment.acceptOffer();
+        newCourier.setAssignment(assignment);
+        newCourier.acceptOffer();
+        USER_REPOSITORY.save(newCourier);
+
+        dispatchNext();
+    }
 }
