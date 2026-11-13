@@ -21,6 +21,7 @@ const linksByRole = {
     [ROLES.OPERATOR]: [
         { to: "/operator", label: "Dashboard", end: true },
         { to: "/operator/orders", label: "Orders" },
+        { to: "/operator/restaurants", label: "Restaurants"},
     ],
 };
 
