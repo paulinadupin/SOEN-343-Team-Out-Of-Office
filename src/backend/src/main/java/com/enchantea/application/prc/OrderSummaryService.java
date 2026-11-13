@@ -37,6 +37,10 @@ public class OrderSummaryService {
             throw new CommandRejectedException("The order summary is available once the order is delivered");
         }
 
+        return build(order);
+    }
+
+    public OrderSummary build(Order order) {
         // RestaurantQuery uses Long ids; OrderSummary takes a String id, converted below
         Long restaurantId = order.restaurantId();
         List<OrderSummary.Line> lines = order.lines().stream()
@@ -50,7 +54,7 @@ public class OrderSummaryService {
 
         return new OrderSummary(
                 order.id(),
-                String.valueOf(restaurantId),
+                restaurantId,
                 RESTAURANT_QUERY.restaurantName(restaurantId).orElse(String.valueOf(restaurantId)),
                 lines,
                 order.charge(),

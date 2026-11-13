@@ -28,6 +28,7 @@ public class PersistedOrder {
     private Instant placedAt;
     private Instant closedAt;
     private Instant deliveredAt;
+    private Long courierId;
     private String rejectionReason;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -50,6 +51,7 @@ public class PersistedOrder {
             Instant placedAt,
             Instant closedAt,
             Instant deliveredAt,
+            Long courierId,
             String rejectionReason,
             OrderStatus status,
             List<PersistedOrderLine> lines,
@@ -60,6 +62,7 @@ public class PersistedOrder {
         this.placedAt = placedAt;
         this.closedAt = closedAt;
         this.deliveredAt = deliveredAt;
+        this.courierId = courierId;
         this.rejectionReason = rejectionReason;
         this.status = status;
         this.lines = new ArrayList<>(lines);
@@ -72,6 +75,7 @@ public class PersistedOrder {
     public Instant placedAt() { return placedAt; }
     public Instant closedAt() { return closedAt; }
     public Instant deliveredAt() { return deliveredAt; }
+    public Long courierId() { return courierId; }
     public String rejectionReason() { return rejectionReason; }
     public OrderStatus status() { return status; }
     public List<PersistedOrderLine> lines() { return lines; }

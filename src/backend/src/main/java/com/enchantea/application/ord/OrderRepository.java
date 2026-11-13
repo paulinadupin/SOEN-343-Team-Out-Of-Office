@@ -15,4 +15,6 @@ public interface OrderRepository {
                 .filter(order -> order.status() == status)
                 .toList();
     }
+    List<Order> findByCustomerId(Long customerId);
+    List<Order> findByCourierId(Long courierId);
 }

@@ -21,7 +21,8 @@ public final class Order {
     private OrderState status;
     private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
-    private Instant deliveredAt; 
+    private Instant deliveredAt;
+    private Long courierId;
     private String rejectionReason;
     private Charge charge; // FIX: this field was missing
     private final Long CUSTOMER_ID;
@@ -31,8 +32,7 @@ public final class Order {
 
     // constructor
     public Order(String OrderId, Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
-        // FIX: the private constructor takes 10 arguments; added rejectionReason and charge (both null for a new order)
-        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null, null);
+        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null, null, null);
     }
 
     private Order(
@@ -44,6 +44,7 @@ public final class Order {
             OrderStatus orderStatus,
             Instant closedAt,
             Instant deliveredAt,
+            Long courierId,
             String rejectionReason,
             Charge charge) {
         this.ORDER_ID = Objects.requireNonNull(orderId, "id");
@@ -57,6 +58,7 @@ public final class Order {
         this.status = stateFor(orderStatus);
         this.closedAt = closedAt;
         this.deliveredAt = deliveredAt;
+        this.courierId = courierId;
         this.rejectionReason = rejectionReason;
         this.charge = charge;
     }
@@ -75,11 +77,12 @@ public final class Order {
             OrderStatus status,
             Instant closedAt,
             Instant deliveredAt,
+            Long courierId,
             String rejectionReason,
             Charge charge) {
         return new Order(
                 orderId, customerId, restaurantId, lines, placedAt, status, closedAt, deliveredAt,
-                rejectionReason, charge);
+                courierId, rejectionReason, charge);
     }
 
     //getters
@@ -90,6 +93,7 @@ public final class Order {
     public Instant placedAt() { return PLACED_AT; }
     public Instant closedAt() { return closedAt; }
     public Instant deliveredAt() { return deliveredAt; }
+    public Long courierId() { return courierId; }
     public OrderStatus status() { return status.status(); }
     public String rejectionReason() { return rejectionReason; }
     public List<StateTransition> transitions() { return List.copyOf(TRANSITIONS); }
@@ -127,8 +131,12 @@ public final class Order {
     public OrderStatus prepare() { return apply(status.prepare()); }
     // when restaurant marks order as ready
     public OrderStatus markReady() { return apply(status.markReady()); }
-    // when order is picked up by courier
-    public OrderStatus pickUp() { return apply(status.pickUp()); }
+    // when order is picked up by courier, remembers which courier has it, need this for PRC-04 so we have order history for the courier.
+    public OrderStatus pickUp(Long courierId) {
+        OrderState nextState = status.pickUp();
+        this.courierId = Objects.requireNonNull(courierId, "courierId");
+        return apply(nextState);
+    }
     //when order is delivered up by courier
     public OrderStatus deliver() { return apply(status.deliver()); }
     // when order is refunded

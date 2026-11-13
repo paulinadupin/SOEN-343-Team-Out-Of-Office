@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-//customer views the summary of a delivered order (UC-PRC-03)
 @RestController
 @RequestMapping("/api/orders")
 public class OrderSummaryController {
@@ -33,7 +32,7 @@ public class OrderSummaryController {
         return toView(SUMMARY_SERVICE.summaryFor(currentUser(servletRequest), id));
     }
 
-    //same session -> CurrentUser conversion as OrderController
+    // builds current user from login session (same as the ordercontroller)
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         // FIX: CurrentUser takes a Long user id, so no toString()
@@ -41,7 +40,7 @@ public class OrderSummaryController {
         return new CurrentUser(user.getUserId(), user.getAccountType(), restaurantId);
     }
 
-    private static OrderSummaryView toView(OrderSummary summary) {
+    static OrderSummaryView toView(OrderSummary summary) { 
         return new OrderSummaryView(
                 summary.orderId(), summary.restaurantId(), summary.restaurantName(),
                 summary.lines(), toChargeView(summary.charge()),
@@ -67,7 +66,7 @@ public class OrderSummaryController {
 
     public record OrderSummaryView(
             String orderId,
-            String restaurantId, // FIX: back to String, since OrderSummary.restaurantId() returns a String
+            Long restaurantId,
             String restaurantName,
             List<OrderSummary.Line> lines,
             ChargeView charge,
