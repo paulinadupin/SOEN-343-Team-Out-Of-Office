@@ -19,6 +19,7 @@ import com.enchantea.domain.prc.ChargeRecording;
 import com.enchantea.domain.prc.LedgerEntryType;
 import com.enchantea.domain.prc.RefundRecording;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -134,6 +135,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
+        restorePreparationQueueIfEmpty(order.restaurantId());
         Order firstOrder = PREPARATION_QUEUE.peek(order.restaurantId())
                 .orElseThrow(() -> new IllegalStateException("Preparation queue is empty"));
         if (!firstOrder.id().equals(order.id())) {
@@ -151,6 +153,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
+        restorePreparationQueueIfEmpty(order.restaurantId());
         Order firstOrder = PREPARATION_QUEUE.peek(order.restaurantId())
                 .orElseThrow(() -> new IllegalStateException("Preparation queue is empty"));
         if (!firstOrder.id().equals(order.id())) {
@@ -208,10 +211,12 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional(readOnly = true)
     public Order get(String orderId) {
         return load(orderId);
     }
 
+    @Transactional(readOnly = true)
     public List<Order> allOrders() {
         return ORDERS.findAll();
     }
@@ -233,6 +238,18 @@ public class OrderApplicationService {
     private Order load(String orderId) {
         return ORDERS.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
+    }
+
+    private void restorePreparationQueueIfEmpty(Long restaurantId) {
+        if (PREPARATION_QUEUE.peek(restaurantId).isPresent()) {
+            return;
+        }
+
+        ORDERS.findByRestaurantId(restaurantId).stream()
+                .filter(order -> order.status() == OrderStatus.ACCEPTED
+                        || order.status() == OrderStatus.PREPARING)
+                .sorted(Comparator.comparing(Order::placedAt))
+                .forEach(order -> PREPARATION_QUEUE.enqueue(restaurantId, order));
     }
 
     private Order saveAndPublish(Order order, OrderStatus oldStatus, String reason) {

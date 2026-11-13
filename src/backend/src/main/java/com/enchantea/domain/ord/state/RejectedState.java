@@ -6,7 +6,4 @@ import com.enchantea.domain.ord.OrderStatus;
 public final class RejectedState extends AbstractOrderState {
     @Override
     public OrderStatus status() { return OrderStatus.REJECTED; }
-
-    @Override
-public OrderState cancelByOperator() {return new CancelledState();}
 }

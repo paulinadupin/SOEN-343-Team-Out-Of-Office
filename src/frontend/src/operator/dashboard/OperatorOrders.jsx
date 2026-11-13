@@ -107,32 +107,11 @@ function OperatorOrders() {
         ...baseColumns,
         { header: 'Rejected', render: (order) => formatTime(order.closedAt) },
         { header: 'Reason', render: (order) => order.rejectionReason ?? '-' },
-        {
-            header: 'Actions',
-            render: (order) => (
-                <button disabled={busyId === order.id} onClick={() => act(order.id, 'restore')}>
-                    Make active again
-                </button>
-            ),
-        },
     ]
 
     const cancelledColumns = [
         ...baseColumns,
         { header: 'Cancelled', render: (order) => formatTime(order.closedAt) },
-        {
-            header: 'Actions',
-            render: (order) => (
-                <>
-        <button disabled={busyId === order.id} onClick={() => act(order.id, 'restore')}>
-          Make active again
-        </button>
-        <button disabled={busyId === order.id} onClick={() => act(order.id, 'cancel/operator')}>
-          Cancel
-        </button>
-      </>
-            ),
-        },
     ]
 
     return (

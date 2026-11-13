@@ -99,6 +99,36 @@ public class OrderController {
         return toView(SERVICE.refund(currentUser(servletRequest), action(id, request)));
     }
 
+    @GetMapping("/active")
+    public List<OrderView> activeOrders(HttpServletRequest servletRequest) {
+        requireOperator(servletRequest);
+        return SERVICE.allOrders().stream()
+                .filter(order -> order.status() != OrderStatus.REJECTED
+                        && order.status() != OrderStatus.CANCELLED
+                        && order.status() != OrderStatus.DELIVERED
+                        && order.status() != OrderStatus.REFUNDED)
+                .map(OrderController::toView)
+                .toList();
+    }
+
+    @GetMapping("/rejected")
+    public List<OrderView> rejectedOrders(HttpServletRequest servletRequest) {
+        requireOperator(servletRequest);
+        return SERVICE.allOrders().stream()
+                .filter(order -> order.status() == OrderStatus.REJECTED)
+                .map(OrderController::toView)
+                .toList();
+    }
+
+    @GetMapping("/cancelled")
+    public List<OrderView> cancelledOrders(HttpServletRequest servletRequest) {
+        requireOperator(servletRequest);
+        return SERVICE.allOrders().stream()
+                .filter(order -> order.status() == OrderStatus.CANCELLED)
+                .map(OrderController::toView)
+                .toList();
+    }
+
     @GetMapping("/{id}")
     public OrderView get(@PathVariable String id, HttpServletRequest servletRequest) {
         currentUser(servletRequest);
@@ -123,6 +153,14 @@ public class OrderController {
                 .toList();
     }
 
+    private void requireOperator(HttpServletRequest servletRequest) {
+        User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
+        if (user.getAccountType() != AccountType.OPERATOR) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Operator account required");
+        }
+    }
+
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();
@@ -145,6 +183,9 @@ public class OrderController {
     }
 
     private static ChargeView toChargeView(Charge charge) {
+        if (charge == null) {
+            return null;
+        }
         return new ChargeView(
                 charge.subtotal(), charge.deliveryFee(), charge.serviceFee(),
                 charge.smallOrderSurcharge(), charge.total());

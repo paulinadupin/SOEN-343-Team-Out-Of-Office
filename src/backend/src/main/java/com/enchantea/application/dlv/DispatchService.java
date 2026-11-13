@@ -14,6 +14,7 @@ import com.enchantea.domain.reg.Location;
 import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -54,7 +55,7 @@ public class DispatchService implements CourierAssignment {
 
     @Transactional
     public synchronized void dispatchNext() {
-        List<Courier> availableCouriers = COURIER_SELECTOR.idleCouriers();
+        List<Courier> availableCouriers = new ArrayList<>(COURIER_SELECTOR.idleCouriers());
         while (!availableCouriers.isEmpty()) {
             Optional<Order> next = DISPATCH_QUEUE.peek();
             if (next.isEmpty()) {
