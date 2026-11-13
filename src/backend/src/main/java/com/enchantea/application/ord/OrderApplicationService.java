@@ -204,7 +204,7 @@ public class OrderApplicationService {
         }
 
         order.refund();
-        LEDGER_REPOSITORY.save(new RefundRecording().record(order));
+        LEDGER_REPOSITORY.save(new RefundRecording(user.id()).record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 

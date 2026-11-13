@@ -10,7 +10,7 @@ public abstract class LedgerRecording {
     public final LedgerEntry record(Order order) {
         checkEligible(order);
         double amount = amount(order);
-        return LEDGER.record(order.id(), type(), amount);
+        return LEDGER.record(order.id(), type(), amount, operatorId());
     }
 
     protected abstract void checkEligible(Order order);
@@ -18,4 +18,8 @@ public abstract class LedgerRecording {
     protected abstract double amount(Order order);
 
     protected abstract LedgerEntryType type();
+
+    protected Long operatorId() {
+        return null;
+    }
 }

@@ -52,14 +52,15 @@ public class OrderHistoryController {
     }
 
     private static LedgerEntryView toLedgerView(LedgerEntry entry) {
-        return new LedgerEntryView(entry.entryId(), entry.type(), entry.amount(), entry.createdAt());
+        return new LedgerEntryView(entry.entryId(), entry.type(), entry.amount(), entry.createdAt(), entry.operatorId());
     }
 
     public record LedgerEntryView(
             String entryId,
             LedgerEntryType type,
             double amount,
-            Instant createdAt) { }
+            Instant createdAt,
+            Long operatorId) { }
 
     public record OrderHistoryView(
             OrderSummaryController.OrderSummaryView summary,
