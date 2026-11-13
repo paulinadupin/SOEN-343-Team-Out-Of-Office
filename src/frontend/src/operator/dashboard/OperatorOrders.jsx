@@ -94,10 +94,11 @@ function OperatorOrders() {
         { header: 'Status', render: (order) => order.status },
         {
             header: 'Actions',
-            render: (order) => (
-                <button disabled={busyId === order.id} onClick={() => act(order.id, 'cancel/operator')}>
-                    Cancel
-                </button>
+            render: (order) =>
+        order.status === 'PLACED' ? null : (
+            <button disabled={busyId === order.id} onClick={() => act(order.id, 'cancel/operator')}>
+                Cancel
+            </button>
             ),
         },
     ]
