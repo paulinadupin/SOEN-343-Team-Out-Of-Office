@@ -73,6 +73,10 @@ export async function getCustomerMap() {
   return request("/api/map/customer");
 }
 
+export async function getCourierMap() {
+  return request("/api/map/courier");
+}
+
 export async function getMapData() {
   return request("/api/auth/map");
 }

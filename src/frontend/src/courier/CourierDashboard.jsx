@@ -1,6 +1,17 @@
 import { useState } from 'react'
+import Map from "../components/Map";
+import { useEffect} from "react";
+import { getCourierMap } from "../app/api";
 
 function CourierDashboard() {
+    const [courierMap, setCourierMap] = useState();
+    const [error, setError] = useState();
+
+    useEffect(() => {
+        getCourierMap()
+        .then(setCourierMap)
+        .catch((requestError) => setError(requestError.message));
+    }, []);
 
     return (
         <div className="dashboard-content">
@@ -11,6 +22,13 @@ function CourierDashboard() {
                 <li>Active deliveries: 0</li>
                 <li>Earned so far: $0.00</li>
             </ul>
+            {courierMap && (
+                <Map
+                    restaurant={courierMap.restaurant}
+                    courier={courierMap.onDutyCourier}
+                    customer={courierMap.customer}
+                />
+            )}
         </div>
     )
 }

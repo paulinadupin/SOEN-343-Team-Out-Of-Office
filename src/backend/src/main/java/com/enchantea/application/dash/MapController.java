@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.enchantea.application.reg.AccountFacade;
+import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.Customer;
 import com.enchantea.domain.reg.Restaurant;
 import com.enchantea.domain.reg.User;
@@ -54,6 +55,22 @@ public class MapController {
         }
 
         return MAP_SERVICE.customerMap(customer.getUserId());
+    }
+
+    @GetMapping("/courier")
+    public MapResponse courierMap(HttpServletRequest servletRequest) {
+        User user = ACCOUNT_FACADE.requireLoggedIn(
+            servletRequest.getSession(false)
+        );
+
+        if(!(user instanceof Courier courier)) {
+            throw new ResponseStatusException(
+                HttpStatus.FORBIDDEN,
+                "Courier account required"
+            );
+        }
+
+        return MAP_SERVICE.courierMap(courier.getUserId());
     }
 
 }

@@ -58,6 +58,44 @@ public class MapService {
     }
 
     @Transactional(readOnly = true)
+    public MapResponse courierMap(Long courierId) {
+        User courierUser = USERS.findById(courierId)
+        .orElseThrow(() -> new IllegalArgumentException("Courier not found"));
+
+        if(!(courierUser instanceof Courier courier)) {
+            throw new IllegalArgumentException("User is not a courier");
+        }
+
+        List<CourierResponse> courierResponse = List.of(CourierResponse.from(courier));
+
+        // Return an empty map if the courier has no assigned orders
+        if(courier.getAssignment() == null || courier.getAssignment().getOrderId() == null) {
+            return new MapResponse(List.of(), courierResponse, null);
+        }
+
+        Order courierOrder = ORDERS.findById(courier.getAssignment().getOrderId())
+            .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+
+        //Making into a list to fit the parameters of MapResponse
+        List<RestaurantResponse> restaurantResponse = USERS.findAll()
+            .stream()
+            .filter(user -> user.getUserId().equals(courierOrder.restaurantId()))
+            .filter(Restaurant.class::isInstance)
+            .map(Restaurant.class::cast)
+            .map(RestaurantResponse::from)
+            .toList();
+
+        CustomerResponse customerResponse = USERS.findById(courierOrder.customerId())
+            .filter(Customer.class::isInstance)
+            .map(Customer.class::cast)
+            .map(CustomerResponse::from)
+            .orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+
+        return new MapResponse(restaurantResponse, courierResponse, customerResponse);
+        
+    }
+
+    @Transactional(readOnly = true)
     public MapResponse customerMap(Long customerId) {
         User customerUser = USERS.findById(customerId)
         .orElseThrow(()-> new IllegalArgumentException("Customer not found"));

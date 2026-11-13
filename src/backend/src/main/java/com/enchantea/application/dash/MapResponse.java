@@ -4,7 +4,6 @@ import java.util.List;
 import com.enchantea.application.reg.RestaurantResponse;
 import com.enchantea.application.reg.CourierResponse;
 import com.enchantea.application.reg.CustomerResponse;
-import com.enchantea.domain.reg.Location;
 
 public class MapResponse {
     private List<RestaurantResponse> restaurants;
