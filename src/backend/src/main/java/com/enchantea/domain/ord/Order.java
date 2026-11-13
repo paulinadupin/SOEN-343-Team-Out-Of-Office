@@ -21,7 +21,7 @@ public final class Order {
     private OrderState status;
     private final Instant PLACED_AT; //Instant data type is better to capture specific moments
     private Instant closedAt;
-    private Instant deliveredAt; 
+    private Instant deliveredAt;
     private Long courierId;
     private String rejectionReason;
     private Charge charge;
