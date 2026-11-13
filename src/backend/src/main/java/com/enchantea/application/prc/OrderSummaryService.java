@@ -37,6 +37,10 @@ public class OrderSummaryService {
             throw new CommandRejectedException("The order summary is available once the order is delivered");
         }
 
+        return build(order);
+    }
+
+    public OrderSummary build(Order order) {
         Long restaurantId = order.restaurantId();
         List<OrderSummary.Line> lines = order.lines().stream()
                 .map(line -> new OrderSummary.Line(

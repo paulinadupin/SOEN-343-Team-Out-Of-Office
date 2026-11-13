@@ -7,7 +7,7 @@ import com.enchantea.application.ord.contracts.CourierAssignment;
 import com.enchantea.application.ord.contracts.DispatchQueue;
 import com.enchantea.application.ord.contracts.PreparationQueue;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
-import com.enchantea.application.prc.JpaLedgerRepository;
+import com.enchantea.application.prc.LedgerRepository;
 import com.enchantea.application.prc.PricingCalculator;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
@@ -33,7 +33,7 @@ public class OrderApplicationService {
     private final RestaurantQuery RESTAURANT_QUERY;
     private final OrderEventSubject EVENT_SUBJECT;
     private final PricingCalculator PRICING_CALCULATOR;
-    private final JpaLedgerRepository LEDGER_REPOSITORY;
+    private final LedgerRepository LEDGER_REPOSITORY;
 
     public OrderApplicationService(
             OrderRepository ORDERS,
@@ -44,7 +44,7 @@ public class OrderApplicationService {
             RestaurantQuery RESTAURANT_QUERY,
             OrderEventSubject EVENT_SUBJECT,
             PricingCalculator PRICING_CALCULATOR,
-            JpaLedgerRepository LEDGER_REPOSITORY) {
+            LedgerRepository LEDGER_REPOSITORY) {
         this.ORDERS = ORDERS;
         this.VALIDATOR = VALIDATOR;
         this.PREPARATION_QUEUE = PREPARATION_QUEUE;
@@ -169,7 +169,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
-        order.pickUp();
+        order.pickUp(user.id());
         DISPATCH_QUEUE.removeFromDispatch(order.id());
         return saveAndPublish(order, oldStatus, null);
     }

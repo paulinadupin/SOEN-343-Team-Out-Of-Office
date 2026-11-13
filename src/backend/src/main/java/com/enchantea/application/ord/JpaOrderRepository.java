@@ -41,6 +41,20 @@ public class JpaOrderRepository implements OrderRepository {
                 .map(JpaOrderRepository::toDomain)
                 .toList();
     }
+    
+    @Override
+    public List<Order> findByCustomerId(Long customerId) {
+        return ORDERS.findByCustomerId(customerId).stream()
+                .map(JpaOrderRepository::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Order> findByCourierId(Long courierId) {
+        return ORDERS.findByCourierId(courierId).stream()
+                .map(JpaOrderRepository::toDomain)
+                .toList();
+    }
 
     private static PersistedOrder toEntity(Order order) {
         List<PersistedOrderLine> lines = order.lines().stream()
@@ -51,7 +65,8 @@ public class JpaOrderRepository implements OrderRepository {
                 order.charge().serviceFee(), order.charge().smallOrderSurcharge());
         return new PersistedOrder(
                 order.id(), order.customerId(), order.restaurantId(), order.placedAt(),
-                order.closedAt(), order.deliveredAt(), order.rejectionReason(), order.status(), lines, charge);
+                order.closedAt(), order.deliveredAt(), order.courierId(), order.rejectionReason(),
+                order.status(), lines, charge);
     }
 
     private static Order toDomain(PersistedOrder order) {
@@ -63,6 +78,7 @@ public class JpaOrderRepository implements OrderRepository {
                 order.charge().serviceFee(), order.charge().smallOrderSurcharge());
         return Order.rehydrate(
                 order.id(), order.customerId(), order.restaurantId(), lines, order.placedAt(),
-                order.status(), order.closedAt(), order.deliveredAt(), order.rejectionReason(), charge);
+                order.status(), order.closedAt(), order.deliveredAt(), order.courierId(),
+                order.rejectionReason(), charge);
     }
 }
