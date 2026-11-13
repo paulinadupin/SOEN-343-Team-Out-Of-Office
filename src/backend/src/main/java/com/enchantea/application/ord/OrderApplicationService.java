@@ -20,6 +20,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -196,6 +198,16 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional
+public Order restore(CurrentUser user, OrderCommands.OrderAction command) {
+    VALIDATOR.validate(CommandType.RESTORE_ORDER, user, command);
+    Order order = load(command.orderId());
+    OrderStatus oldStatus = order.status();
+
+    order.restore();
+    return saveAndPublish(order, oldStatus, null);
+}
+
     // FIX: needs a transaction so the order's lazy lines can be loaded while the session is open
     @Transactional(readOnly = true)
     public Order get(String orderId) {
@@ -207,13 +219,29 @@ public class OrderApplicationService {
     public List<Order> allOrders() {
         return ORDERS.findAll();
     }
-     // rejected orders for the operator dashboard, most recently rejected first
+     // different states of orders for the operator dashboard, most recent first
     @Transactional(readOnly = true)
     public List<Order> rejectedOrders() {
         return ORDERS.findByStatus(OrderStatus.REJECTED).stream()
                 .sorted(Comparator.comparing(Order::closedAt, Comparator.nullsLast(Comparator.reverseOrder())))
                 .toList();
     }
+@Transactional(readOnly = true)
+public List<Order> activeOrders() {
+    Set<OrderStatus> active = EnumSet.of(OrderStatus.PLACED, OrderStatus.ACCEPTED,
+            OrderStatus.PREPARING, OrderStatus.READY, OrderStatus.PICKED_UP);
+    return ORDERS.findAll().stream()
+            .filter(order -> active.contains(order.status()))
+            .sorted(Comparator.comparing(Order::placedAt).reversed())
+            .toList();
+}
+
+@Transactional(readOnly = true)
+public List<Order> cancelledOrders() {
+    return ORDERS.findByStatus(OrderStatus.CANCELLED).stream()
+            .sorted(Comparator.comparing(Order::closedAt, Comparator.nullsLast(Comparator.reverseOrder())))
+            .toList();
+}
 
     @Transactional(readOnly = true)
     public List<Order> ordersForRestaurant(Long restaurantId) {

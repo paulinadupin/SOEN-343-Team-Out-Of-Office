@@ -65,6 +65,18 @@ export async function getRestaurantOrders() {
   return request("/api/orders/restaurant");
 }
 
+export async function getActiveOrders() {
+  return request("/api/orders/active");
+}
+
+export async function getRejectedOrders() {
+  return request("/api/orders/rejected");
+}
+
+export async function getCancelledOrders() {
+  return request("/api/orders/cancelled");
+}
+
 export async function placeOrder(restaurantId, lines) {
   return request("/api/orders", {
     method: "POST",

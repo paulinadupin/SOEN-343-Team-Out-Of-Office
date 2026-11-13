@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react'
+import { getRestaurants } from "../../app/api";
+import { formatRestaurantStatus } from "../../app/formatRestaurantStatus";
 
-// Same base URL as OperatorOrders; swap for your shared API helper/constant if you have one
-const API_BASE_URL = 'http://localhost:8080'
+const STATUS_ACTIONS = [
+    { status: 'OPEN', label: 'Open' },
+    { status: 'PAUSED', label: 'Pause' },
+    { status: 'CLOSED', label: 'Close' },
+]
 
 function OperatorRestaurants() {
     const [restaurants, setRestaurants] = useState([])
@@ -9,26 +14,22 @@ function OperatorRestaurants() {
     const [error, setError] = useState(null)
 
     useEffect(() => {
-        let cancelled = false
-
-        async function loadRestaurants() {
-            try {
-                const response = await fetch(`${API_BASE_URL}/api/auth/restaurants`, { credentials: 'include' })
-                if (!response.ok) throw new Error(`Could not load restaurants (${response.status}).`)
-                const data = await response.json()
-                if (!cancelled) setRestaurants(data)
-            } catch (err) {
-                if (!cancelled) setError(err.message)
-            } finally {
-                if (!cancelled) setLoading(false)
-            }
-        }
-
-        loadRestaurants()
-        return () => {
-            cancelled = true
-        }
+        getRestaurants()
+            .then((data) => {
+                setRestaurants(data)
+                setError(null)
+            })
+            .catch((err) => setError(err.message))
+            .finally(() => setLoading(false))
     }, [])
+
+    // DUMMY: only updates the status shown on this page. Nothing is sent to the backend,
+    // so a reload brings back the real status.
+    function changeStatus(index, status) {
+        setRestaurants((current) =>
+            current.map((restaurant, i) => (i === index ? { ...restaurant, status } : restaurant))
+        )
+    }
 
     return (
         <div className="dashboard-content">
@@ -36,7 +37,7 @@ function OperatorRestaurants() {
 
             {loading && <p>Loading...</p>}
             {error && <p role="alert">{error}</p>}
-            {!loading && !error && restaurants.length === 0 && <p>No restaurants registered.</p>}
+            {!loading && restaurants.length === 0 && !error && <p>No restaurants registered.</p>}
 
             {restaurants.length > 0 && (
                 <table>
@@ -45,16 +46,31 @@ function OperatorRestaurants() {
                             <th>ID</th>
                             <th>Name</th>
                             <th>Status</th>
+                            <th>Change status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {restaurants.map((restaurant, index) => (
-                            <tr key={restaurant.id ?? restaurant.userId ?? index}>
-                                <td>{restaurant.id ?? restaurant.userId ?? '-'}</td>
-                                <td>{restaurant.name ?? '-'}</td>
-                                <td>{restaurant.status ?? restaurant.restaurantStatus ?? '-'}</td>
-                            </tr>
-                        ))}
+                        {restaurants.map((restaurant, index) => {
+                            const current = restaurant.status ?? restaurant.restaurantStatus
+                            return (
+                                <tr key={restaurant.id ?? restaurant.userId ?? index}>
+                                    <td>{restaurant.id ?? restaurant.userId ?? '-'}</td>
+                                    <td>{restaurant.name ?? '-'}</td>
+                                    <td>{current ? formatRestaurantStatus(current) : '-'}</td>
+                                    <td>
+                                        {STATUS_ACTIONS.map(({ status, label }) => (
+                                            <button
+                                                key={status}
+                                                disabled={current === status}
+                                                onClick={() => changeStatus(index, status)}
+                                            >
+                                                {label}
+                                            </button>
+                                        ))}
+                                    </td>
+                                </tr>
+                            )
+                        })}
                     </tbody>
                 </table>
             )}

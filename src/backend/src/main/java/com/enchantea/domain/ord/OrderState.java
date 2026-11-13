@@ -14,4 +14,7 @@ public interface OrderState {
     OrderState pickUp();
     OrderState deliver();
     OrderState refund();
+
+    default OrderState restore() {
+    throw new InvalidOrderTransitionException(status(), "restore");}
 }

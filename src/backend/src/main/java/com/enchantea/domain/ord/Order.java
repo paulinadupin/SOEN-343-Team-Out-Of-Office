@@ -133,6 +133,13 @@ public final class Order {
     public OrderStatus deliver() { return apply(status.deliver()); }
     // when order is refunded
     public OrderStatus refund() { return apply(status.refund()); }
+    //when order is restored from rejected state
+    public OrderStatus restore() {
+    OrderStatus restored = apply(status.restore());
+    closedAt = null;
+    rejectionReason = null;
+    return restored;
+}
 
     // enforces the order lifecycle (R-ORD-04)
     private OrderStatus apply(OrderState nextState) {
