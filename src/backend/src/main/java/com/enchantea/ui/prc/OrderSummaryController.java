@@ -35,7 +35,6 @@ public class OrderSummaryController {
     // builds current user from login session (same as the ordercontroller)
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
-        // FIX: CurrentUser takes a Long user id, so no toString()
         Long restaurantId = user instanceof Restaurant ? user.getUserId() : null;
         return new CurrentUser(user.getUserId(), user.getAccountType(), restaurantId);
     }

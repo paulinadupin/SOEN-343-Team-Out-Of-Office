@@ -24,7 +24,7 @@ public final class Order {
     private Instant deliveredAt;
     private Long courierId;
     private String rejectionReason;
-    private Charge charge; // FIX: this field was missing
+    private Charge charge;
     private final Long CUSTOMER_ID;
     private final Long RESTAURANT_ID;
     private final List<OrderLine> LINES;
@@ -141,13 +141,6 @@ public final class Order {
     public OrderStatus deliver() { return apply(status.deliver()); }
     // when order is refunded
     public OrderStatus refund() { return apply(status.refund()); }
-    //when order is restored from rejected state
-    public OrderStatus restore() {
-    OrderStatus restored = apply(status.restore());
-    closedAt = null;
-    rejectionReason = null;
-    return restored;
-}
 
     // enforces the order lifecycle (R-ORD-04)
     private OrderStatus apply(OrderState nextState) {

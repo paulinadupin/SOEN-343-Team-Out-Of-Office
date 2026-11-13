@@ -20,8 +20,7 @@ public class RoleCheck extends CommandCheck {
             Map.entry(CommandType.PICK_UP_ORDER, AccountType.COURIER),
             Map.entry(CommandType.DELIVER_ORDER, AccountType.COURIER),
             Map.entry(CommandType.CANCEL_ORDER_OPERATOR, AccountType.OPERATOR),
-            Map.entry(CommandType.REFUND_ORDER, AccountType.OPERATOR),
-            Map.entry(CommandType.RESTORE_ORDER, AccountType.OPERATOR)));
+            Map.entry(CommandType.REFUND_ORDER, AccountType.OPERATOR)));
 
     @Override
     protected void verify(CommandType type, CurrentUser user, Object command) {

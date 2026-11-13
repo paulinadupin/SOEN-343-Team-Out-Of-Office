@@ -41,7 +41,6 @@ public class OrderSummaryService {
     }
 
     public OrderSummary build(Order order) {
-        // RestaurantQuery uses Long ids; OrderSummary takes a String id, converted below
         Long restaurantId = order.restaurantId();
         List<OrderSummary.Line> lines = order.lines().stream()
                 .map(line -> new OrderSummary.Line(

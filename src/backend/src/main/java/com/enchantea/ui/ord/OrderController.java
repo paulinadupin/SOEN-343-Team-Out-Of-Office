@@ -99,12 +99,6 @@ public class OrderController {
         return toView(SERVICE.refund(currentUser(servletRequest), action(id, request)));
     }
 
-    @PostMapping("/{id}/restore")
-public OrderView restore(
-        @PathVariable String id, @RequestBody ActionRequest request, HttpServletRequest servletRequest) {
-    return toView(SERVICE.restore(currentUser(servletRequest), action(id, request)));
-}
-
     @GetMapping("/{id}")
     public OrderView get(@PathVariable String id, HttpServletRequest servletRequest) {
         currentUser(servletRequest);
@@ -129,36 +123,6 @@ public OrderView restore(
                 .toList();
     }
 
-    // operator dashboard: rejected orders with their rejection reasons
-    @GetMapping("/rejected")
-    public List<OrderView> rejectedOrders(HttpServletRequest servletRequest) {
-        User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
-        if (user.getAccountType() != AccountType.OPERATOR) {
-            throw new org.springframework.web.server.ResponseStatusException(
-                    org.springframework.http.HttpStatus.FORBIDDEN, "Operator account required");
-        }
-        return SERVICE.rejectedOrders().stream().map(OrderController::toView).toList();
-    }
-    @GetMapping("/active")
-public List<OrderView> activeOrders(HttpServletRequest servletRequest) {
-    requireOperator(servletRequest);
-    return SERVICE.activeOrders().stream().map(OrderController::toView).toList();
-}
-
-@GetMapping("/cancelled")
-public List<OrderView> cancelledOrders(HttpServletRequest servletRequest) {
-    requireOperator(servletRequest);
-    return SERVICE.cancelledOrders().stream().map(OrderController::toView).toList();
-}
-
-private void requireOperator(HttpServletRequest servletRequest) {
-    User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
-    if (user.getAccountType() != AccountType.OPERATOR) {
-        throw new org.springframework.web.server.ResponseStatusException(
-                org.springframework.http.HttpStatus.FORBIDDEN, "Operator account required");
-    }
-}
-
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();
@@ -181,10 +145,6 @@ private void requireOperator(HttpServletRequest servletRequest) {
     }
 
     private static ChargeView toChargeView(Charge charge) {
-        // FIX: orders without a charge (placed before pricing, or never priced) would throw an NPE here
-        if (charge == null) {
-            return null;
-        }
         return new ChargeView(
                 charge.subtotal(), charge.deliveryFee(), charge.serviceFee(),
                 charge.smallOrderSurcharge(), charge.total());
