@@ -1,5 +1,10 @@
 # SOEN-343-Team-Out-Of-Office
 
+## How to run Step-by-Step
+1. Clone Repository
+2. `docker compose up` to run the website (frontend and backend)
+3. `docker compose down` to stop the website
+
 ## Requirements
 
 - Java 17 or newer (Maven is included through the Maven Wrapper, no install needed)
@@ -77,8 +82,3 @@ npm run dev
 
 The dashboard runs on http://localhost:5173
 
-
-# Docker Implemented 
-
-- `docker compose up` to run the website (frontend and backend)
-- `docker compose down` to stop the website
