@@ -123,6 +123,17 @@ public class OrderController {
                 .toList();
     }
 
+    // operator dashboard: rejected orders with their rejection reasons
+    @GetMapping("/rejected")
+    public List<OrderView> rejectedOrders(HttpServletRequest servletRequest) {
+        User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
+        if (user.getAccountType() != AccountType.OPERATOR) {
+            throw new org.springframework.web.server.ResponseStatusException(
+                    org.springframework.http.HttpStatus.FORBIDDEN, "Operator account required");
+        }
+        return SERVICE.rejectedOrders().stream().map(OrderController::toView).toList();
+    }
+
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         AccountType accountType = user.getAccountType();
@@ -145,6 +156,10 @@ public class OrderController {
     }
 
     private static ChargeView toChargeView(Charge charge) {
+        // FIX: orders without a charge (placed before pricing, or never priced) would throw an NPE here
+        if (charge == null) {
+            return null;
+        }
         return new ChargeView(
                 charge.subtotal(), charge.deliveryFee(), charge.serviceFee(),
                 charge.smallOrderSurcharge(), charge.total());

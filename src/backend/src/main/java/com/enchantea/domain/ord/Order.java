@@ -23,6 +23,7 @@ public final class Order {
     private Instant closedAt;
     private Instant deliveredAt; 
     private String rejectionReason;
+    private Charge charge; // FIX: this field was missing
     private final Long CUSTOMER_ID;
     private final Long RESTAURANT_ID;
     private final List<OrderLine> LINES;
@@ -30,7 +31,8 @@ public final class Order {
 
     // constructor
     public Order(String OrderId, Long CUSTOMER_ID, Long RESTAURANT_ID, List<OrderLine> LINES) {
-        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null);
+        // FIX: the private constructor takes 10 arguments; added rejectionReason and charge (both null for a new order)
+        this(OrderId, CUSTOMER_ID, RESTAURANT_ID, LINES, Instant.now(), OrderStatus.PLACED, null, null, null, null);
     }
 
     private Order(

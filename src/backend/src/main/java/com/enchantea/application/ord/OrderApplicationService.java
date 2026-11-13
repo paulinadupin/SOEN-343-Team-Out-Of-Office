@@ -19,6 +19,7 @@ import com.enchantea.domain.prc.LedgerEntryType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.Comparator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -195,12 +196,23 @@ public class OrderApplicationService {
         return saveAndPublish(order, oldStatus, null);
     }
 
+    // FIX: needs a transaction so the order's lazy lines can be loaded while the session is open
+    @Transactional(readOnly = true)
     public Order get(String orderId) {
         return load(orderId);
     }
 
+    // FIX: same reason as get()
+    @Transactional(readOnly = true)
     public List<Order> allOrders() {
         return ORDERS.findAll();
+    }
+     // rejected orders for the operator dashboard, most recently rejected first
+    @Transactional(readOnly = true)
+    public List<Order> rejectedOrders() {
+        return ORDERS.findByStatus(OrderStatus.REJECTED).stream()
+                .sorted(Comparator.comparing(Order::closedAt, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
     }
 
     @Transactional(readOnly = true)

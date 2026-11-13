@@ -36,8 +36,9 @@ public class OrderSummaryController {
     //same session -> CurrentUser conversion as OrderController
     private CurrentUser currentUser(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
-        String restaurantId = user instanceof Restaurant ? user.getUserId().toString() : null;
-        return new CurrentUser(user.getUserId().toString(), user.getAccountType(), restaurantId);
+        // FIX: CurrentUser takes a Long user id, so no toString()
+        Long restaurantId = user instanceof Restaurant ? user.getUserId() : null;
+        return new CurrentUser(user.getUserId(), user.getAccountType(), restaurantId);
     }
 
     private static OrderSummaryView toView(OrderSummary summary) {
@@ -66,7 +67,7 @@ public class OrderSummaryController {
 
     public record OrderSummaryView(
             String orderId,
-            String restaurantId,
+            String restaurantId, // FIX: back to String, since OrderSummary.restaurantId() returns a String
             String restaurantName,
             List<OrderSummary.Line> lines,
             ChargeView charge,
