@@ -2,8 +2,9 @@
 
 ## How to run Step-by-Step
 1. Clone Repository
-2. `docker compose up` to run the website (frontend and backend)
-3. `docker compose down` to stop the website
+2. `docker compose up --build` to run the website (frontend and backend)
+3. The dashboard runs on http://localhost:5173
+4. `docker compose down` to stop the website
 
 ## Requirements
 
