@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getCurrentRestaurant, getRestaurantMenu, getOnDutyCouriers, getRestaurants } from "../../app/api";
+import { getCurrentRestaurant, getRestaurantMenu, getRestaurantMap} from "../../app/api";
 import RestaurantHeader from "../../components/RestaurantHeader";
 import MenuItem from "../../components/MenuItem";
 import './RestaurantDashboard.css';
@@ -8,9 +8,8 @@ import Map from "../../components/Map";
 function RestaurantDashboard() {
     const [restaurant, setRestaurant] = useState(null);
     const [menu, setMenu] = useState([]);
-    const [onDutyCouriers, setOnDutyCouriers] = useState([]);
-    const [restaurants, setRestaurants] = useState([]);
     const [error, setError] = useState("");
+    const [restaurantMap, setRestaurantMap] = useState();
 
     useEffect(() => {
         getCurrentRestaurant()
@@ -23,18 +22,9 @@ function RestaurantDashboard() {
     }, []);
 
     useEffect(() => {
-        getOnDutyCouriers()
-            .then((couriers) => {
-                setOnDutyCouriers(couriers);
-            })
-            .catch(() => setError("Could not load on-duty couriers."));
-    }, []);
-
-    useEffect(() => {
-        getRestaurants()
-            .then(setRestaurants)
-            .catch((requestError) => setError(requestError.message))
-            .finally(() => setLoading(false));
+        getRestaurantMap()
+        .then(setRestaurantMap)
+        .catch((requestError) => setError(requestError.message));
     }, []);
 
     return (
@@ -68,7 +58,9 @@ function RestaurantDashboard() {
             ) : !error ? (
                 <p>Loading restaurant information...</p>
             ) : null}
-            <Map restaurants={restaurants} onDutyCouriers={onDutyCouriers}/>
+            {restaurantMap && (
+                <Map restaurants={restaurantMap.restaurants} onDutyCouriers={restaurantMap.couriers}/>
+            )}
         </div>
     )
 }

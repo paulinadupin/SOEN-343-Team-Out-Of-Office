@@ -17,6 +17,8 @@ import com.enchantea.application.reg.RegisterRequest;
 import com.enchantea.application.reg.RestaurantResponse;
 import com.enchantea.domain.reg.User;
 
+import com.enchantea.application.dash.MapResponse;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -84,9 +86,15 @@ public class AuthController {
         return ACCOUNT_FACADE.findRestaurants();
     }
 
-    @GetMapping("/api/on-duty-couriers")
+    @GetMapping("/on-duty-couriers")
     public List<CourierResponse> onDutyCouriers(HttpServletRequest servletRequest) {
         return ACCOUNT_FACADE.findOnDutyCouriers();
+    }
+
+    @GetMapping("/map")
+    public MapResponse map(HttpServletRequest servletRequest) {
+        ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession());
+        return ACCOUNT_FACADE.findMapData();
     }
 
     @PostMapping("/logout")

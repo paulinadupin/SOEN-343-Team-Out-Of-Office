@@ -222,7 +222,7 @@ public class OrderApplicationService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
-    public int preparationQueueSize(String restaurantId) {
+    public int preparationQueueSize(Long restaurantId) { 
         return PREPARATION_QUEUE.size(restaurantId);
     }
 

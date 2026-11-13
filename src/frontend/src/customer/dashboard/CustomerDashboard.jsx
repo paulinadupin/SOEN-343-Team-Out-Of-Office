@@ -3,12 +3,13 @@ import RestaurantProfile from '../../components/RestaurantProfile'
 import Map from '../../components/Map'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { getRestaurants } from '../../app/api'
+import { getCustomerMap, getRestaurants } from '../../app/api'
 
 function CustomerDashboard() {
     const navigate = useNavigate();
-    const [restaurants, setRestaurants] = useState([]);
+    const [customerMap, setCustomerMap] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [restaurants, setRestaurants] = useState([]);
     const [error, setError] = useState(null);
 
     useEffect(() => {
@@ -16,7 +17,13 @@ function CustomerDashboard() {
             .then(setRestaurants)
             .catch((requestError) => setError(requestError.message))
             .finally(() => setLoading(false));
-    }, []);
+    });
+
+    useEffect(() => {
+        getCustomerMap()
+        .then(setCustomerMap)
+        .catch((requestError) => setError(requestError.message))
+    },[]);
 
     return (
         <div className="dashboard">
@@ -37,7 +44,13 @@ function CustomerDashboard() {
                     />
                 ))}
             </div>
-            <Map restaurants={restaurants} />
+            {customerMap && (
+                <Map
+                    restaurants = {customerMap.restaurants}
+                    onDutyCouriers = {customerMap.onDutyCouriers}
+                    customer = {customerMap.customer}
+                />
+            )}
         </div>
     )
 }

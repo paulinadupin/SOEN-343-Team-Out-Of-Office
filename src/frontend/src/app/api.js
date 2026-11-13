@@ -65,6 +65,18 @@ export async function getRestaurantOrders() {
   return request("/api/orders/restaurant");
 }
 
+export async function getRestaurantMap() {
+  return request("/api/map/restaurant");
+}
+
+export async function getCustomerMap() {
+  return request("/api/map/customer");
+}
+
+export async function getMapData() {
+  return request("/api/auth/map");
+}
+
 export async function placeOrder(restaurantId, lines) {
   return request("/api/orders", {
     method: "POST",
@@ -84,7 +96,7 @@ export async function updateOrder(orderId, action, reason) {
 }
 
 export async function getOnDutyCouriers() {
-  return request("/api/on-duty-couriers");
+  return request("/api/auth/on-duty-couriers");
 }
 
 export async function logout() {

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.enchantea.application.dash.MapResponse;
 import com.enchantea.domain.dlv.state.OfflineState;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
@@ -95,10 +96,24 @@ public class AccountFacade {
     public List<CourierResponse> findOnDutyCouriers() {
         return USERS.findAll().stream()
                 .filter(Courier.class::isInstance)
+                .filter(user-> ((Courier) user).getStatus() == CourierStatus.ASSIGNED || ((Courier) user).getStatus() == CourierStatus.CARRYING)
                 .map(Courier.class::cast)
                 .map(CourierResponse::from)
                 .collect(Collectors.toList());
     }
+
+    @Transactional (readOnly = true)
+    public MapResponse findMapData() {
+        List<RestaurantResponse> restaurants = findRestaurants();
+        List<CourierResponse> couriers = findOnDutyCouriers();
+        return new MapResponse(restaurants, couriers, null);
+    }
+
+    // @Transactional (readOnly = true)
+    // public MapResponse findRestaurantMapData(Long restaurantId) {
+    //     Restaurant restaurant = (Restaurant)findById(restaurantId);
+    //     List<Order> restaurantOrders = ORDERS.findByRestaurantId(restaurantId);
+    // }
     
     public User requireLoggedIn(HttpSession session) {
         if (session == null) {

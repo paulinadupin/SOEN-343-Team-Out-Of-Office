@@ -114,7 +114,7 @@ public class CourierController {
                 active = delivery;
             }
         }
-        return new CourierView(courier.getStatus(), active, offer);
+        return new CourierView(courier.getStatus(), courier.getPosition(), active, offer);
     }
 
     private DeliveryView deliveryView(Assignment assignment) {
@@ -128,15 +128,20 @@ public class CourierController {
         String dropoff = customerUser instanceof Customer customer
                 ? format(customer.getDeliveryAddress())
                 : "Customer " + order.customerId();
+        Location restaurantLocation = restaurantUser instanceof Restaurant restaurant ? restaurant.getPosition() : null;
+        Location customerLocation = customerUser instanceof Customer customer ? customer.getDeliveryAddress() : null;
 
-        return new DeliveryView(order.id(), shop, dropoff, assignment.getExpiresAt());
+        // return new DeliveryView(order.id(), shop, dropoff, assignment.getExpiresAt());
+        return new DeliveryView(order.id(), shop, restaurantLocation, customerLocation, dropoff, assignment.getExpiresAt());
+
     }
 
     private static String format(Location location) {
         return location == null ? "Address unavailable" : location.getLat() + ", " + location.getLng();
     }
 
-    public record CourierView(CourierStatus courierStatus, DeliveryView active, DeliveryView offer) { }
+    public record CourierView(CourierStatus courierStatus, Location courierLocation, DeliveryView active, DeliveryView offer) { }
 
-    public record DeliveryView(String orderId, String shop, String dropoff, Instant expiresAt) { }
+    // public record DeliveryView(String orderId, String shop, String dropoff, Instant expiresAt) { }
+    public record DeliveryView(String orderId, String shop, Location restaurantLocation, Location customerLocation, String dropoff, Instant expiresAt) { }
 }
