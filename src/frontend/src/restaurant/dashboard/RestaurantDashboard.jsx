@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from '../../app/AuthContext';
 import { getCurrentRestaurant, getRestaurantMenu, getRestaurantMap} from "../../app/api";
 import RestaurantHeader from "../../components/RestaurantHeader";
 import MenuItem from "../../components/MenuItem";
@@ -10,6 +11,8 @@ function RestaurantDashboard() {
     const [menu, setMenu] = useState([]);
     const [error, setError] = useState("");
     const [restaurantMap, setRestaurantMap] = useState();
+    const {user} = useAuth();
+    
 
     useEffect(() => {
         getCurrentRestaurant()
@@ -59,7 +62,7 @@ function RestaurantDashboard() {
                 <p>Loading restaurant information...</p>
             ) : null}
             {restaurantMap && (
-                <Map restaurants={restaurantMap.restaurants} onDutyCouriers={restaurantMap.couriers}/>
+                <Map restaurants={restaurantMap.restaurants} onDutyCouriers={restaurantMap.couriers} userLocation={user?.location}/>
             )}
         </div>
     )

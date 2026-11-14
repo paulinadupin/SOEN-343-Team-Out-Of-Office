@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import Map from "../components/Map";
-import { useEffect} from "react";
+import { useEffect } from "react";
+import { useAuth } from '../app/AuthContext';
 import { getCourierMap } from "../app/api";
 
 function CourierDashboard() {
     const [courierMap, setCourierMap] = useState();
     const [error, setError] = useState();
+    const {user} = useAuth();
 
     useEffect(() => {
         getCourierMap()
@@ -27,6 +29,7 @@ function CourierDashboard() {
                     restaurants={courierMap.restaurants}
                     onDutyCouriers={courierMap.couriers}
                     customer={courierMap.customer}
+                    userLocation={user?.location}
                 />
             )}
         </div>

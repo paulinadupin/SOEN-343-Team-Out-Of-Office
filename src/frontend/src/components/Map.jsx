@@ -1,14 +1,17 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Icon } from 'leaflet';
+import {useEffect} from 'react';
 
 import "leaflet/dist/leaflet.css";
 import './Map.css';
 
-// Reference: https://www.youtube.com/watch?v=jD6813wGdBA
+function Map({restaurants=[], onDutyCouriers=[], customer, userLocation=null}) {
+    const DEFAULT_CENTER = [45.49694, -73.57806];
 
-//Map Canvas: canvas scaled to [minLon, maxLon] × [minLat, maxLat]
-
-function Map({restaurants=[], onDutyCouriers=[], customer}) {
+    const centerMap = userLocation
+        ? [userLocation.lat, userLocation.lng]
+        : DEFAULT_CENTER;
+    
     const restaurantIcon = new Icon({
         iconUrl:'./pin.png',
         iconSize:[30,30]
@@ -24,14 +27,27 @@ function Map({restaurants=[], onDutyCouriers=[], customer}) {
         iconSize: [30,30]
     });
 
+   function CenterMap({ userLocation }) {
+    const map = useMap();
+
+    useEffect(() => {
+        if (userLocation?.lat != null && userLocation?.lng != null) {
+            map.setView([userLocation.lat, userLocation.lng], 14);
+        }
+    }, [userLocation, map]);
+
+    return null;
+}
+
     return (
         <MapContainer
-            center={[45.49694, -73.57806]}
+            center= {centerMap}
             zoom={14}
             maxZoom={18}
             minZoom={10}
             className="container"
         >
+            <CenterMap userLocation={userLocation} />
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url='https://tile.openstreetmap.org/{z}/{x}/{y}.png'
