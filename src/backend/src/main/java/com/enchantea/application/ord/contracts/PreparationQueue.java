@@ -6,4 +6,5 @@ public interface PreparationQueue {
     Optional<Order> peek(Long restaurantId);
     boolean remove(Long restaurantId, String orderId);
     int size(Long restaurantId);
+    void clear();
 }

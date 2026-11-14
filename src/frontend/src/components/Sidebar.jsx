@@ -1,6 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../app/AuthContext";
 import { ROLES } from "../app/roles";
+import { toggleConsole } from "../app/consoleLog";
+import OutputConsole from "./OutputConsole";
 import "../Sidebar.css";
 
 const linksByRole = {
@@ -42,6 +44,8 @@ function Sidebar() {
                         {label}
                     </NavLink>
                 ))}
+                <button type="button" className="console-toggle" onClick={toggleConsole}>Console</button>
+                <OutputConsole />
             </nav>
         </aside>
     );

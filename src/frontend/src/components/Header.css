@@ -45,4 +45,12 @@ header {
         width: 49px;
         height: 49px;
     }
+
+    .reset-button {
+        border: 2px solid var(--accent-color);
+        border-radius: var(--default-radius);
+        background: var(--background-color);
+        padding: 0.4rem 0.9rem;
+        cursor: pointer;
+    }
 }

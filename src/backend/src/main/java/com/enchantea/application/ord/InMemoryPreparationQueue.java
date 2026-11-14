@@ -35,6 +35,11 @@ public class InMemoryPreparationQueue implements PreparationQueue {
         return queue != null ? queue.size() : 0;
     }
 
+    @Override
+    public synchronized void clear() {
+        QUEUES.clear();
+    }
+
     private OrderQueue queueFor(Long restaurantId) {
         return QUEUES.computeIfAbsent(restaurantId, id -> new OrderQueue());
     }

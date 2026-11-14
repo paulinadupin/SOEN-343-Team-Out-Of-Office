@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getRestaurants } from "../../app/api";
 import { formatRestaurantStatus } from "../../app/formatRestaurantStatus";
+import "./OperatorRestaurants.css";
 
 const STATUS_ACTIONS = [
     { status: 'OPEN', label: 'Open' },
@@ -32,7 +33,7 @@ function OperatorRestaurants() {
     }
 
     return (
-        <div className="dashboard-content">
+        <div className="dashboard-content operator-restaurants">
             <h1>Restaurants</h1>
 
             {loading && <p>Loading...</p>}

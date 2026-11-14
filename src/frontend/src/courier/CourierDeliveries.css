@@ -1,0 +1,17 @@
+.courier-deliveries {
+    padding: 1rem;
+}
+
+.courier-deliveries section {
+    margin-bottom: 1.5rem;
+}
+
+.courier-deliveries button {
+    border: 2px solid var(--accent-color);
+    border-radius: var(--default-radius);
+    background: var(--background-color);
+    padding: var(--input-padding);
+    height: var(--input-height);
+    margin-right: 0.5rem;
+    cursor: pointer;
+}

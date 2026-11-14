@@ -7,4 +7,5 @@ public interface DispatchQueue {
     Optional<Order> peek();
     boolean removeFromDispatch(String orderId);
     boolean contains(String orderId);
+    void clear();
 }
