@@ -96,8 +96,8 @@ public class AccountFacade {
     public List<CourierResponse> findOnDutyCouriers() {
         return USERS.findAll().stream()
                 .filter(Courier.class::isInstance)
-                .filter(user-> ((Courier) user).getStatus() == CourierStatus.ASSIGNED || ((Courier) user).getStatus() == CourierStatus.CARRYING)
                 .map(Courier.class::cast)
+                .filter(courier -> courier.getStatus() != CourierStatus.OFFLINE)
                 .map(CourierResponse::from)
                 .collect(Collectors.toList());
     }
