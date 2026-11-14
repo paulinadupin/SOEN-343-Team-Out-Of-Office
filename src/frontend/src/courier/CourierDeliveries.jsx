@@ -8,6 +8,7 @@ import {
     confirmPickup,
     confirmDelivery,
 } from "../app/api";
+import "./CourierDeliveries.css";
 
 function useSecondsLeft(expiresAt) {
     const [left, setLeft] = useState(0);
@@ -69,7 +70,7 @@ function CourierDeliveries() {
     if (loading) return <p>Loading...</p>;
 
     return (
-        <div className="dashboard-content">
+        <div className="dashboard-content courier-deliveries">
             <h1>Deliveries</h1>
             <p>Status: {courierStatus}</p>
             {error && <p role="alert">{error}</p>}
