@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useAuth } from '../../app/AuthContext';
-import { getCurrentRestaurant, getRestaurantMenu, getRestaurantMap} from "../../app/api";
+import {
+    getCurrentRestaurant,
+    getRestaurantMenu,
+    getRestaurantMap,
+    getRestaurantOrders
+} from "../../app/api";
 import RestaurantHeader from "../../components/RestaurantHeader";
 import MenuItem from "../../components/MenuItem";
 import './RestaurantDashboard.css';
@@ -11,6 +16,7 @@ function RestaurantDashboard() {
     const [menu, setMenu] = useState([]);
     const [error, setError] = useState("");
     const [restaurantMap, setRestaurantMap] = useState();
+    const [orders, setOrders] = useState([]);
     const {user} = useAuth();
     
 
@@ -29,6 +35,18 @@ function RestaurantDashboard() {
         .then(setRestaurantMap)
         .catch((requestError) => setError(requestError.message));
     }, []);
+
+    useEffect(() => {
+        getRestaurantOrders()
+            .then(setOrders)
+            .catch((requestError) => setError(requestError.message));
+    }, []);
+
+    function handleOrderAction(updatedOrder) {
+        setOrders((currentOrders) => currentOrders.map((order) => (
+            order.id === updatedOrder.id ? updatedOrder : order
+        )));
+    }
 
     return (
         <div>
@@ -62,7 +80,16 @@ function RestaurantDashboard() {
                 <p>Loading restaurant information...</p>
             ) : null}
             {restaurantMap && (
-                <Map restaurants={restaurantMap.restaurants} onDutyCouriers={restaurantMap.couriers} userLocation={user?.location}/>
+                <Map
+                    restaurants={restaurantMap.restaurants}
+                    onDutyCouriers={restaurantMap.couriers}
+                    userLocation={user?.location}
+                    queueOrders={orders.filter((order) =>
+                        ['PLACED', 'ACCEPTED', 'PREPARING'].includes(order.status)
+                    )}
+                    canManageQueue
+                    onOrderAction={handleOrderAction}
+                />
             )}
         </div>
     )

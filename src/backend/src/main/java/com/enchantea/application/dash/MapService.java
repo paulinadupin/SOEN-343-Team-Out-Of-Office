@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.enchantea.application.ord.OrderApplicationService;
 import com.enchantea.application.ord.OrderRepository;
 import com.enchantea.application.reg.CourierResponse;
 import com.enchantea.application.reg.CustomerResponse;
@@ -22,10 +23,12 @@ import com.enchantea.foundation.reg.UserRepository;
 public class MapService {
     private final UserRepository USERS;
     private final OrderRepository ORDERS;
+    private final OrderApplicationService ORDER_APPLICATION_SERVICE;
 
-    public MapService(UserRepository users, OrderRepository orders) {
+    public MapService(UserRepository users, OrderRepository orders, OrderApplicationService orderApplicationService) {
         this.USERS = users;
         this.ORDERS = orders;
+        this.ORDER_APPLICATION_SERVICE = orderApplicationService;
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +56,7 @@ public class MapService {
         .map(CourierResponse::from)
         .toList();
 
-    return new MapResponse(List.of(RestaurantResponse.from(restaurant)), couriers, null);
+    return new MapResponse(List.of(RestaurantResponse.from(restaurant,ORDER_APPLICATION_SERVICE.preparationQueueSize(restaurant.getUserId()))), couriers, null);
         
     }
 
@@ -82,7 +85,7 @@ public class MapService {
             .filter(user -> user.getUserId().equals(courierOrder.restaurantId()))
             .filter(Restaurant.class::isInstance)
             .map(Restaurant.class::cast)
-            .map(RestaurantResponse::from)
+            .map(restaurant -> RestaurantResponse.from(restaurant, ORDER_APPLICATION_SERVICE.preparationQueueSize(restaurant.getUserId())))
             .toList();
 
         CustomerResponse customerResponse = USERS.findById(courierOrder.customerId())
@@ -104,17 +107,10 @@ public class MapService {
             throw new IllegalArgumentException("User is not a customer");
         }
 
-        //Filter to make sure to get the orders only associated with the current customer
         List<Order> customerOrders = ORDERS.findAll()
             .stream()
             .filter(order -> customerId.equals(order.customerId()))
             .filter(order -> order.status() == OrderStatus.READY || order.status() == OrderStatus.PICKED_UP)
-            .toList();
-
-        List<Long> restaurantIds = customerOrders
-            .stream()
-            .map(Order::restaurantId)
-            .distinct()
             .toList();
 
         List<String> orderIds = customerOrders
@@ -126,8 +122,7 @@ public class MapService {
             .stream()
             .filter(Restaurant.class::isInstance)
             .map(Restaurant.class::cast)
-            .filter(restaurant -> restaurantIds.contains(restaurant.getUserId()))
-            .map(RestaurantResponse::from)
+            .map(restaurant -> RestaurantResponse.from(restaurant, ORDER_APPLICATION_SERVICE.preparationQueueSize(restaurant.getUserId())))
             .toList();
 
         List<CourierResponse> couriers = USERS.findAll()

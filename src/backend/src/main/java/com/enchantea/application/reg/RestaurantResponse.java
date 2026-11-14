@@ -10,6 +10,7 @@ public class RestaurantResponse {
     private String name;
     private RestaurantStatus status;
     private Location position;
+    private int queueSize;
 
     public RestaurantResponse() {
     }
@@ -19,21 +20,29 @@ public class RestaurantResponse {
             String username,
             String name,
             RestaurantStatus status,
-            Location position) {
+            Location position,
+            int queueSize
+        ) {
         this.userId = userId;
         this.username = username;
         this.name = name;
         this.status = status;
         this.position = position;
+        this.queueSize = queueSize;
     }
 
-    public static RestaurantResponse from(Restaurant restaurant) {
+    public static RestaurantResponse from(Restaurant restaurant, int queueSize) {
         return new RestaurantResponse(
                 restaurant.getUserId(),
                 restaurant.getUsername(),
                 restaurant.getName(),
                 restaurant.getStatus(),
-                restaurant.getPosition());
+                restaurant.getPosition(),
+                queueSize);
+    }
+
+    public static RestaurantResponse from(Restaurant restaurant) {
+        return from(restaurant, 0);
     }
 
     public Long getUserId() {
@@ -54,5 +63,9 @@ public class RestaurantResponse {
 
     public Location getPosition() {
         return position;
+    }
+
+    public int getQueueSize() {
+        return queueSize;
     }
 }
