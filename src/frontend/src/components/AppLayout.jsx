@@ -1,7 +1,6 @@
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
-import OutputConsole from "./OutputConsole";
 
 function AppLayout() {
     return (
@@ -13,7 +12,6 @@ function AppLayout() {
                     <Outlet />
                 </main>
             </div>
-            <OutputConsole />
         </div>
     );
 }

@@ -1,11 +1,14 @@
 .output-console {
-    background: #111;
-    color: #ddd;
+    background: #fff;
+    color: #333;
+    border: 1px solid #ddd;
     font-family: monospace;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     padding: 0.5rem;
-    max-height: 150px;
+    margin-top: 0.5rem;
+    max-height: 200px;
     overflow-y: auto;
+    word-break: break-word;
 }
 
 .output-console ul {
@@ -15,9 +18,9 @@
 }
 
 .output-console li.success {
-    color: #8f8;
+    color: #2a8f2a;
 }
 
 .output-console li.error {
-    color: #f88;
+    color: #c0392b;
 }
