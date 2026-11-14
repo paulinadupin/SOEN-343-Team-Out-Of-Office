@@ -35,4 +35,8 @@ public final class OrderQueue {
         return ORDERS.size();
     }
 
+    public void clear() {
+        ORDERS.clear();
+    }
+
 }
