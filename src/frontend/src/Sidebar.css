@@ -24,6 +24,16 @@
   font-weight: 600;
 }
 
+.sidebar .console-toggle {
+  color: inherit;
+  padding: 0.5rem;
+  text-align: left;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
 .page-layout {
   display: flex;
   min-height: calc(100vh - 80px);

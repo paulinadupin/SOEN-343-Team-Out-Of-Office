@@ -9,6 +9,7 @@ import {
     updateOrder,
     reassignOrder,
 } from "../../app/api";
+import "./OperatorOrders.css";
 
 const POLL_INTERVAL_MS = 15000
 
@@ -217,7 +218,7 @@ function OperatorOrders() {
     ]
 
     return (
-        <div className="dashboard-content">
+        <div className="dashboard-content operator-orders">
             <h1>Orders</h1>
 
             {loading && <p>Loading...</p>}

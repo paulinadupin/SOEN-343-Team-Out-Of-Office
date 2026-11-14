@@ -1,6 +1,9 @@
+import { addEntry } from "./consoleLog";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 async function request(path, options = {}) {
+  const method = options.method || "GET";
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include",
@@ -13,9 +16,12 @@ async function request(path, options = {}) {
   if (!response.ok) {
     const body = await response.json().catch(() => null);
     const message = body?.detail || body?.message || body?.error;
-    throw new Error(message || `Request failed with status ${response.status}`);
+    const errorMessage = message || `Request failed with status ${response.status}`;
+    addEntry(`${method} ${path} - ${errorMessage}`, "error");
+    throw new Error(errorMessage);
   }
 
+  addEntry(`${method} ${path}`, "success");
   return response.status === 204 ? null : response.json();
 }
 
@@ -117,6 +123,10 @@ export async function updateOrder(orderId, action, reason) {
 
 export async function getOnDutyCouriers() {
   return request("/api/auth/on-duty-couriers");
+}
+
+export async function resetSystem() {
+  return request("/api/dash/reset", { method: "POST" });
 }
 
 export async function logout() {

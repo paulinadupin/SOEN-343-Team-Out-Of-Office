@@ -3,6 +3,7 @@ import Map from "../components/Map";
 import { useEffect } from "react";
 import { useAuth } from '../app/AuthContext';
 import { getCourierMap } from "../app/api";
+import "./CourierDashboard.css";
 
 function CourierDashboard() {
     const [courierMap, setCourierMap] = useState();
@@ -16,7 +17,7 @@ function CourierDashboard() {
     }, []);
 
     return (
-        <div className="dashboard-content">
+        <div className="dashboard-content courier-dashboard">
             <h1>Courier Overview</h1>
             <h2>Today</h2>
             <ul>
