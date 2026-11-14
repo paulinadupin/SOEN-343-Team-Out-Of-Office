@@ -119,6 +119,10 @@ export async function getOnDutyCouriers() {
   return request("/api/auth/on-duty-couriers");
 }
 
+export async function resetSystem() {
+  return request("/api/dash/reset", { method: "POST" });
+}
+
 export async function logout() {
   await request("/api/auth/logout", { method: "POST" });
 }
