@@ -20,7 +20,6 @@ function OperatorDashboard() {
         getRestaurants()
             .then(setRestaurants)
             .catch((requestError) => setError(requestError.message))
-            // .finally(() => setLoading(false));
     }, []);
 
     return (

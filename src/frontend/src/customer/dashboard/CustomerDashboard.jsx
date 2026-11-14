@@ -64,7 +64,7 @@ function CustomerDashboard() {
             {customerMap?.restaurants?.length > 0 && (
                 <Map
                     restaurants = {customerMap.restaurants}
-                    onDutyCouriers = {customerMap.onDutyCouriers}
+                    onDutyCouriers = {customerMap.couriers}
                     customer = {customerMap.customer}
                 />
             )}

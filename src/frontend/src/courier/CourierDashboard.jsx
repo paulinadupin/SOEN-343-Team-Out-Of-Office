@@ -24,8 +24,8 @@ function CourierDashboard() {
             </ul>
             {courierMap && (
                 <Map
-                    restaurant={courierMap.restaurant}
-                    courier={courierMap.onDutyCourier}
+                    restaurants={courierMap.restaurants}
+                    onDutyCouriers={courierMap.couriers}
                     customer={courierMap.customer}
                 />
             )}
