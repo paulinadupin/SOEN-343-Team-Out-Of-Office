@@ -79,6 +79,8 @@ export async function getCourierMap() {
 
 export async function getMapData() {
   return request("/api/auth/map");
+}
+
 export async function getActiveOrders() {
   return request("/api/orders/active");
 }
