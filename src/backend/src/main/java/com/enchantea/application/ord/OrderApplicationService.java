@@ -241,6 +241,7 @@ public class OrderApplicationService {
     }
 
     public int preparationQueueSize(Long restaurantId) { 
+        restorePreparationQueueIfEmpty(restaurantId);
         return PREPARATION_QUEUE.size(restaurantId);
     }
     

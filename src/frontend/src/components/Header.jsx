@@ -25,8 +25,8 @@ function Header() {
                 <div className="customer-header">
                     <p>
                         Deliver to{" "}
-                        {user.deliveryAddress
-                            ? `${user.deliveryAddress.lat}, ${user.deliveryAddress.lng}`
+                        {user.location
+                            ? `${user.location.lat}, ${user.location.lng}`
                             : "Location unavailable"}
                     </p>
                     <input className="search-bar" type="text" placeholder="Search shops"></input>

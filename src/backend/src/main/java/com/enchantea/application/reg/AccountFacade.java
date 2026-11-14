@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.enchantea.application.dash.MapResponse;
+import com.enchantea.application.ord.OrderApplicationService;
 import com.enchantea.domain.dlv.state.OfflineState;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
@@ -33,10 +34,15 @@ import java.util.stream.Collectors;
 public class AccountFacade {
     private final UserRepository USERS;
     private final PasswordEncoder PASSWORD_ENCODER;
+    private final OrderApplicationService ORDER_APPLICATION_SERVICE;
 
-    public AccountFacade(UserRepository USERS, PasswordEncoder PASSWORD_ENCODER) {
+    public AccountFacade(
+            UserRepository USERS,
+            PasswordEncoder PASSWORD_ENCODER,
+            OrderApplicationService ORDER_APPLICATION_SERVICE) {
         this.USERS = USERS;
         this.PASSWORD_ENCODER = PASSWORD_ENCODER;
+        this.ORDER_APPLICATION_SERVICE = ORDER_APPLICATION_SERVICE;
     }
 
     @Transactional
@@ -88,7 +94,9 @@ public class AccountFacade {
         return USERS.findAll().stream()
                 .filter(Restaurant.class::isInstance)
                 .map(Restaurant.class::cast)
-                .map(RestaurantResponse::from)
+                .map(restaurant -> RestaurantResponse.from(
+                        restaurant,
+                        ORDER_APPLICATION_SERVICE.preparationQueueSize(restaurant.getUserId())))
                 .collect(Collectors.toList());
     }
 

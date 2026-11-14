@@ -30,7 +30,7 @@ function mapAccount(account) {
     id: account.userId,
     username: account.username,
     accountType: account.accountType,
-    deliveryAddress: account.deliveryAddress,
+    location: account.location,
   };
 }
 

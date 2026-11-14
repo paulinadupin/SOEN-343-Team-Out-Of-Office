@@ -2,6 +2,7 @@ import './Dashboard.css'
 import RestaurantProfile from '../../components/RestaurantProfile'
 import Map from '../../components/Map'
 import { useEffect, useState } from 'react'
+import { useAuth } from '../../app/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getCustomerMap, getRestaurants } from '../../app/api'
 
@@ -13,13 +14,15 @@ function CustomerDashboard() {
     const [restaurants, setRestaurants] = useState([]);
     const [error, setError] = useState(null);
     const [orderPlaced, setOrderPlaced] = useState(false);
+    const {user} = useAuth();
+    
 
     useEffect(() => {
         getRestaurants()
             .then(setRestaurants)
             .catch((requestError) => setError(requestError.message))
             .finally(() => setLoading(false));
-    });
+    }, []);
 
     useEffect(() => {
         getCustomerMap()
@@ -61,11 +64,12 @@ function CustomerDashboard() {
                     />
                 ))}
             </div>
-            {customerMap?.restaurants?.length > 0 && (
+            {customerMap && (
                 <Map
                     restaurants = {customerMap.restaurants}
                     onDutyCouriers = {customerMap.couriers}
                     customer = {customerMap.customer}
+                    userLocation ={user?.location}
                 />
             )}
             {orderPlaced && <span className="order-placed" role="status">Order Placed!</span>}

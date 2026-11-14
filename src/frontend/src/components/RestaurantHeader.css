@@ -44,16 +44,4 @@
         }
     }
 
-    /* Temporary colours */
-    .long-time {
-        color: red;
-    }
-
-    .building-time {
-        color:orange;
-    }
-
-    .short-time {
-        color: var(--primary-color);
-    }
 }
