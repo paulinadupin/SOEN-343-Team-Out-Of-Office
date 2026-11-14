@@ -4,19 +4,22 @@ import com.enchantea.application.ord.contracts.CommandType;
 import com.enchantea.application.ord.contracts.CommandValidator;
 import com.enchantea.application.ord.contracts.CurrentUser;
 import com.enchantea.application.ord.contracts.CourierAssignment;
+import com.enchantea.application.ord.contracts.CommandRejectedException;
 import com.enchantea.application.ord.contracts.DispatchQueue;
 import com.enchantea.application.ord.contracts.PreparationQueue;
 import com.enchantea.application.ord.contracts.RestaurantQuery;
-import com.enchantea.application.prc.JpaLedgerRepository;
+import com.enchantea.application.prc.LedgerRepository;
 import com.enchantea.application.prc.PricingCalculator;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.ord.OrderStatus;
 import com.enchantea.domain.ord.StateTransition;
 import com.enchantea.domain.prc.Charge;
-import com.enchantea.domain.prc.Ledger;
+import com.enchantea.domain.prc.ChargeRecording;
 import com.enchantea.domain.prc.LedgerEntryType;
+import com.enchantea.domain.prc.RefundRecording;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -33,7 +36,7 @@ public class OrderApplicationService {
     private final RestaurantQuery RESTAURANT_QUERY;
     private final OrderEventSubject EVENT_SUBJECT;
     private final PricingCalculator PRICING_CALCULATOR;
-    private final JpaLedgerRepository LEDGER_REPOSITORY;
+    private final LedgerRepository LEDGER_REPOSITORY;
 
     public OrderApplicationService(
             OrderRepository ORDERS,
@@ -44,7 +47,7 @@ public class OrderApplicationService {
             RestaurantQuery RESTAURANT_QUERY,
             OrderEventSubject EVENT_SUBJECT,
             PricingCalculator PRICING_CALCULATOR,
-            JpaLedgerRepository LEDGER_REPOSITORY) {
+            LedgerRepository LEDGER_REPOSITORY) {
         this.ORDERS = ORDERS;
         this.VALIDATOR = VALIDATOR;
         this.PREPARATION_QUEUE = PREPARATION_QUEUE;
@@ -132,6 +135,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
+        restorePreparationQueueIfEmpty(order.restaurantId());
         Order firstOrder = PREPARATION_QUEUE.peek(order.restaurantId())
                 .orElseThrow(() -> new IllegalStateException("Preparation queue is empty"));
         if (!firstOrder.id().equals(order.id())) {
@@ -149,6 +153,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
+        restorePreparationQueueIfEmpty(order.restaurantId());
         Order firstOrder = PREPARATION_QUEUE.peek(order.restaurantId())
                 .orElseThrow(() -> new IllegalStateException("Preparation queue is empty"));
         if (!firstOrder.id().equals(order.id())) {
@@ -169,7 +174,7 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
-        order.pickUp();
+        order.pickUp(user.id());
         DISPATCH_QUEUE.removeFromDispatch(order.id());
         return saveAndPublish(order, oldStatus, null);
     }
@@ -181,7 +186,7 @@ public class OrderApplicationService {
         OrderStatus oldStatus = order.status();
 
         order.deliver();
-        LEDGER_REPOSITORY.save(new Ledger().record(order.id(), LedgerEntryType.CHARGE, order.charge().total()));
+        LEDGER_REPOSITORY.save(new ChargeRecording().record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 
@@ -191,14 +196,27 @@ public class OrderApplicationService {
         Order order = load(command.orderId());
         OrderStatus oldStatus = order.status();
 
+        // check that a delivered was charged so it can be refunded 
+        if (order.status() != OrderStatus.DELIVERED) {
+            throw new CommandRejectedException("Only a delivered order can be refunded");
+        }
+        boolean charged = LEDGER_REPOSITORY.findByOrderId(order.id()).stream()
+                .anyMatch(entry -> entry.type() == LedgerEntryType.CHARGE);
+        if (!charged) {
+            throw new CommandRejectedException("Order has no charge to refund");
+        }
+
         order.refund();
+        LEDGER_REPOSITORY.save(new RefundRecording(user.id()).record(order));
         return saveAndPublish(order, oldStatus, null);
     }
 
+    @Transactional(readOnly = true)
     public Order get(String orderId) {
         return load(orderId);
     }
 
+    @Transactional(readOnly = true)
     public List<Order> allOrders() {
         return ORDERS.findAll();
     }
@@ -224,6 +242,18 @@ public class OrderApplicationService {
 
     public int preparationQueueSize(Long restaurantId) { 
         return PREPARATION_QUEUE.size(restaurantId);
+    }
+    
+    private void restorePreparationQueueIfEmpty(Long restaurantId) {
+        if (PREPARATION_QUEUE.peek(restaurantId).isPresent()) {
+            return;
+        }
+
+        ORDERS.findByRestaurantId(restaurantId).stream()
+                .filter(order -> order.status() == OrderStatus.ACCEPTED
+                        || order.status() == OrderStatus.PREPARING)
+                .sorted(Comparator.comparing(Order::placedAt))
+                .forEach(order -> PREPARATION_QUEUE.enqueue(restaurantId, order));
     }
 
     private Order saveAndPublish(Order order, OrderStatus oldStatus, String reason) {

@@ -23,16 +23,18 @@ public class PersistedLedgerEntry {
     private double amount;
     @Column(nullable = false)
     private Instant createdAt;
+    private Long operatorId;
 
     protected PersistedLedgerEntry() {
     }
 
-    public PersistedLedgerEntry(String entryId, String orderId, LedgerEntryType type, double amount, Instant createdAt) {
+    public PersistedLedgerEntry(String entryId, String orderId, LedgerEntryType type, double amount, Instant createdAt, Long operatorId) {
         this.entryId = entryId;
         this.orderId = orderId;
         this.type = type;
         this.amount = amount;
         this.createdAt = createdAt;
+        this.operatorId = operatorId;
     }
 
     public String entryId() { return entryId; }
@@ -40,4 +42,5 @@ public class PersistedLedgerEntry {
     public LedgerEntryType type() { return type; }
     public double amount() { return amount; }
     public Instant createdAt() { return createdAt; }
+    public Long operatorId() { return operatorId; }
 }

@@ -84,6 +84,7 @@ function CourierDeliveries() {
                         <section>
                             <h2>New offer ({secondsLeft}s)</h2>
                             <p>
+                                {/* FIX: was `delivery.dropoff`, but `delivery` is not defined here */}
                                 <strong>{offer.shop}</strong> to {offer.dropoff}
                             </p>
                             <button onClick={() => respond(acceptOffer)}>Accept</button>

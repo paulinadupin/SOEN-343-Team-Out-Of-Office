@@ -1,11 +1,13 @@
 package com.enchantea.ui.dlv;
 
 import com.enchantea.application.dlv.CourierDutyService;
+import com.enchantea.application.dlv.DispatchService;
 import com.enchantea.application.ord.OrderApplicationService;
 import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.domain.dlv.Assignment;
 import com.enchantea.domain.dlv.AssignmentStatus;
 import com.enchantea.domain.ord.Order;
+import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.CourierStatus;
 import com.enchantea.domain.reg.Customer;
@@ -15,10 +17,14 @@ import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -29,17 +35,20 @@ public class CourierController {
     private final CourierDutyService COURIER_DUTY_SERVICE;
     private final OrderApplicationService ORDER_APPLICATION_SERVICE;
     private final UserRepository USER_REPOSITORY;
+    private final DispatchService DISPATCH_SERVICE;
 
     public CourierController(
             AccountFacade accountFacade,
             CourierDutyService courierDutyService,
             OrderApplicationService orderApplicationService,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            DispatchService dispatchService) {
 
         this.ACCOUNT_FACADE = accountFacade;
         this.COURIER_DUTY_SERVICE = courierDutyService;
         this.ORDER_APPLICATION_SERVICE = orderApplicationService;
         this.USER_REPOSITORY = userRepository;
+        this.DISPATCH_SERVICE = dispatchService;
     }
 
     @GetMapping("/assignment")
@@ -87,6 +96,42 @@ public class CourierController {
         Long courierId = currentCourierId(request);
         COURIER_DUTY_SERVICE.confirmDelivery(courierId);
         return viewFor(courierId);
+    }
+
+  
+    @GetMapping("/stalled")
+    public List<StalledOrderView> stalledOrders(HttpServletRequest request) {
+        requireOperator(request);
+        return DISPATCH_SERVICE.stalledCouriers().stream()
+                .map(courier -> new StalledOrderView(
+                        courier.getAssignment().getOrderId(), courier.getUserId(), courier.getUsername()))
+                .toList();
+    }
+
+    @GetMapping("/idle")
+    public List<IdleCourierView> idleCouriers(HttpServletRequest request) {
+        requireOperator(request);
+        return USER_REPOSITORY.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .filter(courier -> courier.getStatus() == CourierStatus.IDLE)
+                .map(courier -> new IdleCourierView(courier.getUserId(), courier.getUsername()))
+                .toList();
+    }
+
+    @PostMapping("/stalled/{orderId}/reassign")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void reassign(
+            @PathVariable String orderId, @RequestBody ReassignRequest reassignRequest, HttpServletRequest request) {
+        requireOperator(request);
+        DISPATCH_SERVICE.reassignOrder(orderId, reassignRequest.courierId());
+    }
+
+    private void requireOperator(HttpServletRequest request) {
+        User user = ACCOUNT_FACADE.requireLoggedIn(request.getSession(false));
+        if (user.getAccountType() != AccountType.OPERATOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Operator account required");
+        }
     }
 
     private Long currentCourierId(HttpServletRequest request) {
@@ -142,6 +187,12 @@ public class CourierController {
 
     public record CourierView(CourierStatus courierStatus, Location courierLocation, DeliveryView active, DeliveryView offer) { }
 
-    // public record DeliveryView(String orderId, String shop, String dropoff, Instant expiresAt) { }
     public record DeliveryView(String orderId, String shop, Location restaurantLocation, Location customerLocation, String dropoff, Instant expiresAt) { }
+    // public record DeliveryView(String orderId, String shop, String dropoff, Instant expiresAt) { }
+
+    public record StalledOrderView(String orderId, Long courierId, String courierUsername) { }
+
+    public record IdleCourierView(Long courierId, String username) { }
+
+    public record ReassignRequest(Long courierId) { }
 }
