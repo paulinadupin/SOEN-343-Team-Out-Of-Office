@@ -30,4 +30,9 @@ public class InMemoryDispatchQueue implements DispatchQueue {
     public synchronized boolean contains(String orderId) {
         return QUEUE.contains(orderId);
     }
+
+    @Override
+    public synchronized void clear() {
+        QUEUE.clear();
+    }
 }
