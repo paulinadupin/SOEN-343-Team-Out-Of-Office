@@ -3,12 +3,19 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
 import { useCart } from '../app/useCart'
+import { resetSystem } from '../app/api'
 import UserMenu from './UserMenu'
 
 function Header() {
     const { user } = useAuth();
     const { itemCount } = useCart();
     const navigate = useNavigate();
+
+    async function handleReset() {
+        if (!window.confirm("Reset the entire system to its initial state? This cannot be undone.")) return;
+        await resetSystem();
+        window.location.reload();
+    }
 
     return (
         <header>
@@ -25,6 +32,10 @@ function Header() {
                     <input className="search-bar" type="text" placeholder="Search shops"></input>
                     <button className="cart-button" onClick={()=> navigate('/cart')}>Cart · {itemCount}</button>
                 </div>
+            )}
+
+            {user && user.accountType === 'OPERATOR' && (
+                <button className="reset-button" onClick={handleReset}>Reset</button>
             )}
 
             {user && <UserMenu/>}
