@@ -14,7 +14,7 @@ import com.enchantea.foundation.reg.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// DASH Reset Seed: restores the initial scenario for repeatable demos
+
 @Service
 public class ResetService {
     private final PersistedOrderRepository ORDERS;
