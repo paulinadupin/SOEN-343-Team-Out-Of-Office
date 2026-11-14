@@ -65,6 +65,22 @@ export async function getRestaurantOrders() {
   return request("/api/orders/restaurant");
 }
 
+export async function getRestaurantMap() {
+  return request("/api/map/restaurant");
+}
+
+export async function getCustomerMap() {
+  return request("/api/map/customer");
+}
+
+export async function getCourierMap() {
+  return request("/api/map/courier");
+}
+
+export async function getMapData() {
+  return request("/api/auth/map");
+}
+
 export async function getActiveOrders() {
   return request("/api/orders/active");
 }
@@ -88,11 +104,19 @@ export async function placeOrder(restaurantId, lines) {
   });
 }
 
+export async function getPreperationQueueSize() {
+  return request('/api/orders/restaurant/queue/size');
+}
+
 export async function updateOrder(orderId, action, reason) {
   return request(`/api/orders/${encodeURIComponent(orderId)}/${action}`, {
     method: "POST",
     body: JSON.stringify({ reason }),
   });
+}
+
+export async function getOnDutyCouriers() {
+  return request("/api/auth/on-duty-couriers");
 }
 
 export async function logout() {

@@ -35,7 +35,7 @@ function Cart() {
                 }))
             );
             clearCart();
-            navigate("/");
+            navigate("/", {state: {orderPlaced: true}});
         } catch (requestError) {
             setError(requestError.message);
         } finally {

@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.enchantea.application.reg.AccountResponse;
+import com.enchantea.application.reg.CourierResponse;
 import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.application.reg.LoginRequest;
 import com.enchantea.application.reg.RegisterRequest;
 import com.enchantea.application.reg.RestaurantResponse;
 import com.enchantea.domain.reg.User;
+
+import com.enchantea.application.dash.MapResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -81,6 +84,17 @@ public class AuthController {
     @GetMapping("/restaurants")
     public List<RestaurantResponse> restaurants() {
         return ACCOUNT_FACADE.findRestaurants();
+    }
+
+    @GetMapping("/on-duty-couriers")
+    public List<CourierResponse> onDutyCouriers(HttpServletRequest servletRequest) {
+        return ACCOUNT_FACADE.findOnDutyCouriers();
+    }
+
+    @GetMapping("/map")
+    public MapResponse map(HttpServletRequest servletRequest) {
+        ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession());
+        return ACCOUNT_FACADE.findMapData();
     }
 
     @PostMapping("/logout")

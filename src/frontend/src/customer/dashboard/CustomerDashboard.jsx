@@ -1,21 +1,46 @@
 import './Dashboard.css'
 import RestaurantProfile from '../../components/RestaurantProfile'
+import Map from '../../components/Map'
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getRestaurants } from '../../app/api'
+import { useNavigate, useLocation } from 'react-router-dom'
+import { getCustomerMap, getRestaurants } from '../../app/api'
 
 function CustomerDashboard() {
     const navigate = useNavigate();
-    const [restaurants, setRestaurants] = useState([]);
+    const location = useLocation();
+    const [customerMap, setCustomerMap] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [restaurants, setRestaurants] = useState([]);
     const [error, setError] = useState(null);
+    const [orderPlaced, setOrderPlaced] = useState(false);
 
     useEffect(() => {
         getRestaurants()
             .then(setRestaurants)
             .catch((requestError) => setError(requestError.message))
             .finally(() => setLoading(false));
-    }, []);
+    });
+
+    useEffect(() => {
+        getCustomerMap()
+        .then(setCustomerMap)
+        .catch((requestError) => setError(requestError.message))
+    },[]);
+
+    useEffect(() => {
+        // If there is no order placed
+        if(!location.state?.orderPlaced) return;
+        
+        setOrderPlaced(true);
+
+        const timeout = setTimeout(() => {
+            setOrderPlaced(false);
+            //Prevent the popup from appearing again
+            navigate("/", {replace: true, state: null});
+        },1500);
+
+        return () => clearTimeout(timeout);
+    }, [location.state, navigate]);
 
     return (
         <div className="dashboard">
@@ -36,6 +61,14 @@ function CustomerDashboard() {
                     />
                 ))}
             </div>
+            {customerMap?.restaurants?.length > 0 && (
+                <Map
+                    restaurants = {customerMap.restaurants}
+                    onDutyCouriers = {customerMap.couriers}
+                    customer = {customerMap.customer}
+                />
+            )}
+            {orderPlaced && <span className="order-placed" role="status">Order Placed!</span>}
         </div>
     )
 }

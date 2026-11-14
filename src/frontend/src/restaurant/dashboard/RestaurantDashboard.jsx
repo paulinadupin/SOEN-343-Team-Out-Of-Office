@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { getCurrentRestaurant, getRestaurantMenu } from "../../app/api";
+import { getCurrentRestaurant, getRestaurantMenu, getRestaurantMap} from "../../app/api";
 import RestaurantHeader from "../../components/RestaurantHeader";
 import MenuItem from "../../components/MenuItem";
 import './RestaurantDashboard.css';
+import Map from "../../components/Map";
 
 function RestaurantDashboard() {
     const [restaurant, setRestaurant] = useState(null);
     const [menu, setMenu] = useState([]);
     const [error, setError] = useState("");
+    const [restaurantMap, setRestaurantMap] = useState();
 
     useEffect(() => {
         getCurrentRestaurant()
@@ -17,6 +19,12 @@ function RestaurantDashboard() {
             })
             .then(setMenu)
             .catch(() => setError("Could not load restaurant information."));
+    }, []);
+
+    useEffect(() => {
+        getRestaurantMap()
+        .then(setRestaurantMap)
+        .catch((requestError) => setError(requestError.message));
     }, []);
 
     return (
@@ -50,6 +58,9 @@ function RestaurantDashboard() {
             ) : !error ? (
                 <p>Loading restaurant information...</p>
             ) : null}
+            {restaurantMap && (
+                <Map restaurants={restaurantMap.restaurants} onDutyCouriers={restaurantMap.couriers}/>
+            )}
         </div>
     )
 }

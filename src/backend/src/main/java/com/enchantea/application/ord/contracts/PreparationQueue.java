@@ -5,4 +5,5 @@ public interface PreparationQueue {
     void enqueue(Long restaurantId, Order order);
     Optional<Order> peek(Long restaurantId);
     boolean remove(Long restaurantId, String orderId);
+    int size(Long restaurantId);
 }

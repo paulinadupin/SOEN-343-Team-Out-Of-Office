@@ -240,6 +240,10 @@ public class OrderApplicationService {
                 .orElseThrow(() -> new OrderNotFoundException(orderId));
     }
 
+    public int preparationQueueSize(Long restaurantId) { 
+        return PREPARATION_QUEUE.size(restaurantId);
+    }
+    
     private void restorePreparationQueueIfEmpty(Long restaurantId) {
         if (PREPARATION_QUEUE.peek(restaurantId).isPresent()) {
             return;

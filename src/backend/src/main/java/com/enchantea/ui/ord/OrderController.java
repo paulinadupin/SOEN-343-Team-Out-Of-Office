@@ -162,6 +162,19 @@ public class OrderController {
                 .toList();
     }
 
+    @GetMapping("/restaurant/queue/size")
+    public int preparationQueueSize(HttpServletRequest servletRequest) {
+        CurrentUser user = currentUser(servletRequest);
+        if(user.restaurantId() == null){
+            throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.FORBIDDEN, "Restaurant account required");
+        }
+        else{
+            return SERVICE.preparationQueueSize(user.restaurantId());
+        }
+
+    }
+
     private void requireOperator(HttpServletRequest servletRequest) {
         User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
         if (user.getAccountType() != AccountType.OPERATOR) {
