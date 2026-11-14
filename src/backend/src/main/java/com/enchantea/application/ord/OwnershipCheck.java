@@ -17,6 +17,9 @@ public class OwnershipCheck extends CommandCheck {
             CommandType.CANCEL_ORDER_CUSTOMER,
             CommandType.VIEW_ORDER_SUMMARY);
 
+    private static final Set<CommandType> COURIER_COMMANDS = Set.of(
+            CommandType.DELIVER_ORDER);
+
     private final OrderRepository ORDERS;
 
     public OwnershipCheck(OrderRepository ORDERS) {
@@ -34,6 +37,11 @@ public class OwnershipCheck extends CommandCheck {
             Order order = load(command);
             if (!order.customerId().equals(user.id())) {
                 throw new CommandRejectedException("This order belongs to another customer");
+            }
+        } else if (COURIER_COMMANDS.contains(type)) {
+            Order order = load(command);
+            if (!user.id().equals(order.courierId())) {
+                throw new CommandRejectedException("This order is not assigned to this courier");
             }
         }
     }

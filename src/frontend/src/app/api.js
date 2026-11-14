@@ -65,6 +65,22 @@ export async function getRestaurantOrders() {
   return request("/api/orders/restaurant");
 }
 
+export async function getActiveOrders() {
+  return request("/api/orders/active");
+}
+
+export async function getRejectedOrders() {
+  return request("/api/orders/rejected");
+}
+
+export async function getCancelledOrders() {
+  return request("/api/orders/cancelled");
+}
+
+export async function getDeliveredOrders() {
+  return request("/api/orders/delivered");
+}
+
 export async function placeOrder(restaurantId, lines) {
   return request("/api/orders", {
     method: "POST",
@@ -109,4 +125,19 @@ export async function confirmPickup(){
 
 export async function confirmDelivery(){
   return request("/api/courier/delivery",{method:"POST"});
+}
+
+export async function getStalledOrders() {
+  return request("/api/courier/stalled");
+}
+
+export async function getIdleCouriers() {
+  return request("/api/courier/idle");
+}
+
+export async function reassignOrder(orderId, courierId) {
+  return request(`/api/courier/stalled/${encodeURIComponent(orderId)}/reassign`, {
+    method: "POST",
+    body: JSON.stringify({ courierId: Number(courierId) }),
+  });
 }

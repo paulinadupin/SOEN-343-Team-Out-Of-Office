@@ -11,6 +11,7 @@ import Browse from "../customer/browse/Browse";
 import Register from "../components/Register";
 import OperatorDashboard from "../operator/dashboard/OperatorDashboard";
 import OperatorOrders from "../operator/dashboard/OperatorOrders";
+import OperatorRestaurants from "../operator/dashboard/OperatorRestaurants";
 import CourierDashboard from "../courier/CourierDashboard";
 import CourierDeliveries from "../courier/CourierDeliveries";
 import CourierHistory from "../courier/CourierHistory";
@@ -48,6 +49,7 @@ export function AppRouter() {
           <Route element={<ProtectedRoute role={ROLES.OPERATOR} />}>
             <Route path="/operator" element={ <OperatorDashboard/>} />
             <Route path="/operator/orders" element={<OperatorOrders />} />
+            <Route path="/operator/restaurants" element={<OperatorRestaurants />} />
           </Route>
         </Route>
       </Route>

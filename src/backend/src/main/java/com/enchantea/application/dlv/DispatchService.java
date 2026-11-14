@@ -14,6 +14,7 @@ import com.enchantea.domain.reg.Location;
 import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -54,7 +55,7 @@ public class DispatchService implements CourierAssignment {
 
     @Transactional
     public synchronized void dispatchNext() {
-        List<Courier> availableCouriers = COURIER_SELECTOR.idleCouriers();
+        List<Courier> availableCouriers = new ArrayList<>(COURIER_SELECTOR.idleCouriers());
         while (!availableCouriers.isEmpty()) {
             Optional<Order> next = DISPATCH_QUEUE.peek();
             if (next.isEmpty()) {
@@ -158,5 +159,45 @@ public class DispatchService implements CourierAssignment {
         if (!couriers.isEmpty()) {
             dispatchNext();
         }
+    }
+
+    
+    public List<Courier> stalledCouriers() {
+        return USER_REPOSITORY.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .filter(courier -> courier.getAssignment() != null && courier.getAssignment().isStalled())
+                .toList();
+    }
+
+    @Transactional
+    public void reassignOrder(String orderId, Long newCourierId) {
+        Courier oldCourier = USER_REPOSITORY.findAll().stream()
+                .filter(Courier.class::isInstance)
+                .map(Courier.class::cast)
+                .filter(courier -> courier.getAssignment() != null
+                        && orderId.equals(courier.getAssignment().getOrderId()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No courier is currently assigned to this order"));
+
+        User newUser = USER_REPOSITORY.findById(newCourierId)
+                .orElseThrow(() -> new IllegalArgumentException("Courier not found"));
+        if (!(newUser instanceof Courier newCourier) || newCourier.getStatus() != CourierStatus.IDLE) {
+            throw new IllegalArgumentException("The new courier must be idle");
+        }
+
+        if (oldCourier.getStatus() == CourierStatus.ASSIGNED || oldCourier.getStatus() == CourierStatus.CARRYING) {
+            oldCourier.operatorCancelAssignment();
+        }
+        oldCourier.setAssignment(null);
+        USER_REPOSITORY.save(oldCourier);
+
+        Assignment assignment = new Assignment(AssignmentStatus.OFFERED, orderId, Instant.now());
+        assignment.acceptOffer();
+        newCourier.setAssignment(assignment);
+        newCourier.acceptOffer();
+        USER_REPOSITORY.save(newCourier);
+
+        dispatchNext();
     }
 }
