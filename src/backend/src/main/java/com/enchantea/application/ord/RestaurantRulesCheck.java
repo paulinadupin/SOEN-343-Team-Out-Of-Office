@@ -1,5 +1,7 @@
 package com.enchantea.application.ord;
 
+import java.util.List;
+
 import com.enchantea.application.ord.contracts.CommandRejectedException;
 import com.enchantea.application.ord.contracts.CommandType;
 import com.enchantea.application.ord.contracts.CurrentUser;
@@ -19,34 +21,51 @@ public class RestaurantRulesCheck extends CommandCheck {
         if (type == CommandType.PLACE_ORDER) {
             verifyPlaceOrder((OrderCommands.PlaceOrder) command);
         } else if (type == CommandType.ACCEPT_ORDER) {
-            String orderId = ((OrderCommands.OrderAction) command).orderId();
-            Long restaurantId = ORDERS.findById(orderId)
-                    .orElseThrow(() -> new OrderNotFoundException(orderId))
-                    .restaurantId();
-            if (!RESTAURANT_QUERY.isOpen(restaurantId)) {
-                throw new CommandRejectedException("The restaurant is closed");
-            }
+            verifyAcceptOrder((OrderCommands.OrderAction) command);
         }
     }
 
     private void verifyPlaceOrder(OrderCommands.PlaceOrder place) {
-        if (place.restaurantId() == null || place.restaurantId() <= 0) {
+        requireRestaurant(place.restaurantId());
+        requireOpen(place.restaurantId());
+        requireAtLeastOneLine(place.lines());
+        place.lines().forEach(line -> requireItemAvailable(place.restaurantId(), line.itemId()));
+    }
+
+    private void verifyAcceptOrder(OrderCommands.OrderAction accept) {
+        requireOpen(restaurantIdOf(accept.orderId()));
+    }
+
+    private Long restaurantIdOf(String orderId) {
+        return ORDERS.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId))
+                .restaurantId();
+    }
+
+    private void requireRestaurant(Long restaurantId) {
+        if (restaurantId == null || restaurantId <= 0) {
             throw new CommandRejectedException("A restaurant is required");
         }
-        if (!RESTAURANT_QUERY.isOpen(place.restaurantId())) {
+    }
+
+    private void requireOpen(Long restaurantId) {
+        if (!RESTAURANT_QUERY.isOpen(restaurantId)) {
             throw new CommandRejectedException("The restaurant is closed");
         }
-        if (place.lines().isEmpty()) {
+    }
+
+    private void requireAtLeastOneLine(List<OrderCommands.RequestedLine> lines) {
+        if (lines.isEmpty()) {
             throw new CommandRejectedException("An order needs at least one item");
         }
+    }
 
-        for (OrderCommands.RequestedLine line : place.lines()) {
-            if (line.itemId() == null || line.itemId().isBlank()) {
-                throw new CommandRejectedException("An item is required");
-            }
-            if (!RESTAURANT_QUERY.isItemAvailable(place.restaurantId(), line.itemId())) {
-                throw new CommandRejectedException("Item is not available: " + line.itemId());
-            }
+    private void requireItemAvailable(Long restaurantId, String itemId) {
+        if (itemId == null || itemId.isBlank()) {
+            throw new CommandRejectedException("An item is required");
+        }
+        if (!RESTAURANT_QUERY.isItemAvailable(restaurantId, itemId)) {
+            throw new CommandRejectedException("Item is not available: " + itemId);
         }
     }
 }
