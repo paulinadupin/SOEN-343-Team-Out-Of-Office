@@ -3,6 +3,7 @@ package com.enchantea.application.ord;
 import com.enchantea.domain.ord.Order;
 import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.prc.Charge;
+import com.enchantea.domain.prc.Fees;
 import com.enchantea.foundation.ord.PersistedCharge;
 import com.enchantea.foundation.ord.PersistedOrder;
 import com.enchantea.foundation.ord.PersistedOrderLine;
@@ -74,8 +75,9 @@ public class JpaOrderRepository implements OrderRepository {
                 .map(line -> new OrderLine(line.itemId(), line.quantity(), line.unitPrice()))
                 .toList();
         Charge charge = order.charge() == null ? null : new Charge(
-                order.charge().subtotal(), order.charge().deliveryFee(),
-                order.charge().serviceFee(), order.charge().smallOrderSurcharge());
+                order.charge().subtotal(),
+                new Fees(order.charge().deliveryFee(), order.charge().serviceFee(),
+                        order.charge().smallOrderSurcharge()));
         return Order.rehydrate(
                 order.id(), order.customerId(), order.restaurantId(), lines, order.placedAt(),
                 order.status(), order.closedAt(), order.deliveredAt(), order.courierId(),

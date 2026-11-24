@@ -2,6 +2,7 @@ package com.enchantea.application.prc;
 
 import com.enchantea.domain.ord.OrderLine;
 import com.enchantea.domain.prc.Charge;
+import com.enchantea.domain.prc.Fees;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -21,7 +22,8 @@ public class PricingCalculator {
             subtotal += line.total();
         }
         double surcharge = subtotal < config.smallOrderThreshold() ? config.smallOrderSurcharge() : 0;
+        Fees fees = new Fees(config.deliveryFee(), config.serviceFee(), surcharge);
 
-        return new Charge(subtotal, config.deliveryFee(), config.serviceFee(), surcharge);
+        return new Charge(subtotal, fees);
     }
 }
