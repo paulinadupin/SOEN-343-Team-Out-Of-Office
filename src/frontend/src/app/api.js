@@ -63,6 +63,13 @@ export async function getRestaurants() {
   return request("/api/auth/restaurants");
 }
 
+export async function updateRestaurantStatus(restaurantId, status) {
+  return request(`/api/auth/restaurants/${encodeURIComponent(restaurantId)}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+}
+
 export async function getRestaurantMenu(restaurantId) {
   return request(`/api/restaurants/${encodeURIComponent(restaurantId)}/menu`);
 }
