@@ -16,6 +16,10 @@ function Cart() {
         (sum, item) => sum + Number(item.price) * item.quantity,
         0
     );
+    const [promoCode, setPromoCode] = useState("");
+    const [promoMessage, setPromoMessage] = useState(null);
+    const [appliedCode, setAppliedCode] = useState(null);
+    const [discount, setDiscount] = useState(0);
 
     const cartRestaurantId = items[0]?.restaurantId;
 
@@ -36,6 +40,12 @@ function Cart() {
             .then(setMenu)
             .catch(() => setMenu([]));
     }, [cartRestaurantId]);
+
+    useEffect(() => {
+        setDiscount(0);
+        setAppliedCode(null);
+        setPromoMessage(null);
+    }, [items]);
 
     const allItemsSoldOut = items.length > 0 && items.every((item) => {
         const menuItem = menu.find((candidate) => candidate.id === item.itemId);
@@ -61,8 +71,9 @@ function Cart() {
                 restaurantId,
                 items.map((item) => ({
                     itemId: item.itemId,
-                    quantity: item.quantity,
-                }))
+                    quantity: item.quantity
+                })),
+                appliedCode
             );
             clearCart();
             navigate("/", {state: {orderPlaced: true}});
@@ -70,6 +81,24 @@ function Cart() {
             setError(requestError.message);
         } finally {
             setPlacingOrder(false);
+        }
+    }
+
+    async function handleApplyPromo() {
+        setPromoMessage(null);
+        const code = promoCode.trim();
+        try {
+            const result = await applyPromo(
+                code,
+                items.map((item) => ({ itemId: item.itemId, quantity: item.quantity }))
+            );
+            setDiscount(result.discount);
+            setAppliedCode(code);
+            setPromoMessage("Promo applied!");
+        } catch (requestError) {
+            setDiscount(0);
+            setAppliedCode(null);
+            setPromoMessage(requestError.message);
         }
     }
 
@@ -98,6 +127,19 @@ function Cart() {
                     <button onClick={handlePlaceOrder} disabled={placeOrderDisabled}>
                         {placingOrder ? "Placing order..." : "Place Order"}
                     </button>
+                    <div className="cart promo">
+                <label htmlFor="promo-code">Promo code</label>
+                <input
+                    id="promo-code"
+                    type="text"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                />
+                <button type="button" onClick={handleApplyPromo}>Apply</button>
+            </div>
+            {promoMessage && <p role="status">{promoMessage}</p>}
+
+            {error && <p role="alert">{error}</p>}
                 </div>
             )}
         </div>
