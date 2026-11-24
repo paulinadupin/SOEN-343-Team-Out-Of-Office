@@ -2,7 +2,7 @@ import CartItem from "./CartItem";
 import "./Cart.css";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../../app/useCart";
-import { placeOrder, getRestaurants, getRestaurantMenu } from "../../app/api";
+import { placeOrder, getOrderQuote, getRestaurants, getRestaurantMenu, applyPromo } from "../../app/api";
 import { useEffect, useState } from "react";
 
 function Cart() {
@@ -12,16 +12,44 @@ function Cart() {
     const [placingOrder, setPlacingOrder] = useState(false);
     const [restaurantStatus, setRestaurantStatus] = useState(null);
     const [menu, setMenu] = useState([]);
-    const total = items.reduce(
-        (sum, item) => sum + Number(item.price) * item.quantity,
-        0
-    );
+    const [quoteResult, setQuoteResult] = useState(null);
     const [promoCode, setPromoCode] = useState("");
     const [promoMessage, setPromoMessage] = useState(null);
     const [appliedCode, setAppliedCode] = useState(null);
+    //TODO: Review if discount is needed or will be handled in the backend
     const [discount, setDiscount] = useState(0);
 
     const cartRestaurantId = items[0]?.restaurantId;
+    const hasValidQuoteRequest = items.length > 0
+        && new Set(items.map((item) => item.restaurantId)).size === 1
+        && items.every((item) => item.itemId);
+    const currentQuoteResult = quoteResult?.items === items ? quoteResult : null;
+    const quote = currentQuoteResult?.quote ?? null;
+    const quoteError = items.length > 0 && !hasValidQuoteRequest
+        ? "Your cart contains invalid restaurant or menu information."
+        : currentQuoteResult?.error ?? null;
+    const quoteLoading = items.length > 0 && hasValidQuoteRequest && !currentQuoteResult;
+
+    useEffect(() => {
+        let current = true;
+
+        if (!hasValidQuoteRequest) return;
+
+        getOrderQuote(
+            cartRestaurantId,
+            items.map((item) => ({ itemId: item.itemId, quantity: item.quantity }))
+        )
+            .then((result) => {
+                if (current) setQuoteResult({ items, quote: result, error: null });
+            })
+            .catch((requestError) => {
+                if (current) setQuoteResult({ items, quote: null, error: requestError.message });
+            });
+
+        return () => {
+            current = false;
+        };
+    }, [items, cartRestaurantId, hasValidQuoteRequest]);
 
     // R-DASH-04: Place Order must disable when the restaurant is paused/closed,
     // or when every selected item is sold out, so this needs live data, not the
@@ -53,7 +81,8 @@ function Cart() {
     });
 
     const placeOrderDisabled =
-        placingOrder || (restaurantStatus != null && restaurantStatus !== "OPEN") || allItemsSoldOut;
+        placingOrder || quoteLoading || !quote
+        || (restaurantStatus != null && restaurantStatus !== "OPEN") || allItemsSoldOut;
 
     async function handlePlaceOrder() {
         setError(null);
@@ -118,7 +147,19 @@ function Cart() {
                         <CartItem key={item.name} item={item} />
                     ))}
                     <p>Items: {itemCount}</p>
-                    <p>Total: ${total.toFixed(2)}</p>
+                    {quoteLoading && <p role="status">Calculating total...</p>}
+                    {quoteError && <p role="alert">Unable to calculate total: {quoteError}</p>}
+                    {quote && (
+                        <>
+                            <p>Subtotal: ${quote.subtotal.toFixed(2)}</p>
+                            <p>Delivery fee: ${quote.deliveryFee.toFixed(2)}</p>
+                            <p>Service fee: ${quote.serviceFee.toFixed(2)}</p>
+                            {quote.smallOrderSurcharge > 0 && (
+                                <p>Small-order surcharge: ${quote.smallOrderSurcharge.toFixed(2)}</p>
+                            )}
+                            <p>Total: ${quote.total.toFixed(2)}</p>
+                        </>
+                    )}
                     {error && <p role="alert">{error}</p>}
                     {restaurantStatus != null && restaurantStatus !== "OPEN" && (
                         <p role="alert">This restaurant is currently {restaurantStatus.toLowerCase()}.</p>

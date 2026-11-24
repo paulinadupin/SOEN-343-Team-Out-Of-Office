@@ -110,6 +110,13 @@ export async function placeOrder(restaurantId, lines, promoCode=null) {
   });
 }
 
+export async function getOrderQuote(restaurantId, lines) {
+  return request("/api/orders/quote", {
+    method: "POST",
+    body: JSON.stringify({ restaurantId: Number(restaurantId), lines }),
+  });
+}
+
 export async function getPreperationQueueSize() {
   return request('/api/orders/restaurant/queue/size');
 }
