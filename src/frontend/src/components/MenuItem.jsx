@@ -31,11 +31,6 @@ function MenuItem({ itemId, restaurantId, name, price, description, status, imag
                 <p className="description">{itemStatus}</p>
                 <p className="price">${price}</p>
             </div>
-            {user && user.accountType === 'RESTAURANT' && (
-               <button>
-                <img src="/edit.png" alt="Edit" className="edit-icon"></img>
-               </button>
-            )}
             {user && user.accountType === 'CUSTOMER' && (
                <button
                    className="add-cart"
