@@ -182,3 +182,22 @@ export async function reassignOrder(orderId, courierId) {
     body: JSON.stringify({ courierId: Number(courierId) }),
   });
 }
+
+export async function reverseGeocode(lat, lng) {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`
+  );
+
+  if (!response.ok) {
+    throw new Error("Could not look up address.");
+  }
+
+  const data = await response.json();
+  const { house_number, road } = data.address ?? {};
+
+  if (!road) {
+    throw new Error("No street found.");
+  }
+  
+  return house_number ? `${house_number} ${road}` : road;
+}

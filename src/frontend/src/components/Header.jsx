@@ -1,20 +1,29 @@
 import './Header.css'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../app/AuthContext'
 import { useCart } from '../app/useCart'
-import { resetSystem } from '../app/api'
+import { resetSystem, reverseGeocode } from '../app/api'
 import UserMenu from './UserMenu'
 
 function Header() {
     const { user } = useAuth();
     const { itemCount } = useCart();
     const navigate = useNavigate();
+    const [address, setAddress] = useState(null);
 
     async function handleReset() {
         if (!window.confirm("Reset the entire system to its initial state? This cannot be undone.")) return;
         await resetSystem();
         window.location.reload();
     }
+
+    useEffect(() => {
+        if (!user?.location) return;
+        reverseGeocode(user.location.lat, user.location.lng)
+            .then(setAddress)
+            .catch(() => setAddress(null));
+    }, [user?.location?.lat, user?.location?.lng]);
 
     return (
         <header className="site-header">
@@ -28,7 +37,7 @@ function Header() {
                                 <p>
                                     Deliver to{" "}
                                     {user.location
-                                        ? `${user.location.lat}, ${user.location.lng}`
+                                        ? address ?? `${user.location.lat}, ${user.location.lng}`
                                         : "Location unavailable"}
                                 </p>
                             </div>
