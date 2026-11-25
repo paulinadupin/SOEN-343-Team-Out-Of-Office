@@ -1,16 +1,30 @@
 let entries = [];
 const subscribers = new Set();
+let activeUserId = null;
 
 let isOpen = false;
 const visibilitySubscribers = new Set();
 
+function notifySubscribers() {
+  const userEntries = activeUserId == null
+    ? []
+    : entries.filter((entry) => entry.userId === activeUserId);
+  subscribers.forEach((callback) => callback(userEntries));
+}
+
 export function addEntry(message, type = "info") {
-  entries = [...entries, { message, type, time: new Date() }];
-  subscribers.forEach((callback) => callback(entries));
+  entries = [...entries, { message, type, time: new Date(), userId: activeUserId }];
+  notifySubscribers();
 }
 
 export function getEntries() {
-  return entries;
+  if (activeUserId == null) return [];
+  return entries.filter((entry) => entry.userId === activeUserId);
+}
+
+export function setConsoleUser(userId) {
+  activeUserId = userId;
+  notifySubscribers();
 }
 
 export function subscribe(callback) {
