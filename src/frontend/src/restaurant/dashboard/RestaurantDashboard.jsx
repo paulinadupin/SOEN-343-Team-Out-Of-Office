@@ -80,16 +80,19 @@ function RestaurantDashboard() {
                 <p>Loading restaurant information...</p>
             ) : null}
             {restaurantMap && (
-                <Map
-                    restaurants={restaurantMap.restaurants}
-                    onDutyCouriers={restaurantMap.couriers}
-                    userLocation={user?.location}
-                    queueOrders={orders.filter((order) =>
-                        ['PLACED', 'ACCEPTED', 'PREPARING'].includes(order.status)
-                    )}
-                    canManageQueue
-                    onOrderAction={handleOrderAction}
-                />
+                <div>
+                    <h1>Map</h1>
+                    <Map
+                        restaurants={restaurantMap.restaurants}
+                        onDutyCouriers={restaurantMap.couriers}
+                        userLocation={user?.location}
+                        queueOrders={orders.filter((order) =>
+                            ['PLACED', 'ACCEPTED', 'PREPARING'].includes(order.status)
+                        )}
+                        canManageQueue
+                        onOrderAction={handleOrderAction}
+                    />
+                </div>
             )}
         </div>
     )

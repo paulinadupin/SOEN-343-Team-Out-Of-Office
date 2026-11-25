@@ -24,18 +24,19 @@
         white-space: nowrap;
     }
 
-    .customer-header {
+    .header-actions {
         display: flex;
         align-items: center;
         gap: 16px;
         margin-left: auto;
-
-        p {
-            font-size: 14px;
-        }
+        min-width: 0;
     }
 
-    .user-menu {
+    .customer-header p {
+        font-size: 14px;
+    }
+
+    .header-actions .user-menu {
         margin-left: 0;
         flex-shrink: 0;
     }
@@ -75,7 +76,6 @@
     }
 
     .reset-button {
-        margin-left: auto;
         border: 1px solid var(--accent-color);
         border-radius: 999px;
         background: var(--background-color);
@@ -109,7 +109,7 @@
             display: none;
         }
 
-        .customer-header {
+        .header-actions {
             gap: 8px;
         }
 

@@ -1,5 +1,6 @@
 import './MenuItem.css'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useAuth } from '../app/AuthContext'
 import { useCart } from '../app/useCart'
 
@@ -44,7 +45,10 @@ function MenuItem({ itemId, restaurantId, name, price, description, status, imag
                    +
                </button>
             )}
-            {added && <span className="cart-feedback" role="status">Added to cart</span>}
+            {added && createPortal(
+                <span className="cart-feedback" role="status">Added to cart</span>,
+                document.body
+            )}
 
         </div>
     )
