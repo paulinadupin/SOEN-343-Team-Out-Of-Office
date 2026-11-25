@@ -123,8 +123,15 @@ export async function getDeliveredOrders() {
   return request("/api/orders/delivered");
 }
 
-export async function placeOrder(restaurantId, lines) {
+export async function placeOrder(restaurantId, lines, promoCode=null) {
   return request("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({ restaurantId: Number(restaurantId), lines, promoCode }),
+  });
+}
+
+export async function getOrderQuote(restaurantId, lines) {
+  return request("/api/orders/quote", {
     method: "POST",
     body: JSON.stringify({ restaurantId: Number(restaurantId), lines }),
   });
@@ -241,4 +248,10 @@ export async function reverseGeocode(lat, lng) {
     addEntry(`GET Nominatim /reverse - ${error.message}`, "error", requestUserId);
     throw error;
   }
+}
+export async function applyPromo(code, items) {
+    return request("/api/orders/promo", {
+        method: "POST",
+        body: JSON.stringify({ code, items }),
+    });
 }
