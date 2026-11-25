@@ -7,9 +7,9 @@
 .map-layout .leaflet-container {
     width: 100%;
     height: clamp(360px, 55vh, 560px);
-    border: 1px solid rgb(129 107 117 / 18%);
+    border: 1px solid var(--border-color);
     border-radius: var(--default-radius);
-    box-shadow: 0 6px 20px rgb(57 47 51 / 10%);
+    box-shadow: var(--box-shadow);
 }
 
 .restaurant-marker-wrapper {
@@ -27,17 +27,17 @@
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    box-shadow: 0 2px 8px rgb(57 47 51 / 30%);
+    box-shadow: var(--box-shadow);
 }
 
 .restaurant-label {
     white-space: nowrap;
     background: var(--background-color);
-    border: 1px solid rgb(129 107 117 / 18%);
+    border: 1px solid var(--border-color);
     padding: 4px 8px;
-    border-radius: 8px;
-    font-size: 11px;
-    box-shadow: 0 2px 8px rgb(57 47 51 / 14%);
+    border-radius: var(--radius-small);
+    font-size: var(--font-size-caption);
+    box-shadow: var(--box-shadow);
 }
 
 .restaurant-details {
@@ -51,30 +51,30 @@
     overflow-y: auto;
     padding: 18px;
     background: var(--background-color);
-    border: 1px solid rgb(129 107 117 / 22%);
+    border: 1px solid var(--border-color);
     border-radius: 14px;
-    box-shadow: 0 8px 24px rgb(57 47 51 / 20%);
+    box-shadow: var(--box-shadow);
 }
 
 .restaurant-details h2 {
     margin: 4px 0 8px;
     padding-right: 56px;
-    font-size: 20px;
+    font-size: var(--font-size-title);
     font-weight: 600;
 }
 
 .restaurant-details > p {
     color: var(--accent-color);
-    font-size: 14px;
+    font-size: var(--font-size-body);
 }
 
 .restaurant-details button {
     border: 1px solid var(--accent-color);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--primary-color);
     padding: 7px 12px;
     font: inherit;
-    font-size: 13px;
+    font-size: var(--font-size-compact);
     font-weight: 600;
     cursor: pointer;
     transition: filter 150ms ease, transform 150ms ease;
@@ -94,16 +94,16 @@
     display: grid;
     gap: 8px;
     padding: 12px 0;
-    border-top: 1px solid rgb(129 107 117 / 20%);
+    border-top: 1px solid var(--border-color);
 }
 
 .queue-order strong {
-    font-size: 14px;
+    font-size: var(--font-size-body);
 }
 
 .queue-order span {
     color: var(--accent-color);
-    font-size: 13px;
+    font-size: var(--font-size-compact);
 }
 
 .queue-order button {

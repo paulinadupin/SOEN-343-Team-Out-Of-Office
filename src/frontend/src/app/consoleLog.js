@@ -12,9 +12,13 @@ function notifySubscribers() {
   subscribers.forEach((callback) => callback(userEntries));
 }
 
-export function addEntry(message, type = "info") {
-  entries = [...entries, { message, type, time: new Date(), userId: activeUserId }];
+export function addEntry(message, type = "info", userId = activeUserId) {
+  entries = [...entries, { message, type, time: new Date(), userId }];
   notifySubscribers();
+}
+
+export function getConsoleUserId() {
+  return activeUserId;
 }
 
 export function getEntries() {

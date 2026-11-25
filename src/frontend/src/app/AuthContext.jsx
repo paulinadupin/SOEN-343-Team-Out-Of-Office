@@ -12,11 +12,9 @@ export function AuthProvider({ children }) {
     authApi.getCurrentUser()
       .then((currentUser) => {
         setUser(currentUser);
-        setConsoleUser(currentUser.id);
       })
       .catch(() => {
         setUser(null);
-        setConsoleUser(null);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -24,7 +22,6 @@ export function AuthProvider({ children }) {
   async function login(username, password) {
     const loggedInUser = await authApi.login(username, password);
     setUser(loggedInUser);
-    setConsoleUser(loggedInUser.id);
     return loggedInUser;
   }
 

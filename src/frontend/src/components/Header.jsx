@@ -10,7 +10,14 @@ function Header() {
     const { user } = useAuth();
     const { itemCount } = useCart();
     const navigate = useNavigate();
-    const [address, setAddress] = useState(null);
+    const [geocodedAddress, setGeocodedAddress] = useState(null);
+    const location = user?.location;
+    const locationKey = location
+        ? `${user.id}:${location.lat}:${location.lng}`
+        : null;
+    const address = geocodedAddress?.key === locationKey
+        ? geocodedAddress.value
+        : null;
 
     async function handleReset() {
         if (!window.confirm("Reset the entire system to its initial state? This cannot be undone.")) return;
@@ -19,11 +26,26 @@ function Header() {
     }
 
     useEffect(() => {
-        if (!user?.location) return;
-        reverseGeocode(user.location.lat, user.location.lng)
-            .then(setAddress)
-            .catch(() => setAddress(null));
-    }, [user?.location?.lat, user?.location?.lng]);
+        let current = true;
+        if (!location) {
+            return () => {
+                current = false;
+            };
+        }
+
+        const requestKey = `${user.id}:${location.lat}:${location.lng}`;
+        reverseGeocode(location.lat, location.lng)
+            .then((value) => {
+                if (current) setGeocodedAddress({ key: requestKey, value });
+            })
+            .catch(() => {
+                if (current) setGeocodedAddress({ key: requestKey, value: null });
+            });
+
+        return () => {
+            current = false;
+        };
+    }, [user?.id, location]);
 
     return (
         <header className="site-header">

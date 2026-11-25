@@ -12,15 +12,15 @@
 .courier-dashboard .courier-section-title {
     margin-top: 4px;
     color: var(--accent-color);
-    font-size: 18px;
+    font-size: var(--font-size-large);
     font-weight: 600;
 }
 
 .courier-dashboard .courier-error {
     padding: 12px 16px;
     border: 1px solid var(--tertiary-color);
-    border-radius: 12px;
-    background: rgb(239 149 157 / 18%);
+    border-radius: var(--radius-control);
+    background: var(--alert-tint);
 }
 
 .courier-dashboard ul {
@@ -37,15 +37,15 @@
     min-height: 92px;
     box-sizing: border-box;
     padding: 18px;
-    border: 1px solid rgb(129 107 117 / 18%);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
     background: var(--secondary-color);
-    box-shadow: 0 4px 12px rgb(57 47 51 / 7%);
+    box-shadow: var(--box-shadow);
 }
 
 .courier-dashboard li span {
     color: var(--accent-color);
-    font-size: 14px;
+    font-size: var(--font-size-body);
 }
 
 .courier-dashboard li strong {

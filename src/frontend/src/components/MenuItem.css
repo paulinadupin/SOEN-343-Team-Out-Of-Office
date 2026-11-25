@@ -7,8 +7,8 @@
 
 .menu-item {
     background-color: var(--secondary-light);
-    border: 1px solid rgb(129 107 117 / 14%);
-    border-radius: 18px;
+    border: 1px solid var(--border-color-subtle);
+    border-radius: var(--radius-card);
     min-width: 0;
     min-height: 340px;
     display: flex;
@@ -16,12 +16,12 @@
     align-items: stretch;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 12px rgb(57 47 51 / 8%);
+    box-shadow: var(--box-shadow);
     transition: transform 180ms ease, box-shadow 180ms ease;
 
     &:hover:not(.sold-out) {
         transform: translateY(-3px);
-        box-shadow: 0 10px 24px rgb(57 47 51 / 14%);
+        box-shadow: var(--box-shadow);
     }
 
     &.sold-out {
@@ -45,14 +45,14 @@
     }
 
     .title {
-        font-size: 20px;
+        font-size: var(--font-size-title);
         font-weight: 600;
         line-height: 1.3;
     }
 
     .description {
         color: var(--accent-color);
-        font-size: 14px;
+        font-size: var(--font-size-body);
         line-height: 1.4;
     }
 
@@ -60,7 +60,7 @@
         margin-top: auto;
         padding-top: 2px;
         color: var(--text-color);
-        font-size: 18px;
+        font-size: var(--font-size-large);
         font-weight: 700;
     }
 
@@ -69,7 +69,7 @@
         bottom: 14px;
         right: 14px;
         background-color: var(--primary-color);
-        border: 1px solid rgb(57 47 51 / 12%);
+        border: 1px solid var(--border-contrast-color);
         border-radius: 50%;
         color: var(--text-color);
         font-size: 30px;
@@ -82,7 +82,7 @@
 
         &:hover:not(:disabled) {
             transform: scale(1.08);
-            box-shadow: 0 4px 10px rgb(57 47 51 / 16%);
+            box-shadow: var(--box-shadow);
         }
 
         &:disabled {
@@ -94,14 +94,6 @@
             outline: 3px solid var(--accent-color);
             outline-offset: 2px;
         }
-    }
-
-    .edit-icon {
-        position: absolute;
-        bottom: 18px;
-        right: 18px;
-        width: 30px;
-        height: 30px;
     }
 }
 
@@ -115,13 +107,13 @@
     transform: translateX(-50%);
     padding: 12px 24px;
     border: 1px solid var(--accent-color);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background-color: var(--primary-color);
     color: var(--text-color);
     font-weight: 700;
     text-align: center;
     white-space: nowrap;
-    box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
+    box-shadow: var(--box-shadow);
     animation: cart-feedback-in 0.2s ease-out;
 }
 

@@ -24,25 +24,17 @@ header {
         height: 90px;
     }
 
-    .search-bar {
-        flex: 1;               /* fills the leftover space */
-        max-width: 700px;      /* optional: stops it getting absurdly wide */
-        border: none;
-        border-radius: 100px;
-        padding: 0 16px;
-        height: 46px;
-    }
 
     .cart-button {
         background-color: var(--secondary-color);
         border: none;
-        border-radius: 100px;
+        border-radius: var(--radius-pill);
         padding: 13px 19px;
         line-height: 20px;
         display: flex;
         align-items: center;
         max-width: 115px;
-        font-size: 14px;
+        font-size: var(--font-size-body);
         height: 44px;
     }
 

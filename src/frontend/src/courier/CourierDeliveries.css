@@ -21,7 +21,7 @@
 .deliveries-eyebrow {
     margin-bottom: 4px;
     color: var(--accent-color);
-    font-size: 12px;
+    font-size: var(--font-size-small);
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -35,9 +35,9 @@
     min-width: 76px;
     padding: 7px 12px;
     border: 1px solid var(--accent-color);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--background-color);
-    font-size: 13px;
+    font-size: var(--font-size-compact);
     font-weight: 600;
 }
 
@@ -60,8 +60,8 @@
     box-sizing: border-box;
     padding: 12px 16px;
     border: 1px solid var(--tertiary-color);
-    border-radius: 12px;
-    background: rgb(239 149 157 / 18%);
+    border-radius: var(--radius-control);
+    background: var(--alert-tint);
 }
 
 .delivery-card,
@@ -69,10 +69,10 @@
     width: min(100%, 680px);
     box-sizing: border-box;
     padding: clamp(20px, 4vw, 30px);
-    border: 1px solid rgb(129 107 117 / 18%);
-    border-radius: 18px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
     background: var(--secondary-color);
-    box-shadow: 0 6px 18px rgb(57 47 51 / 8%);
+    box-shadow: var(--box-shadow);
 }
 
 .delivery-card {
@@ -90,7 +90,7 @@
 
 .delivery-card h2,
 .delivery-empty-state h2 {
-    font-size: 22px;
+    font-size: var(--font-size-heading);
     font-weight: 600;
 }
 
@@ -100,7 +100,7 @@
     align-items: center;
     gap: 10px;
     padding: 16px;
-    border-radius: 12px;
+    border-radius: var(--radius-control);
     background: var(--background-color);
 }
 
@@ -111,7 +111,7 @@
 
 .delivery-route span {
     color: var(--accent-color);
-    font-size: 14px;
+    font-size: var(--font-size-body);
 }
 
 .delivery-actions {
@@ -124,9 +124,9 @@
     min-height: 42px;
     padding: 0 18px;
     border: 1px solid var(--accent-color);
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     font: inherit;
-    font-size: 14px;
+    font-size: var(--font-size-body);
     font-weight: 600;
     cursor: pointer;
     transition: transform 150ms ease, filter 150ms ease;
@@ -156,7 +156,7 @@
 
 .delivery-empty-state {
     border-style: dashed;
-    background: rgb(184 216 186 / 18%);
+    background: var(--primary-tint);
 }
 
 .delivery-empty-state p,

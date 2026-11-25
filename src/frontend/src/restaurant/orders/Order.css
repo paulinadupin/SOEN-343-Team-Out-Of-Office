@@ -2,10 +2,10 @@
     width: min(100%, 560px);
     box-sizing: border-box;
     padding: 24px;
-    border: 1px solid #eadfda;
-    border-radius: 18px;
-    background: #fff;
-    box-shadow: 0 8px 24px rgba(57, 47, 51, 0.08);
+    border: 1px solid var(--border-color-warm);
+    border-radius: var(--radius-card);
+    background: var(--surface-color);
+    box-shadow: var(--box-shadow);
 }
 
 .order-header,
@@ -19,39 +19,39 @@
 .order-eyebrow {
     margin-bottom: 4px;
     color: var(--accent-color);
-    font-size: 12px;
+    font-size: var(--font-size-small);
     letter-spacing: 0.08em;
     text-transform: uppercase;
 }
 
 .order h3 {
-    font-size: 22px;
+    font-size: var(--font-size-heading);
 }
 
 .order-status {
     padding: 7px 12px;
-    border-radius: 999px;
-    background: #f3efed;
+    border-radius: var(--radius-pill);
+    background: var(--status-neutral-background);
     color: var(--accent-color);
-    font-size: 12px;
+    font-size: var(--font-size-small);
     font-weight: 600;
 }
 
 .order-status--placed {
-    background: #fff0d8;
-    color: #9a6500;
+    background: var(--status-warning-background);
+    color: var(--status-warning-color);
 }
 
 .order-status--accepted,
 .order-status--preparing {
-    background: #e7f3e9;
-    color: #387047;
+    background: var(--status-success-background);
+    color: var(--status-order-success-color);
 }
 
 .order-status--ready,
 .order-status--picked_up {
-    background: #e8efff;
-    color: #3d5f9c;
+    background: var(--status-info-background);
+    color: var(--status-info-color);
 }
 
 .order-meta {
@@ -59,8 +59,8 @@
     gap: 8px;
     margin: 20px 0;
     padding: 14px 0;
-    border-top: 1px solid #f0e9e5;
-    border-bottom: 1px solid #f0e9e5;
+    border-top: 1px solid var(--border-color-soft);
+    border-bottom: 1px solid var(--border-color-soft);
 }
 
 .order-meta p {
@@ -68,8 +68,8 @@
     gap: 10px;
     margin: 0;
     overflow: hidden;
-    color: #766a6c;
-    font-size: 13px;
+    color: var(--muted-text-color);
+    font-size: var(--font-size-compact);
     text-overflow: ellipsis;
     white-space: nowrap;
 }
@@ -82,8 +82,8 @@
 
 .order-items-heading {
     padding-bottom: 8px;
-    color: #887b7d;
-    font-size: 11px;
+    color: var(--accent-color);
+    font-size: var(--font-size-caption);
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -106,13 +106,13 @@
 .order-footer {
     margin-top: 16px;
     padding-top: 16px;
-    border-top: 1px solid #eadfda;
+    border-top: 1px solid var(--border-color-warm);
     font-size: 15px;
 }
 
 .order-footer strong {
     color: var(--accent-color);
-    font-size: 20px;
+    font-size: var(--font-size-title);
 }
 
 .order-actions {
@@ -127,14 +127,14 @@
     border: 0;
     border-radius: 10px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: var(--font-size-compact);
     font-weight: 600;
     transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .order-button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(57, 47, 51, 0.12);
+    box-shadow: var(--box-shadow);
 }
 
 .order-button--primary {
@@ -144,8 +144,8 @@
 }
 
 .order-button--secondary {
-    background: #f7e8e8;
-    color: #a64d56;
+    background: var(--status-error-background);
+    color: var(--status-order-error-color);
 }
 
 @media (max-width: 520px) {

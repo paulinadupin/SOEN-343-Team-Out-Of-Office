@@ -109,7 +109,9 @@ public class AccountFacade {
         }
 
         restaurant.setStatus(status);
-        return RestaurantResponse.from(USERS.save(restaurant));
+        Restaurant updatedRestaurant = USERS.save(restaurant);
+        int queueSize = ORDER_APPLICATION_SERVICE.preparationQueueSize(restaurantId);
+        return RestaurantResponse.from(updatedRestaurant, queueSize);
     }
 
     @Transactional(readOnly = true)
