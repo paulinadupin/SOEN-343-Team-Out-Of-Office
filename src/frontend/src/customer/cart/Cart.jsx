@@ -146,18 +146,36 @@ function Cart() {
                     {items.map((item) => (
                         <CartItem key={item.name} item={item} />
                     ))}
-                    <p>Items: {itemCount}</p>
+                    <p className="receipt-note">Items: {itemCount}</p>
+
+                    <div className="receipt-divider" />
+
                     {quoteLoading && <p role="status">Calculating total...</p>}
                     {quoteError && <p role="alert">Unable to calculate total: {quoteError}</p>}
                     {quote && (
                         <>
-                            <p>Subtotal: ${quote.subtotal.toFixed(2)}</p>
-                            <p>Delivery fee: ${quote.deliveryFee.toFixed(2)}</p>
-                            <p>Service fee: ${quote.serviceFee.toFixed(2)}</p>
+                            <div className="receipt-line">
+                                <span>Subtotal</span>
+                                <span>${quote.subtotal.toFixed(2)}</span>
+                            </div>
+                            <div className="receipt-line">
+                                <span>Delivery fee</span>
+                                <span>${quote.deliveryFee.toFixed(2)}</span>
+                            </div>
+                            <div className="receipt-line">
+                                <span>Service fee</span>
+                                <span>${quote.serviceFee.toFixed(2)}</span>
+                            </div>
                             {quote.smallOrderSurcharge > 0 && (
-                                <p>Small-order surcharge: ${quote.smallOrderSurcharge.toFixed(2)}</p>
+                                <div className="receipt-line">
+                                    <span>Small-order surcharge</span>
+                                    <span>${quote.smallOrderSurcharge.toFixed(2)}</span>
+                                </div>
                             )}
-                            <p>Total: ${quote.total.toFixed(2)}</p>
+                            <div className="receipt-line total">
+                                <span>Total</span>
+                                <span>${quote.total.toFixed(2)}</span>
+                            </div>
                         </>
                     )}
                     {error && <p role="alert">{error}</p>}
@@ -168,19 +186,20 @@ function Cart() {
                     <button onClick={handlePlaceOrder} disabled={placeOrderDisabled}>
                         {placingOrder ? "Placing order..." : "Place Order"}
                     </button>
-                    <div className="cart promo">
-                <label htmlFor="promo-code">Promo code</label>
-                <input
-                    id="promo-code"
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                />
-                <button type="button" onClick={handleApplyPromo}>Apply</button>
-            </div>
-            {promoMessage && <p role="status">{promoMessage}</p>}
 
-            {error && <p role="alert">{error}</p>}
+                    <div className="receipt-divider" />
+
+                    <div className="cart promo">
+                        <label htmlFor="promo-code">Promo code</label>
+                        <input
+                            id="promo-code"
+                            type="text"
+                            value={promoCode}
+                            onChange={(e) => setPromoCode(e.target.value)}
+                        />
+                        <button type="button" onClick={handleApplyPromo}>Apply</button>
+                    </div>
+                    {promoMessage && <p role="status">{promoMessage}</p>}
                 </div>
             )}
         </div>
