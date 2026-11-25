@@ -103,8 +103,15 @@ export async function getDeliveredOrders() {
   return request("/api/orders/delivered");
 }
 
-export async function placeOrder(restaurantId, lines) {
+export async function placeOrder(restaurantId, lines, promoCode=null) {
   return request("/api/orders", {
+    method: "POST",
+    body: JSON.stringify({ restaurantId: Number(restaurantId), lines, promoCode }),
+  });
+}
+
+export async function getOrderQuote(restaurantId, lines) {
+  return request("/api/orders/quote", {
     method: "POST",
     body: JSON.stringify({ restaurantId: Number(restaurantId), lines }),
   });
@@ -174,4 +181,11 @@ export async function reassignOrder(orderId, courierId) {
     method: "POST",
     body: JSON.stringify({ courierId: Number(courierId) }),
   });
+}
+
+export async function applyPromo(code, items) {
+    return request("/api/orders/promo", {
+        method: "POST",
+        body: JSON.stringify({ code, items }),
+    });
 }
