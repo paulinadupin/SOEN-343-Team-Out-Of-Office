@@ -24,8 +24,7 @@ function OperatorDashboard() {
 
     return (
         <div className="dashboard-content">
-            <h1>Some Operator Analytics</h1>
-            <p>stocks are up yay!</p>
+            <h1>Operator Dashboard</h1>
             <Map restaurants={restaurants} onDutyCouriers={onDutyCouriers}/>
         </div>
     )

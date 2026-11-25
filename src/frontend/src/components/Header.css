@@ -1,21 +1,43 @@
-header {
+.site-header {
     display: flex;
-    vertical-align: center;
     align-items: center;
+    min-height: 84px;
+    box-sizing: border-box;
+    padding: 10px clamp(16px, 3vw, 40px);
     background-color: var(--primary-color);
-    gap: 30px;
-    height: 100px;
+    gap: 16px;
+    box-shadow: 0 3px 14px rgb(57 47 51 / 10%);
+    position: relative;
+    z-index: 20;
 
     .logo{
-        width: 90px;
-        height:90px;
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        cursor: pointer;
+    }
+
+    .brand {
+        font-size: clamp(24px, 3vw, 32px);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        white-space: nowrap;
     }
 
     .customer-header {
         display: flex;
-        flex-direction: row;
         align-items: center;
-        gap: 20px;
+        gap: 16px;
+        margin-left: auto;
+
+        p {
+            font-size: 14px;
+        }
+    }
+
+    .user-menu {
+        margin-left: 0;
+        flex-shrink: 0;
     }
 
     .search-bar {
@@ -24,33 +46,76 @@ header {
         padding: 0 16px;
         height: 46px;
         width: 500px;
-        visibility: hidden;  /* Hide the search bar for now */
+        visibility: hidden;
     }
 
     .cart-button {
         background-color: var(--secondary-color);
-        border: none;
-        border-radius: 100px;
-        padding: 13px 19px;
-        line-height: 20px;
+        border: 1px solid rgb(57 47 51 / 12%);
+        border-radius: 999px;
+        padding: 0 18px;
         display: flex;
         align-items: center;
-        /* gap: 8px; */
-        max-width: 115px;
         font-size: 14px;
-        height:44px;
+        font-weight: 600;
+        height: 42px;
+        cursor: pointer;
+        transition: transform 160ms ease, box-shadow 160ms ease;
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgb(57 47 51 / 12%);
+        }
     }
 
     .user-icon {
-        width: 49px;
-        height: 49px;
+        width: 42px;
+        height: 42px;
+        object-fit: contain;
     }
 
     .reset-button {
-        border: 2px solid var(--accent-color);
-        border-radius: var(--default-radius);
+        margin-left: auto;
+        border: 1px solid var(--accent-color);
+        border-radius: 999px;
         background: var(--background-color);
-        padding: 0.4rem 0.9rem;
+        padding: 0 16px;
+        height: 40px;
         cursor: pointer;
+    }
+
+    button:focus-visible {
+        outline: 3px solid var(--accent-color);
+        outline-offset: 3px;
+    }
+}
+
+@media (max-width: 640px) {
+    .site-header {
+        min-height: 72px;
+        padding: 8px 14px;
+        gap: 10px;
+
+        .logo {
+            width: 48px;
+            height: 48px;
+        }
+
+        .brand {
+            font-size: 20px;
+        }
+
+        .customer-header p {
+            display: none;
+        }
+
+        .customer-header {
+            gap: 8px;
+        }
+
+        .user-icon {
+            width: 36px;
+            height: 36px;
+        }
     }
 }

@@ -1,7 +1,25 @@
 .dashboard {
-    display:flex;
+    display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 18px;
+
+    > h1 {
+        font-size: clamp(26px, 3vw, 34px);
+        font-weight: 700;
+    }
+
+    > h2 {
+        color: var(--accent-color);
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .restaurant-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+        align-items: stretch;
+        gap: 16px;
+    }
 
     .order-placed { 
         position: fixed;
@@ -17,5 +35,11 @@
         white-space: nowrap;
         box-shadow: 0 4px 12px rgb(0 0 0 / 20%);
         animation: cart-feedback-in 0.2s ease-out;
+    }
+}
+
+@media (max-width: 520px) {
+    .dashboard .restaurant-list {
+        grid-template-columns: 1fr;
     }
 }

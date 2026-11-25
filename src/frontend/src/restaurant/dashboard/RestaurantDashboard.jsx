@@ -49,7 +49,7 @@ function RestaurantDashboard() {
     }
 
     return (
-        <div>
+        <div className="restaurant-dashboard">
             {error && <p>{error}</p>}
             {restaurant ? (
                 <div>

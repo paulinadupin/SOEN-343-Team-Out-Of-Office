@@ -28,6 +28,12 @@ function useSecondsLeft(expiresAt) {
     return left;
 }
 
+function formatCourierStatus(status) {
+    return status
+        ? status.toLowerCase().replace(/_/g, " ").replace(/^\w/, (letter) => letter.toUpperCase())
+        : "Unknown";
+}
+
 function CourierDeliveries() {
     const [state, setState] = useState({ courierStatus: null, active: null, offer: null });
     const [loading, setLoading] = useState(true);
@@ -67,50 +73,95 @@ function CourierDeliveries() {
         await load();
     }
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) {
+        return (
+            <div className="dashboard-content courier-deliveries">
+                <h1>Deliveries</h1>
+                <p className="deliveries-loading">Loading delivery status...</p>
+            </div>
+        );
+    }
 
     return (
         <div className="dashboard-content courier-deliveries">
-            <h1>Deliveries</h1>
-            <p>Status: {courierStatus}</p>
-            {error && <p role="alert">{error}</p>}
+            <div className="deliveries-heading">
+                <div>
+                    <p className="deliveries-eyebrow">Courier workspace</p>
+                    <h1>Deliveries</h1>
+                </div>
+                <span className={`courier-status ${courierStatus?.toLowerCase()}`}>
+                    {formatCourierStatus(courierStatus)}
+                </span>
+            </div>
+            {error && <p className="deliveries-error" role="alert">{error}</p>}
 
             {courierStatus === "OFFLINE" && (
-                <button onClick={() => respond(goOnline)}>Go online</button>
+                <button className="delivery-button primary" onClick={() => respond(goOnline)}>
+                    Go online
+                </button>
             )}
 
             {courierStatus === "IDLE" && (
                 <>
                     {offer ? (
-                        <section>
-                            <h2>New offer ({secondsLeft}s)</h2>
-                            <p>
-                                {/* FIX: was `delivery.dropoff`, but `delivery` is not defined here */}
-                                <strong>{offer.shop}</strong> to {offer.dropoff}
-                            </p>
-                            <button onClick={() => respond(acceptOffer)}>Accept</button>
-                            <button onClick={() => respond(declineOffer)}>Decline</button>
+                        <section className="delivery-card offer-card">
+                            <div className="delivery-card-heading">
+                                <div>
+                                    <p className="deliveries-eyebrow">New request</p>
+                                    <h2>Delivery offer</h2>
+                                </div>
+                                <span className="offer-countdown">{secondsLeft}s</span>
+                            </div>
+                            <div className="delivery-route">
+                                <strong>{offer.shop}</strong>
+                                <span>to</span>
+                                <strong>{offer.dropoff}</strong>
+                            </div>
+                            <div className="delivery-actions">
+                                <button className="delivery-button primary" onClick={() => respond(acceptOffer)}>
+                                    Accept offer
+                                </button>
+                                <button className="delivery-button secondary" onClick={() => respond(declineOffer)}>
+                                    Decline
+                                </button>
+                            </div>
                         </section>
                     ) : (
-                        <p>Waiting for offers...</p>
+                        <div className="delivery-empty-state">
+                            <h2>Waiting for offers</h2>
+                            <p>New delivery requests will appear here while you are online.</p>
+                        </div>
                     )}
-                    <button onClick={() => respond(goOffline)}>Go offline</button>
+                    <button className="delivery-button outline" onClick={() => respond(goOffline)}>
+                        Go offline
+                    </button>
                 </>
             )}
 
             {(courierStatus === "ASSIGNED" || courierStatus === "CARRYING") && (
-                <section>
-                    <h2>Current delivery</h2>
+                <section className="delivery-card active-delivery">
+                    <div className="delivery-card-heading">
+                        <div>
+                            <p className="deliveries-eyebrow">In progress</p>
+                            <h2>Current delivery</h2>
+                        </div>
+                    </div>
                     {active && (
-                        <p>
-                            <strong>{active.shop}</strong> to {active.dropoff}
-                        </p>
+                        <div className="delivery-route">
+                            <strong>{active.shop}</strong>
+                            <span>to</span>
+                            <strong>{active.dropoff}</strong>
+                        </div>
                     )}
                     {courierStatus === "ASSIGNED" && (
-                        <button onClick={() => respond(confirmPickup)}>Confirm pickup</button>
+                        <button className="delivery-button primary" onClick={() => respond(confirmPickup)}>
+                            Confirm pickup
+                        </button>
                     )}
                     {courierStatus === "CARRYING" && (
-                        <button onClick={() => respond(confirmDelivery)}>Confirm delivery</button>
+                        <button className="delivery-button primary" onClick={() => respond(confirmDelivery)}>
+                            Confirm delivery
+                        </button>
                     )}
                 </section>
             )}

@@ -1,26 +1,39 @@
 .restaurant-header {
     display: flex;
     flex-direction: column;
+    gap: 8px;
     width: 100%;
-    padding: 50px 100px;
- 
+    box-sizing: border-box;
+    padding: clamp(20px, 3vw, 32px);
+    border-radius: var(--default-radius);
+    background: var(--primary-color);
+
     .title {
-        font-size: var(--title);
+        font-size: clamp(28px, 4vw, 44px);
+        font-weight: 700;
+        letter-spacing: -0.03em;
     }
 
     .address {
-        font-size: var(--header4);
+        font-size: 15px;
+        color: var(--accent-color);
     }
 
     .status {
-        max-width:150px;
-        max-height:40px;
-        border: 2px solid;
-        border-radius: var(--default-radius);
-        font-size: var(--header4);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        width: fit-content;
+        margin-top: 8px;
+        padding: 6px 12px;
+        border: 1px solid;
+        border-radius: 999px;
+        background: var(--background-color);
+        font-size: 13px;
+        font-weight: 600;
 
         &.Open  {
-            border-color: var(--primary-color);
+            border-color: var(--accent-color);
             
             svg circle {
                 fill: var(--primary-color);
@@ -28,7 +41,7 @@
         }
 
         &.Paused {
-            border-color: var(--secondary-color);
+            border-color: var(--accent-color);
 
             svg circle {
                 fill: var(--secondary-color);
@@ -36,7 +49,7 @@
         }
 
         &.Closed {
-            border-color: var(--tertiary-color);
+            border-color: var(--accent-color);
 
             svg circle {
                 fill: var(--tertiary-color);
