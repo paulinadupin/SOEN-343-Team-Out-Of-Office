@@ -213,7 +213,13 @@ function Cart() {
                             value={promoCode}
                             onChange={(e) => setPromoCode(e.target.value)}
                         />
-                        <button type="button" onClick={handleApplyPromo}>Apply</button>
+                        <button
+                            type="button"
+                            onClick={handleApplyPromo}
+                            disabled={appliedCode !== null}
+                        >
+                            Apply
+                        </button>
                     </div>
                     {promoMessage && <p role="status">{promoMessage}</p>}
                 </div>

@@ -63,6 +63,11 @@
         padding: var(--input-padding);
         height: var(--input-height);
         cursor: pointer;
+
+        &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     }
 
     &.items > button {
