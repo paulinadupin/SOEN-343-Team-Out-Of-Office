@@ -34,14 +34,14 @@ public class OrderController {
     @PostMapping
     public OrderView place(@RequestBody PlaceRequest request, HttpServletRequest servletRequest) {
         OrderCommands.PlaceOrder command = new OrderCommands.PlaceOrder(
-                request.restaurantId(), request.lines());
+                request.restaurantId(), request.lines(), request.promoCode());
         return toView(SERVICE.place(currentUser(servletRequest), command));
     }
 
     @PostMapping("/quote")
     public ChargeView quote(@RequestBody PlaceRequest request, HttpServletRequest servletRequest) {
         OrderCommands.PlaceOrder command = new OrderCommands.PlaceOrder(
-                request.restaurantId(), request.lines());
+                request.restaurantId(), request.lines(), request.promoCode());
         return toChargeView(SERVICE.quote(currentUser(servletRequest), command));
     }
 
@@ -210,12 +210,13 @@ public class OrderController {
         }
         return new ChargeView(
                 charge.subtotal(), charge.deliveryFee(), charge.serviceFee(),
-                charge.smallOrderSurcharge(), charge.total());
+                charge.smallOrderSurcharge(), charge.discount(), charge.total());
     }
 
     public record PlaceRequest(
             Long restaurantId,
-            List<OrderCommands.RequestedLine> lines) { }
+            List<OrderCommands.RequestedLine> lines,
+            String promoCode) { }
 
     public record ActionRequest(String reason) { }
 
@@ -226,6 +227,7 @@ public class OrderController {
             double deliveryFee,
             double serviceFee,
             double smallOrderSurcharge,
+            double discount,
             double total) { }
 
     public record OrderView(
