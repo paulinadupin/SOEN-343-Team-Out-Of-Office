@@ -130,10 +130,10 @@ export async function placeOrder(restaurantId, lines, promoCode=null) {
   });
 }
 
-export async function getOrderQuote(restaurantId, lines) {
+export async function getOrderQuote(restaurantId, lines, promoCode = null) {
   return request("/api/orders/quote", {
     method: "POST",
-    body: JSON.stringify({ restaurantId: Number(restaurantId), lines }),
+    body: JSON.stringify({ restaurantId: Number(restaurantId), lines, promoCode }),
   });
 }
 
@@ -249,9 +249,10 @@ export async function reverseGeocode(lat, lng) {
     throw error;
   }
 }
-export async function applyPromo(code, items) {
+
+export async function applyPromo(code, restaurantId, items) {
     return request("/api/orders/promo", {
         method: "POST",
-        body: JSON.stringify({ code, items }),
+        body: JSON.stringify({ code, restaurantId: Number(restaurantId), items }),
     });
 }

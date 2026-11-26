@@ -1,0 +1,14 @@
+[
+  {
+    "code": "SAVE10",
+    "expiresAt": "2030-01-01T00:00:00Z",
+    "minOrderValue": 15.00,
+    "percentOff": 10.0
+  },
+  {
+    "code": "WELCOME5",
+    "expiresAt": "2020-01-01T00:00:00Z",
+    "minOrderValue": 0.00,
+    "percentOff": 5.0
+  }
+]

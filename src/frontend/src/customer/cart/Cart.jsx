@@ -16,8 +16,6 @@ function Cart() {
     const [promoCode, setPromoCode] = useState("");
     const [promoMessage, setPromoMessage] = useState(null);
     const [appliedCode, setAppliedCode] = useState(null);
-    //TODO: Review if discount is needed or will be handled in the backend
-    const [discount, setDiscount] = useState(0);
 
     const cartRestaurantId = items[0]?.restaurantId;
     const hasValidQuoteRequest = items.length > 0
@@ -37,7 +35,8 @@ function Cart() {
 
         getOrderQuote(
             cartRestaurantId,
-            items.map((item) => ({ itemId: item.itemId, quantity: item.quantity }))
+            items.map((item) => ({ itemId: item.itemId, quantity: item.quantity })),
+            appliedCode
         )
             .then((result) => {
                 if (current) setQuoteResult({ items, quote: result, error: null });
@@ -49,7 +48,7 @@ function Cart() {
         return () => {
             current = false;
         };
-    }, [items, cartRestaurantId, hasValidQuoteRequest]);
+    }, [items, cartRestaurantId, hasValidQuoteRequest, appliedCode]);
 
     // R-DASH-04: Place Order must disable when the restaurant is paused/closed,
     // or when every selected item is sold out, so this needs live data, not the
@@ -70,7 +69,6 @@ function Cart() {
     }, [cartRestaurantId]);
 
     useEffect(() => {
-        setDiscount(0);
         setAppliedCode(null);
         setPromoMessage(null);
     }, [items]);
@@ -117,15 +115,16 @@ function Cart() {
         setPromoMessage(null);
         const code = promoCode.trim();
         try {
-            const result = await applyPromo(
+            // validate the code before committing it to the quote - a rejected
+            // code shouldn't break the base subtotal/fees breakdown below.
+            await applyPromo(
                 code,
+                cartRestaurantId,
                 items.map((item) => ({ itemId: item.itemId, quantity: item.quantity }))
             );
-            setDiscount(result.discount);
             setAppliedCode(code);
             setPromoMessage("Promo applied!");
         } catch (requestError) {
-            setDiscount(0);
             setAppliedCode(null);
             setPromoMessage(requestError.message);
         }
@@ -149,18 +148,42 @@ function Cart() {
                     {items.map((item) => (
                         <CartItem key={item.name} item={item} />
                     ))}
-                    <p>Items: {itemCount}</p>
+                    <p className="receipt-note">Items: {itemCount}</p>
+
+                    <div className="receipt-divider" />
+
                     {quoteLoading && <p role="status">Calculating total...</p>}
                     {quoteError && <p role="alert">Unable to calculate total: {quoteError}</p>}
                     {quote && (
                         <>
-                            <p>Subtotal: ${quote.subtotal.toFixed(2)}</p>
-                            <p>Delivery fee: ${quote.deliveryFee.toFixed(2)}</p>
-                            <p>Service fee: ${quote.serviceFee.toFixed(2)}</p>
+                            <div className="receipt-line">
+                                <span>Subtotal</span>
+                                <span>${quote.subtotal.toFixed(2)}</span>
+                            </div>
+                            <div className="receipt-line">
+                                <span>Delivery fee</span>
+                                <span>${quote.deliveryFee.toFixed(2)}</span>
+                            </div>
+                            <div className="receipt-line">
+                                <span>Service fee</span>
+                                <span>${quote.serviceFee.toFixed(2)}</span>
+                            </div>
                             {quote.smallOrderSurcharge > 0 && (
-                                <p>Small-order surcharge: ${quote.smallOrderSurcharge.toFixed(2)}</p>
+                                <div className="receipt-line">
+                                    <span>Small-order surcharge</span>
+                                    <span>${quote.smallOrderSurcharge.toFixed(2)}</span>
+                                </div>
                             )}
-                            <p>Total: ${quote.total.toFixed(2)}</p>
+                            {quote.discount > 0 && (
+                                <div className="receipt-line">
+                                    <span>Discount</span>
+                                    <span>-${quote.discount.toFixed(2)}</span>
+                                </div>
+                            )}
+                            <div className="receipt-line total">
+                                <span>Total</span>
+                                <span>${quote.total.toFixed(2)}</span>
+                            </div>
                         </>
                     )}
                     {error && <p role="alert">{error}</p>}
@@ -179,19 +202,20 @@ function Cart() {
                     >
                         {placingOrder ? "Placing order..." : "Place Order"}
                     </button>
-                    <div className="cart promo">
-                <label htmlFor="promo-code">Promo code</label>
-                <input
-                    id="promo-code"
-                    type="text"
-                    value={promoCode}
-                    onChange={(e) => setPromoCode(e.target.value)}
-                />
-                <button type="button" onClick={handleApplyPromo}>Apply</button>
-            </div>
-            {promoMessage && <p role="status">{promoMessage}</p>}
 
-            {error && <p role="alert">{error}</p>}
+                    <div className="receipt-divider" />
+
+                    <div className="cart promo">
+                        <label htmlFor="promo-code">Promo code</label>
+                        <input
+                            id="promo-code"
+                            type="text"
+                            value={promoCode}
+                            onChange={(e) => setPromoCode(e.target.value)}
+                        />
+                        <button type="button" onClick={handleApplyPromo}>Apply</button>
+                    </div>
+                    {promoMessage && <p role="status">{promoMessage}</p>}
                 </div>
             )}
         </div>
