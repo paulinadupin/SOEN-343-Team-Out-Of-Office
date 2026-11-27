@@ -17,5 +17,16 @@ For PRC, AI helped outline the tasks for implementing the PRC module and clarify
 For solving merge conflicts, recovering files and finding bugs in the code.
 For DASH, AI was used to help outline the files to modify and tasks to be done as well as for some debugging.
 
+## Phase 4 refactoring (AI level 2)
+R1: AI was used to refactor the RestaurantRulesCheck class. The exact prompt and refactoring details can be found in the report in the refactoring log section.
+R2: AI was used to refator Charge within PricingCalculator. Claude was prompted to change the constructor of PricingCalculator/Charge according to the prompt outlined within the a4 report within the refactoring log section.
+R3: AI was used to refactor the OrderApplicationService class. The exact prompt and refactoring details can be found in the report in the refactoring log section.
+
 ## Phase 4 (AI Level 2)
+For PROMO, AI helped implement parts of the backend (domain model, config-driven promo codes, validation, and the discount endpoint) on top of the existing frontend, with the rest written and reviewed by the team.
+
 For PROMO, AI helped diagnose why rejected promo codes (e.g. an expired code) showed a generic "Bad Request" instead of the actual reason: Spring's default error response omits the exception message unless explicitly configured. AI added a global exception handler (`GlobalExceptionHandler`) that returns the real message for `CommandRejectedException`, `OrderNotFoundException`, and `IllegalArgumentException`/`IllegalStateException`, fixing this across the whole backend rather than just the promo case, and verified the fix live against the running app before confirming it. 
+
+Additionally, AI was used to help send the promo code's input  from the user in the frontend to the backend via an API call. 
+
+For general cleanup, AI was used to help clean the styling of the app, making it more polished. It was also used to fix bugs that appeared in previous iterations such as adding the connection to the backend so that the operator can modify a restaurant's status.
