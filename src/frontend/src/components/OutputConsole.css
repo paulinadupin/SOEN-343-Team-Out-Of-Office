@@ -1,7 +1,7 @@
 .output-console {
-    background: #fff;
-    color: #333;
-    border: 1px solid #ddd;
+    background: var(--surface-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
     font-family: monospace;
     font-size: 0.75rem;
     padding: 0.5rem;
@@ -18,9 +18,9 @@
 }
 
 .output-console li.success {
-    color: #2a8f2a;
+    color: var(--status-success-color);
 }
 
 .output-console li.error {
-    color: #c0392b;
+    color: var(--status-error-color);
 }

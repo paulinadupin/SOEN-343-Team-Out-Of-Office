@@ -13,21 +13,21 @@
     button {
         background-color: var(--primary-color);
         border: none;
-        border-radius: 100px;
+        border-radius: var(--radius-pill);
         padding: 13px 19px;
         line-height: 20px;
         display: flex;
         align-items: center;
         /* gap: 8px; */
         max-width: 115px;
-        font-size: 14px;
+        font-size: var(--font-size-body);
         height:44px;
     }
 
     a {
         color: var(--accent-color);
         text-decoration: none;
-        font-size: 14px;
+        font-size: var(--font-size-body);
         margin-top: 10px;
     }
     

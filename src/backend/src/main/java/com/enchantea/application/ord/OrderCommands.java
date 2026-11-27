@@ -8,10 +8,14 @@ public final class OrderCommands {
     //one menu item and how many the customer wants.
     public record RequestedLine(String itemId, int quantity) { }
 
-    //the restaurant and items the customer chose when placing an order.
-    public record PlaceOrder(Long restaurantId, List<RequestedLine> lines) {
+    //the restaurant and items the customer chose when placing an order, with an optional promo code.
+    public record PlaceOrder(Long restaurantId, List<RequestedLine> lines, String promoCode) {
         public PlaceOrder {
             lines = List.copyOf(lines);
+        }
+
+        public PlaceOrder(Long restaurantId, List<RequestedLine> lines) {
+            this(restaurantId, lines, null);
         }
     }
 

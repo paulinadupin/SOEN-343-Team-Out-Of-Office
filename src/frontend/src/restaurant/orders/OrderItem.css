@@ -2,9 +2,9 @@
     display: flex;
     align-items: center;
     min-height: 44px;
-    border-bottom: 1px solid #eee8e3;
+    border-bottom: 1px solid var(--border-color-soft);
     color: var(--text-color);
-    font-size: 14px;
+    font-size: var(--font-size-body);
 }
 
 .order-item:last-child {
@@ -22,7 +22,7 @@
 
 .order-item-quantity {
     width: 48px;
-    color: #766a6c;
+    color: var(--muted-text-color);
     text-align: center;
 }
 

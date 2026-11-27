@@ -100,6 +100,20 @@ public class AccountFacade {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public RestaurantResponse updateRestaurantStatus(Long restaurantId, RestaurantStatus status) {
+        User user = USERS.findById(restaurantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found"));
+        if (!(user instanceof Restaurant restaurant)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Restaurant not found");
+        }
+
+        restaurant.setStatus(status);
+        Restaurant updatedRestaurant = USERS.save(restaurant);
+        int queueSize = ORDER_APPLICATION_SERVICE.preparationQueueSize(restaurantId);
+        return RestaurantResponse.from(updatedRestaurant, queueSize);
+    }
+
     @Transactional(readOnly = true)
     public List<CourierResponse> findOnDutyCouriers() {
         return USERS.findAll().stream()

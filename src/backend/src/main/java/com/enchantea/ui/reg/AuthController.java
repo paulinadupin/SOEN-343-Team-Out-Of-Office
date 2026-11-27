@@ -2,6 +2,8 @@ package com.enchantea.ui.reg;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,8 @@ import com.enchantea.application.reg.AccountFacade;
 import com.enchantea.application.reg.LoginRequest;
 import com.enchantea.application.reg.RegisterRequest;
 import com.enchantea.application.reg.RestaurantResponse;
+import com.enchantea.domain.reg.AccountType;
+import com.enchantea.domain.reg.RestaurantStatus;
 import com.enchantea.domain.reg.User;
 
 import com.enchantea.application.dash.MapResponse;
@@ -86,6 +90,21 @@ public class AuthController {
         return ACCOUNT_FACADE.findRestaurants();
     }
 
+    @PatchMapping("/restaurants/{restaurantId}/status")
+    public RestaurantResponse updateRestaurantStatus(
+            @PathVariable Long restaurantId,
+            @RequestBody RestaurantStatusRequest request,
+            HttpServletRequest servletRequest) {
+        User user = ACCOUNT_FACADE.requireLoggedIn(servletRequest.getSession(false));
+        if (user.getAccountType() != AccountType.OPERATOR) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Operator account required");
+        }
+        if (request.status() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Restaurant status is required");
+        }
+        return ACCOUNT_FACADE.updateRestaurantStatus(restaurantId, request.status());
+    }
+
     @GetMapping("/on-duty-couriers")
     public List<CourierResponse> onDutyCouriers(HttpServletRequest servletRequest) {
         return ACCOUNT_FACADE.findOnDutyCouriers();
@@ -104,4 +123,6 @@ public class AuthController {
         ACCOUNT_FACADE.requireLoggedIn(session);
         session.invalidate();
     }
+
+    public record RestaurantStatusRequest(RestaurantStatus status) { }
 }

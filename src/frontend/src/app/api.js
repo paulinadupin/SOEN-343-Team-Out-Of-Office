@@ -1,9 +1,11 @@
-import { addEntry } from "./consoleLog";
+import { addEntry, getConsoleUserId, setConsoleUser } from "./consoleLog";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const reverseGeocodeCache = new Map();
 
-async function request(path, options = {}) {
+async function request(path, options = {}, shouldLog = true) {
   const method = options.method || "GET";
+  const requestUserId = getConsoleUserId();
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include",
@@ -17,11 +19,11 @@ async function request(path, options = {}) {
     const body = await response.json().catch(() => null);
     const message = body?.detail || body?.message || body?.error;
     const errorMessage = message || `Request failed with status ${response.status}`;
-    addEntry(`${method} ${path} - ${errorMessage}`, "error");
+    if (shouldLog) addEntry(`${method} ${path} - ${errorMessage}`, "error", requestUserId);
     throw new Error(errorMessage);
   }
 
-  addEntry(`${method} ${path}`, "success");
+  if (shouldLog) addEntry(`${method} ${path}`, "success", requestUserId);
   return response.status === 204 ? null : response.json();
 }
 
@@ -38,8 +40,11 @@ export async function login(username, password) {
   const account = await request("/api/auth/login", {
     method: "POST",
     body: JSON.stringify({ username, password }),
-  });
-  return mapAccount(account);
+  }, false);
+  const loggedInUser = mapAccount(account);
+  setConsoleUser(loggedInUser.id);
+  addEntry("POST /api/auth/login", "success", loggedInUser.id);
+  return loggedInUser;
 }
 
 export async function register(account) {
@@ -51,8 +56,16 @@ export async function register(account) {
 }
 
 export async function getCurrentUser() {
-  const account = await request("/api/auth/me");
-  return mapAccount(account);
+  try {
+    const account = await request("/api/auth/me", {}, false);
+    const currentUser = mapAccount(account);
+    setConsoleUser(currentUser.id);
+    addEntry("GET /api/auth/me", "success", currentUser.id);
+    return currentUser;
+  } catch (error) {
+    setConsoleUser(null);
+    throw error;
+  }
 }
 
 export async function getCurrentRestaurant() {
@@ -61,6 +74,13 @@ export async function getCurrentRestaurant() {
 
 export async function getRestaurants() {
   return request("/api/auth/restaurants");
+}
+
+export async function updateRestaurantStatus(restaurantId, status) {
+  return request(`/api/auth/restaurants/${encodeURIComponent(restaurantId)}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
 }
 
 export async function getRestaurantMenu(restaurantId) {
@@ -103,10 +123,17 @@ export async function getDeliveredOrders() {
   return request("/api/orders/delivered");
 }
 
-export async function placeOrder(restaurantId, lines) {
+export async function placeOrder(restaurantId, lines, promoCode=null) {
   return request("/api/orders", {
     method: "POST",
-    body: JSON.stringify({ restaurantId: Number(restaurantId), lines }),
+    body: JSON.stringify({ restaurantId: Number(restaurantId), lines, promoCode }),
+  });
+}
+
+export async function getOrderQuote(restaurantId, lines, promoCode = null) {
+  return request("/api/orders/quote", {
+    method: "POST",
+    body: JSON.stringify({ restaurantId: Number(restaurantId), lines, promoCode }),
   });
 }
 
@@ -174,4 +201,58 @@ export async function reassignOrder(orderId, courierId) {
     method: "POST",
     body: JSON.stringify({ courierId: Number(courierId) }),
   });
+}
+
+export async function reverseGeocode(lat, lng) {
+  const requestUserId = getConsoleUserId();
+  const cacheKey = `${Number(lat)},${Number(lng)}`;
+  const cachedRequest = reverseGeocodeCache.get(cacheKey);
+  if (cachedRequest) {
+    addEntry("GET Nominatim /reverse (cached)", "info", requestUserId);
+    return cachedRequest;
+  }
+
+  const query = new URLSearchParams({
+    format: "jsonv2",
+    lat: String(lat),
+    lon: String(lng),
+  });
+  const lookup = (async () => {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?${query.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Could not look up address.");
+    }
+
+    const data = await response.json();
+    const { house_number, road } = data.address ?? {};
+
+    if (!road) {
+      throw new Error("No street found.");
+    }
+
+    return house_number ? `${house_number} ${road}` : road;
+  })();
+  reverseGeocodeCache.set(cacheKey, lookup);
+
+  try {
+    const address = await lookup;
+    addEntry("GET Nominatim /reverse", "success", requestUserId);
+    return address;
+  } catch (error) {
+    if (reverseGeocodeCache.get(cacheKey) === lookup) {
+      reverseGeocodeCache.delete(cacheKey);
+    }
+    addEntry(`GET Nominatim /reverse - ${error.message}`, "error", requestUserId);
+    throw error;
+  }
+}
+
+export async function applyPromo(code, restaurantId, items) {
+    return request("/api/orders/promo", {
+        method: "POST",
+        body: JSON.stringify({ code, restaurantId: Number(restaurantId), items }),
+    });
 }

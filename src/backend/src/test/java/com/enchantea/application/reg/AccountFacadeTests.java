@@ -5,21 +5,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.enchantea.application.ord.OrderApplicationService;
 import com.enchantea.domain.reg.AccountType;
 import com.enchantea.domain.reg.Courier;
 import com.enchantea.domain.reg.Customer;
 import com.enchantea.domain.reg.Location;
 import com.enchantea.domain.reg.Operator;
 import com.enchantea.domain.reg.Restaurant;
+import com.enchantea.domain.reg.RestaurantStatus;
 import com.enchantea.domain.reg.User;
 import com.enchantea.foundation.reg.UserRepository;
 
@@ -116,6 +122,28 @@ class AccountFacadeTests {
                 ResponseStatusException.class, () -> accountFacade.register(request));
 
         assertEquals(409, exception.getStatusCode().value());
+    }
+
+    @Test
+    void updatingRestaurantStatusReturnsTheCurrentQueueSize() {
+        UserRepository userRepository = mock(UserRepository.class);
+        OrderApplicationService orderApplicationService = mock(OrderApplicationService.class);
+        Restaurant restaurant = new Restaurant(
+                "status-restaurant",
+                "password-hash",
+                "Tea House",
+                RestaurantStatus.CLOSED,
+                new Location(45.5, -73.6));
+        when(userRepository.findById(42L)).thenReturn(Optional.of(restaurant));
+        when(userRepository.save(restaurant)).thenReturn(restaurant);
+        when(orderApplicationService.preparationQueueSize(42L)).thenReturn(3);
+
+        AccountFacade facade = new AccountFacade(
+                userRepository, mock(PasswordEncoder.class), orderApplicationService);
+        RestaurantResponse response = facade.updateRestaurantStatus(42L, RestaurantStatus.OPEN);
+
+        assertEquals(RestaurantStatus.OPEN, response.getStatus());
+        assertEquals(3, response.getQueueSize());
     }
 
     @Test
