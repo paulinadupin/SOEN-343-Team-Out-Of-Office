@@ -16,3 +16,8 @@ For Courier and Operator front end, AI was used to identify the different file d
 For PRC, AI helped outline the tasks for implementing the PRC module and clarify what the module needed from the other components.
 For solving merge conflicts, recovering files and finding bugs in the code.
 For DASH, AI was used to help outline the files to modify and tasks to be done as well as for some debugging.
+
+## Phase 4 refactoring (AI level 2)
+R1: AI was used to refactor the RestaurantRulesCheck class. The exact prompt and refactoring details can be found in the report in the refactoring log section.
+R2: AI was used to refator Charge within PricingCalculator. Claude was prompted to change the constructor of PricingCalculator/Charge according to the prompt outlined within the a4 report within the refactoring log section.
+R3: AI was used to refactor the OrderApplicationService class. The exact prompt and refactoring details can be found in the report in the refactoring log section.
