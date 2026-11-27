@@ -70,6 +70,12 @@
     box-shadow: var(--box-shadow);
 }
 
+.operator-orders button:focus-visible,
+.operator-orders select:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
 .operator-orders button:disabled {
     background: var(--accent-color);
     color: var(--background-color);

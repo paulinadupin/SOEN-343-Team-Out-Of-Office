@@ -137,6 +137,11 @@
     box-shadow: var(--box-shadow);
 }
 
+.order-button:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
 .order-button--primary {
     flex: 1;
     background: var(--primary-color);

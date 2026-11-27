@@ -9,6 +9,12 @@
     padding: 0;
     cursor: pointer;
     display: flex;
+    border-radius: 50%;
+}
+
+.user-menu-button:focus-visible {
+    outline: 3px solid var(--accent-color);
+    outline-offset: 2px;
 }
 
 .user-menu-dropdown {
@@ -42,6 +48,12 @@
 .user-menu-dropdown a:hover,
 .user-menu-dropdown button:hover {
     background: var(--surface-hover-color);
+}
+
+.user-menu-dropdown a:focus-visible,
+.user-menu-dropdown button:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: -2px;
 }
 
 .user-menu-dropdown hr {
