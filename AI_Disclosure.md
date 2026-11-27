@@ -16,3 +16,6 @@ For Courier and Operator front end, AI was used to identify the different file d
 For PRC, AI helped outline the tasks for implementing the PRC module and clarify what the module needed from the other components.
 For solving merge conflicts, recovering files and finding bugs in the code.
 For DASH, AI was used to help outline the files to modify and tasks to be done as well as for some debugging.
+
+## Phase 4 (AI Level 2)
+For PROMO, AI helped diagnose why rejected promo codes (e.g. an expired code) showed a generic "Bad Request" instead of the actual reason: Spring's default error response omits the exception message unless explicitly configured. AI added a global exception handler (`GlobalExceptionHandler`) that returns the real message for `CommandRejectedException`, `OrderNotFoundException`, and `IllegalArgumentException`/`IllegalStateException`, fixing this across the whole backend rather than just the promo case, and verified the fix live against the running app before confirming it. 
