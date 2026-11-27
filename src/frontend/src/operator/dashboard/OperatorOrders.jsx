@@ -27,6 +27,7 @@ function OrdersTable({ title, orders, emptyText, columns }) {
             {orders.length === 0 ? (
                 <p>{emptyText}</p>
             ) : (
+                <div className="table-scroll">
                 <table>
                     <thead>
                         <tr>
@@ -45,6 +46,7 @@ function OrdersTable({ title, orders, emptyText, columns }) {
                         ))}
                     </tbody>
                 </table>
+                </div>
             )}
         </section>
     )
@@ -57,6 +59,7 @@ function StalledOrdersTable({ orders, idleCouriers, selectedCourier, onSelectCou
             {orders.length === 0 ? (
                 <p>No stalled orders.</p>
             ) : (
+                <div className="table-scroll">
                 <table>
                     <thead>
                         <tr>
@@ -96,6 +99,7 @@ function StalledOrdersTable({ orders, idleCouriers, selectedCourier, onSelectCou
                         ))}
                     </tbody>
                 </table>
+                </div>
             )}
         </section>
     )

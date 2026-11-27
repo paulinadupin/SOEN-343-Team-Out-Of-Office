@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getEntries, subscribe, isConsoleOpen, subscribeVisibility } from '../app/consoleLog'
+import { getEntries, subscribe, isConsoleOpen, subscribeVisibility, toggleConsole } from '../app/consoleLog'
 import './OutputConsole.css'
 
 function OutputConsole() {
@@ -18,11 +18,22 @@ function OutputConsole() {
 
     return (
         <div className="output-console">
-            <h2>Console</h2>
+            <div className="output-console-header">
+                <h2>Console</h2>
+                <button
+                    type="button"
+                    className="output-console-close"
+                    onClick={toggleConsole}
+                    aria-label="Close console"
+                >
+                    &times;
+                </button>
+            </div>
             <ul>
                 {entries.map((entry, index) => (
                     <li key={index} className={entry.type}>
-                        {entry.time.toLocaleTimeString()} · {entry.message}
+                        <span className="entry-time">{entry.time.toLocaleTimeString()}</span>
+                        <span className="entry-message">{entry.message}</span>
                     </li>
                 ))}
             </ul>
