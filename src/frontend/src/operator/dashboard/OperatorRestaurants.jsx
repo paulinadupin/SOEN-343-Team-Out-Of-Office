@@ -53,6 +53,7 @@ function OperatorRestaurants() {
             {!loading && restaurants.length === 0 && !error && <p>No restaurants registered.</p>}
 
             {restaurants.length > 0 && (
+                <div className="table-scroll">
                 <table>
                     <thead>
                         <tr>
@@ -87,6 +88,7 @@ function OperatorRestaurants() {
                         })}
                     </tbody>
                 </table>
+                </div>
             )}
         </div>
     )

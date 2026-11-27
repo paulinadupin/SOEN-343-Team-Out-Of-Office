@@ -80,6 +80,7 @@ body{
 }
 
 input[type="text"], input[type="password"] {
+  box-sizing: border-box;
   border: 2px solid var(--accent-color);
   border-radius: var(--default-radius);
   padding: var(--input-padding);
