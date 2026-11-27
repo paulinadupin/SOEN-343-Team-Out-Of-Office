@@ -30,3 +30,5 @@ For PROMO, AI helped diagnose why rejected promo codes (e.g. an expired code) sh
 Additionally, AI was used to help send the promo code's input  from the user in the frontend to the backend via an API call. 
 
 For general cleanup, AI was used to help clean the styling of the app, making it more polished. It was also used to fix bugs that appeared in previous iterations such as adding the connection to the backend so that the operator can modify a restaurant's status.
+
+AI was also used to fix a window-resizing layout bug, add missing keyboard-focus states, redesign the Login/Register pages and debug console into cleaner card-based UI, and diagnose a CORS/port-conflict issue between the local dev servers and stale Docker containers.

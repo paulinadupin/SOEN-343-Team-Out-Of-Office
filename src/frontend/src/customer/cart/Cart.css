@@ -68,6 +68,11 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+
+        &:focus-visible {
+            outline: 3px solid var(--accent-color);
+            outline-offset: 2px;
+        }
     }
 
     &.items > button {

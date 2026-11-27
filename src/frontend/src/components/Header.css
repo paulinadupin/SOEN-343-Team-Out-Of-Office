@@ -32,8 +32,16 @@
         min-width: 0;
     }
 
+    .customer-header {
+        min-width: 0;
+        overflow: hidden;
+    }
+
     .customer-header p {
+        overflow: hidden;
         font-size: var(--font-size-body);
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .header-actions .user-menu {
@@ -48,6 +56,7 @@
         padding: 0 18px;
         display: flex;
         align-items: center;
+        flex-shrink: 0;
         font-size: var(--font-size-body);
         font-weight: 600;
         height: 42px;
