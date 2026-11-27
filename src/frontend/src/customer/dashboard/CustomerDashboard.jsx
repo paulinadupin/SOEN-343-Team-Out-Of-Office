@@ -65,12 +65,15 @@ function CustomerDashboard() {
                 ))}
             </div>
             {customerMap && (
-                <Map
-                    restaurants = {customerMap.restaurants}
-                    onDutyCouriers = {customerMap.couriers}
-                    customer = {customerMap.customer}
-                    userLocation ={user?.location}
-                />
+                <div>
+                    <h1>Map</h1>
+                    <Map
+                        restaurants = {customerMap.restaurants}
+                        onDutyCouriers = {customerMap.couriers}
+                        customer = {customerMap.customer}
+                        userLocation ={user?.location}
+                    />
+                </div>
             )}
             {orderPlaced && <span className="order-placed" role="status">Order Placed!</span>}
         </div>

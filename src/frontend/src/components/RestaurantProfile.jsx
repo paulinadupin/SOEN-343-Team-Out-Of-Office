@@ -2,6 +2,8 @@ import './RestaurantProfile.css';
 import { formatRestaurantStatus } from '../app/formatRestaurantStatus';
 
 function RestaurantProfile({ name, address, status, onClick }) {
+    const statusLabel = formatRestaurantStatus(status);
+
     return (
         <div
             className="restaurant-profile"
@@ -15,9 +17,11 @@ function RestaurantProfile({ name, address, status, onClick }) {
             role="button"
             tabIndex="0"
         >
-            <h1>{name}</h1>
-            <p>{address}</p>
-            <p>Status: {formatRestaurantStatus(status)}</p>
+            <h2>{name}</h2>
+            <p className="restaurant-profile-address">{address}</p>
+            <span className={`restaurant-profile-status ${statusLabel}`}>
+                {statusLabel}
+            </span>
         </div>
     );
 }

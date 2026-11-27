@@ -5,8 +5,8 @@ function CartItem({ item }) {
 
     return (
         <div className="cart-item">
-            <p>{item.name}</p>
-            <p>{item.quantity}</p>
+            <p className="cart-item-name">{item.name}</p>
+            <p className="cart-item-quantity">{item.quantity}</p>
             <p className="price">${lineTotal.toFixed(2)}</p>
         </div>
     )

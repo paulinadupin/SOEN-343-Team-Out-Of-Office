@@ -132,15 +132,18 @@ function Cart() {
 
     return (
         <div className="cart">
-            <h1>Cart</h1>
+            <h1 className="cart-title">Your cart</h1>
             {items.length === 0 ? (
-                <p>Your cart is empty.</p>
+                <div className="cart-empty">
+                    <h2>Your cart is empty</h2>
+                    <p>Add something delicious from a restaurant menu to get started.</p>
+                </div>
             ) : (
                 <div className="cart items">
                     <div className="cart header">
-                        <p>Item</p>
-                        <p>Quantity</p>
-                        <p>Price</p>
+                        <span>Item</span>
+                        <span>Quantity</span>
+                        <span>Price</span>
                     </div>
                     {items.map((item) => (
                         <CartItem key={item.name} item={item} />
@@ -185,10 +188,18 @@ function Cart() {
                     )}
                     {error && <p role="alert">{error}</p>}
                     {restaurantStatus != null && restaurantStatus !== "OPEN" && (
-                        <p role="alert">This restaurant is currently {restaurantStatus.toLowerCase()}.</p>
+                        <p className="cart-alert" role="alert">
+                            This restaurant is currently {restaurantStatus.toLowerCase()}.
+                        </p>
                     )}
-                    {allItemsSoldOut && <p role="alert">All selected items are sold out.</p>}
-                    <button onClick={handlePlaceOrder} disabled={placeOrderDisabled}>
+                    {allItemsSoldOut && (
+                        <p className="cart-alert" role="alert">All selected items are sold out.</p>
+                    )}
+                    <button
+                        className="place-order-button"
+                        onClick={handlePlaceOrder}
+                        disabled={placeOrderDisabled}
+                    >
                         {placingOrder ? "Placing order..." : "Place Order"}
                     </button>
 
@@ -202,7 +213,13 @@ function Cart() {
                             value={promoCode}
                             onChange={(e) => setPromoCode(e.target.value)}
                         />
-                        <button type="button" onClick={handleApplyPromo}>Apply</button>
+                        <button
+                            type="button"
+                            onClick={handleApplyPromo}
+                            disabled={appliedCode !== null}
+                        >
+                            Apply
+                        </button>
                     </div>
                     {promoMessage && <p role="status">{promoMessage}</p>}
                 </div>

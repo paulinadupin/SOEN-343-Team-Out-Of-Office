@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getRestaurants } from "../../app/api";
+import { getRestaurants, updateRestaurantStatus } from "../../app/api";
 import { formatRestaurantStatus } from "../../app/formatRestaurantStatus";
 import "./OperatorRestaurants.css";
 
@@ -13,6 +13,7 @@ function OperatorRestaurants() {
     const [restaurants, setRestaurants] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
+    const [updatingStatus, setUpdatingStatus] = useState(false)
 
     useEffect(() => {
         getRestaurants()
@@ -24,12 +25,23 @@ function OperatorRestaurants() {
             .finally(() => setLoading(false))
     }, [])
 
-    // DUMMY: only updates the status shown on this page. Nothing is sent to the backend,
-    // so a reload brings back the real status.
-    function changeStatus(index, status) {
-        setRestaurants((current) =>
-            current.map((restaurant, i) => (i === index ? { ...restaurant, status } : restaurant))
-        )
+    async function changeStatus(restaurantId, status) {
+        setUpdatingStatus(true)
+        setError(null)
+        try {
+            const updatedRestaurant = await updateRestaurantStatus(restaurantId, status)
+            setRestaurants((current) =>
+                current.map((restaurant) =>
+                    (restaurant.userId ?? restaurant.id) === restaurantId
+                        ? { ...restaurant, ...updatedRestaurant }
+                        : restaurant
+                )
+            )
+        } catch (requestError) {
+            setError(requestError.message)
+        } finally {
+            setUpdatingStatus(false)
+        }
     }
 
     return (
@@ -51,19 +63,20 @@ function OperatorRestaurants() {
                         </tr>
                     </thead>
                     <tbody>
-                        {restaurants.map((restaurant, index) => {
+                        {restaurants.map((restaurant) => {
                             const current = restaurant.status ?? restaurant.restaurantStatus
+                            const restaurantId = restaurant.userId ?? restaurant.id
                             return (
-                                <tr key={restaurant.id ?? restaurant.userId ?? index}>
-                                    <td>{restaurant.id ?? restaurant.userId ?? '-'}</td>
+                                <tr key={restaurantId}>
+                                    <td>{restaurantId ?? '-'}</td>
                                     <td>{restaurant.name ?? '-'}</td>
                                     <td>{current ? formatRestaurantStatus(current) : '-'}</td>
                                     <td>
                                         {STATUS_ACTIONS.map(({ status, label }) => (
                                             <button
                                                 key={status}
-                                                disabled={current === status}
-                                                onClick={() => changeStatus(index, status)}
+                                                disabled={updatingStatus || current === status}
+                                                onClick={() => changeStatus(restaurantId, status)}
                                             >
                                                 {label}
                                             </button>

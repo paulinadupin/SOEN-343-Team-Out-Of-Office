@@ -19,11 +19,21 @@ function CourierDashboard() {
     return (
         <div className="dashboard-content courier-dashboard">
             <h1>Courier Overview</h1>
-            <h2>Today</h2>
+            <h2 className="courier-section-title">Today</h2>
+            {error && <p className="courier-error" role="alert">{error}</p>}
             <ul>
-                <li>Deliveries completed: 0</li>
-                <li>Active deliveries: 0</li>
-                <li>Earned so far: $0.00</li>
+                <li>
+                    <span>Deliveries completed</span>
+                    <strong>0</strong>
+                </li>
+                <li>
+                    <span>Active deliveries</span>
+                    <strong>0</strong>
+                </li>
+                <li>
+                    <span>Earned so far</span>
+                    <strong>$0.00</strong>
+                </li>
             </ul>
             {courierMap && (
                 <Map

@@ -3,6 +3,7 @@ package com.enchantea.ui.reg;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -17,6 +18,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import com.enchantea.domain.reg.Restaurant;
+import com.enchantea.domain.reg.RestaurantStatus;
+import com.enchantea.foundation.reg.UserRepository;
+
 // Exercises /api/auth/* over real HTTP, unlike AccountFacadeTests which calls the
 // service directly. Covers status codes and session cookie behavior.
 @SpringBootTest
@@ -28,6 +33,9 @@ import org.springframework.test.web.servlet.MvcResult;
 class AuthControllerTests {
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Test
     void registeringReturns201AndTheNewAccount() throws Exception {
@@ -133,6 +141,41 @@ class AuthControllerTests {
         mockMvc.perform(get("/api/auth/restaurant/me").session(session))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("http-resto-me"));
+    }
+
+    @Test
+    void operatorCanUpdateRestaurantStatusAndItIsPersisted() throws Exception {
+        registerRestaurant("http-status-target");
+        register("http-status-operator");
+        Restaurant restaurant = (Restaurant) userRepository.findByUsername("http-status-target").orElseThrow();
+        MockHttpSession session = loginAndGetSession("http-status-operator");
+
+        mockMvc.perform(patch("/api/auth/restaurants/{restaurantId}/status", restaurant.getUserId())
+                        .session(session)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PAUSED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PAUSED"));
+
+        Restaurant updated = (Restaurant) userRepository.findById(restaurant.getUserId()).orElseThrow();
+        assertEquals(RestaurantStatus.PAUSED, updated.getStatus());
+    }
+
+    @Test
+    void restaurantCannotUpdateItsStatusThroughOperatorEndpoint() throws Exception {
+        registerRestaurant("http-status-owner");
+        registerRestaurant("http-status-target-denied");
+        Restaurant target = (Restaurant) userRepository.findByUsername("http-status-target-denied").orElseThrow();
+        MockHttpSession session = loginAndGetSession("http-status-owner");
+
+        mockMvc.perform(patch("/api/auth/restaurants/{restaurantId}/status", target.getUserId())
+                        .session(session)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"OPEN\"}"))
+                .andExpect(status().isForbidden());
+
+        Restaurant unchanged = (Restaurant) userRepository.findById(target.getUserId()).orElseThrow();
+        assertEquals(RestaurantStatus.CLOSED, unchanged.getStatus());
     }
 
     private void register(String username) throws Exception {

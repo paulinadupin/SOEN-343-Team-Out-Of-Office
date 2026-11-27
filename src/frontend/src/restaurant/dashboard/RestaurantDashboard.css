@@ -1,5 +1,16 @@
-.menu-items {
+.restaurant-dashboard {
     display: flex;
-    flex-direction: row;
-    gap: 20px;
+    flex-direction: column;
+    gap: 22px;
+
+    h1 {
+        font-size: clamp(26px, 3vw, 34px);
+        font-weight: 600;
+    }
+
+    h2 {
+        margin-bottom: 14px;
+        font-size: var(--font-size-heading);
+        font-weight: 600;
+    }
 }
